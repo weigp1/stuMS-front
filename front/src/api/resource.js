@@ -1,9 +1,8 @@
 import axios from 'axios';
-// 上传
 
+// 上传
 async function uploadFile(file) {
   try {
-      // 使用Axios发送PUT请求将文件上传到MinIO
       const response = await axios.put(presignedUrl, file, {
         headers: {
           'Content-Type': file.type,

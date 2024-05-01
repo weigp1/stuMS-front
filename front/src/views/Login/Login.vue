@@ -24,8 +24,8 @@
 import {ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {UserStore} from '../../stores/UserStore.js'
-import {GetUser} from '../../api/api.js'
-import {uploadFile,downloadFile} from '../../api/resource.js'
+import {Login} from '../../api/api.js'
+import {downloadFile,uploadFile} from '../../api/resource.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -36,22 +36,22 @@ let input_password = ref('')
 let fileInput = ref(null);
 
 const call_login = () =>{
-  downloadFile('http://43.136.61.147:9000/homepage/front.txt','front.txt');
-  // let user = { 'username': input_account.value, 'password': input_password.value };
-  // GetUser(user).then(response => {
-  //     userStore.login(user);
-  //     localStorage.setItem('jwtToken', data.token);
-  //     router.push('/home');
-  //   }).catch(error => {
-  //     if(error==101)
-  //     {
-  //       userStore.logout();
-  //       router.push('/home');
-  //     }
-  //     else{
-  //       console.error('Error:', error);
-  //     }
-  //   });
+  // downloadFile('http://43.136.61.147:9000/homepage/front.txt','front.txt');
+  let user = { 'username': input_account.value, 'password': input_password.value };
+  Login(user).then(response => {
+      userStore.login(user);
+      localStorage.setItem('jwtToken', response.token);
+      router.push('/home');
+    }).catch(error => {
+      if(error==401)
+      {
+        userStore.logout();
+        router.push('/home');
+      }
+      else{
+        console.error('Error:', error);
+      }
+    });
 }
 
 const handleFileUpload = () =>{
@@ -66,7 +66,6 @@ const handleFileUpload = () =>{
   position: fixed;
   height: 100%;
   width: 100%;
-  background-image: url('../assets/body.jpg');
   background-size:100% 100%;
 }
 

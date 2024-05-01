@@ -11,7 +11,6 @@ Mock.setup({
 Mock.mock(/mock\/test/, 'get', () => {
     const arr = []
     arr.push(Mock.mock({
-      // 生成id和name
       id: '@id',
       name: '@cname'
     }))

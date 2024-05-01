@@ -12,19 +12,19 @@ function Test()
   });
 };
 
-function GetUser(params) 
+function Login(params) 
 {
   return request({
-    url: '/test',
+    url: '/auth/login',
     method: 'post',
     mock: false,
     data: params,
     headers: {
-      'Content-Type': 'application/json', // 设置请求头
+      'Content-Type': 'application/json',
     },
   });
 }
 
 export {
-  Test, GetUser
+  Test, Login
 };
