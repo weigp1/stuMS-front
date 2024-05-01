@@ -24,7 +24,7 @@
 import {ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {UserStore} from '../../stores/UserStore.js'
-import {Login} from '../../api/api.js'
+import {Login, Test_Login} from '../../api/api.js'
 import {downloadFile,uploadFile} from '../../api/resource.js'
 
 const router = useRouter()
@@ -35,26 +35,34 @@ let input_account = ref('')
 let input_password = ref('')
 let fileInput = ref(null);
 
-const call_login = () =>{
-  // downloadFile('http://43.136.61.147:9000/homepage/front.txt','front.txt');
+// 处理登录操作
+const call_login = () => {
+  
+  // 从输入框中获取用户名和密码，构建用户对象
   let user = { 'username': input_account.value, 'password': input_password.value };
-  Login(user).then(response => {
+  
+  // 调用Login函数进行登录操作，使用Promise处理异步操作
+  Test_Login(user).then(response => { // 登录成功的情况
+      // 在UserStore中更新用户登录状态和存储用户信息
       userStore.login(user);
+      // 将返回的JWT Token存储到localStorage中
       localStorage.setItem('jwtToken', response.token);
+      // 导航到'/home'页面
       router.push('/home');
-    }).catch(error => {
-      if(error==401)
-      {
+    }).catch(error => { // 登录失败的情况
+      if(error==401) { // 如果返回状态码为401，表示未授权
+        // 在UserStore中更新用户登录状态和清空用户信息
         userStore.logout();
+        // 导航到'/home'页面
         router.push('/home');
-      }
-      else{
-        console.error('Error:', error);
+      } else { // 其他错误情况
+        console.error('Error:', error); // 打印错误信息到控制台
       }
     });
 }
 
 const handleFileUpload = () =>{
+  // downloadFile('http://43.136.61.147:9000/homepage/front.txt','front.txt');
   const file = fileInput.value.files[0];
   const filename = file.name;
   uploadFile(url,file);
@@ -70,12 +78,6 @@ const handleFileUpload = () =>{
 }
 
 .login{
-  /* margin-top:5%;
-  margin-left: 10%;
-  margin-right: 10%;
-  height: 3rem;
-  width: 80%;
-  font-size: 1.2rem; */
   position: absolute;
   left: 59px;
   top: 147.59px;
@@ -142,11 +144,6 @@ const handleFileUpload = () =>{
 }
 
 .card{
-  /* margin-top:15%;
-  margin-left: 60%;
-  opacity: 80%;
-  width: 23%;
-  height: 15rem; */
   position: absolute;
   left: 904px;
   top: 253px;

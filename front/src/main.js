@@ -8,6 +8,7 @@ import './assets/base.css'
 import './assets/iconfont/iconfont.css'
 
 import axios from 'axios';
+import './api/mock'
 
 import { createPinia } from "pinia";
 import { UserStore } from "./stores/UserStore" 

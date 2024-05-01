@@ -3,12 +3,16 @@
  */
 import request from './request';
 
-function Test() 
+function Test_Login(params) 
 {
   return request({
     url: '/test',
-    method: 'get',
+    method: 'post',
     mock: true,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 };
 
@@ -26,5 +30,5 @@ function Login(params)
 }
 
 export {
-  Test, Login
+  Test_Login, Login
 };
