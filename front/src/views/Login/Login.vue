@@ -42,7 +42,7 @@ const call_login = () => {
   let user = { 'username': input_account.value, 'password': input_password.value };
   
   // 调用Login函数进行登录操作，使用Promise处理异步操作
-  Test_Login(user).then(response => { // 登录成功的情况
+  Login(user).then(response => { // 登录成功的情况
       // 在UserStore中更新用户登录状态和存储用户信息
       userStore.login(user);
       // 将返回的JWT Token存储到localStorage中
