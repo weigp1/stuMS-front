@@ -39,10 +39,10 @@ let fileInput = ref(null);
 const call_login = () => {
   
   // 从输入框中获取用户名和密码，构建用户对象
-  let user = { 'username': input_account.value, 'password': input_password.value };
+  let user = { 'SID': input_account.value, 'SPassword': input_password.value };
   
   // 调用Login函数进行登录操作，使用Promise处理异步操作
-  Login(user).then(response => { // 登录成功的情况
+  Test_Login(user).then(response => { // 登录成功的情况
       // 在UserStore中更新用户登录状态和存储用户信息
       userStore.login(user);
       // 将返回的JWT Token存储到localStorage中

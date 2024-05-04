@@ -1,6 +1,6 @@
 import Mock from 'mockjs';
 
-Mock.mock('http://localhost:5173/mock/test', 'post', (options) => {
+Mock.mock(/\/mock\/auth\/login/, 'post', (options) => {
     // 从参数中获取查询参数
     const { username, password } = JSON.parse(options.body);
     // 生成模拟的token

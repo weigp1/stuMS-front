@@ -20,7 +20,8 @@ service.interceptors.request.use((req) => {
 
 // 请求之后的拦截器
 service.interceptors.response.use((res) => {
-  const {code, data} = res;  // 从响应中解构出状态码和数据
+  console.log(res.data);
+  const {code, data} = res.data;  // 从响应中解构出状态码和数据
   if (code == 200) {  // 如果状态码为200，表示请求成功
     return data;  // 返回响应数据
   } 

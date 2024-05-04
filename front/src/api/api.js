@@ -6,7 +6,7 @@ import request from './request';
 function Test_Login(params) 
 {
   return request({
-    url: '/test',
+    url: 'auth-service/auth/login',
     method: 'post',
     mock: true,
     data: params,
@@ -19,7 +19,7 @@ function Test_Login(params)
 function Login(params) 
 {
   return request({
-    url: '/auth/login',
+    url: 'auth-service/auth/login',
     method: 'post',
     mock: false,
     data: params,
