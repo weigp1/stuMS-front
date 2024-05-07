@@ -5,9 +5,10 @@
         <el-card class="card">
           <el-input v-model="input_account" class="account" placeholder="账号"/>
           <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
-          <el-button class="login" @click="call_login()">
+          <el-button class="login" @click="upload()">
           登录
           </el-button>
+          <input type="file" id="file-input"/>
           <el-button class="getpass">
           忘记密码
           </el-button>
@@ -25,7 +26,7 @@ import {ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {UserStore} from '../../stores/UserStore.js'
 import {Login, Test_Login} from '../../api/api.js'
-import {downloadFile,uploadFile} from '../../api/resource.js'
+import {downloadFile,uploadFile,getPresignedURL} from '../../api/resource.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -33,7 +34,6 @@ const userStore = UserStore();
 
 let input_account = ref('')
 let input_password = ref('')
-let fileInput = ref(null);
 
 // 处理登录操作
 const call_login = () => {
@@ -61,12 +61,27 @@ const call_login = () => {
     });
 }
 
-const handleFileUpload = () =>{
-  // downloadFile('http://43.136.61.147:9000/homepage/front.txt','front.txt');
-  const file = fileInput.value.files[0];
-  const filename = file.name;
-  uploadFile(url,file);
-}
+
+const upload = () => {
+  const fileInput = document.getElementById('file-input');
+  try {
+    const bucketName = 'homepage';
+    const objectName = fileInput.files[0].name; // 获取选中的文件名作为对象名
+    const expiryTimeInSeconds = 60 * 60; // 设置过期时间为1小时
+    getPresignedURL(bucketName, objectName, expiryTimeInSeconds)
+      .then(presignedURL => {
+        console.log(presignedURL);
+        uploadFile(presignedURL, fileInput.files[0]); // 传递选中的文件对象
+      })
+      .catch(error => {
+        console.error('Error:', error.message);
+      });
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+};
+
+
 </script>
 
 <style scoped>

@@ -1,15 +1,26 @@
 import axios from 'axios';  // 导入axios库
 
+// 定义函数来向服务器请求预签名 URL
+async function getPresignedURL(bucketName, objectName, expiryTimeInSeconds) {
+  const response = await axios.get('http://localhost:3000/generatePresignedURL', {
+    params: {
+      bucketName,
+      objectName,
+      expiryTimeInSeconds
+    }
+  });
+  return response.data;
+}
+
 // 上传文件函数
-async function uploadFile(file) {
+async function uploadFile(presignedURL, file) {
   try {
-    // 发送PUT请求上传文件到预签名URL
-    const response = await axios.put(presignedUrl, file, {
+    // 发送PUT请求预签名URL
+    await axios.put(presignedURL, file, {
       headers: {
         'Content-Type': file.type,  // 设置请求头中的Content-Type字段为文件类型
       },
     });
-    console.log('Successful: ',response.data);  // 打印上传成功的响应数据
   } catch (error) {
     console.error('Error: ', error.message);  // 打印上传失败的错误信息
   }
@@ -43,5 +54,13 @@ async function downloadFile(downloadUrl, name){
 
 // 导出上传文件和下载文件函数
 export {
-  uploadFile, downloadFile
+  getPresignedURL, uploadFile, downloadFile
 };
+
+//
+
+
+
+
+
+
