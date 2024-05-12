@@ -7,12 +7,9 @@ function Test_Login(params)
 {
   return request({
     url: 'auth-service/auth/login',
-    method: 'post',
+    method: 'GET',
     mock: true,
-    data: params,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    params: params,
   });
 };
 
@@ -20,14 +17,12 @@ function Login(params)
 {
   return request({
     url: 'auth-service/auth/login',
-    method: 'post',
+    method: 'GET',
     mock: false,
-    data: params,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    params: params,
   });
 }
+
 
 export {
   Test_Login, Login

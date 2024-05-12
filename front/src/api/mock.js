@@ -1,9 +1,10 @@
 import Mock from 'mockjs';
 
-Mock.mock(/\/mock\/auth\/login/, 'post', (options) => {
+
+Mock.mock(/\/mock\/auth\/login/, 'get', (options) => {  // 使用 GET 请求
     // 从参数中获取查询参数
-    const { username, password } = JSON.parse(options.body);
-    // 生成模拟的token
+    const { username, password } = options.urlParams;
+    // 生成模拟的 token
     const token = Mock.mock('@guid');
     // 返回模拟响应对象，包含状态码、模拟数据对象和消息
     return { code: 200, data: { token } };
