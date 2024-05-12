@@ -21,16 +21,8 @@ service.interceptors.request.use((req) => {
 // 请求之后的拦截器
 service.interceptors.response.use(
   (res) => {
-    const {code, data} = res.data;  // 从响应中解构出状态码和数据
-    console.log(data)
-    if (code == 200) {
-      return data;
-    } 
-    else if(code == 4004)
-    {
-      ElMessage.error('登录已过期，请重新登录！');
-      return Promise.reject(code);
-    }
+    // res.data包括code和data两个字段
+    return res.data;
   },
   (error) => {
     ElMessage.error('网络请求出错！');
