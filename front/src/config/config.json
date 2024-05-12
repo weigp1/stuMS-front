@@ -6,11 +6,6 @@
             "mainMenu": "noSub"
         },
         {
-            "index": "/info",
-            "label": "信息查询",
-            "mainMenu": "noSub"
-        },
-        {
             "index": "/plan",
             "label": "综测方案",
             "mainMenu": "noSub"

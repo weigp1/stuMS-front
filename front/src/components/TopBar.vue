@@ -2,10 +2,10 @@
   <!-- 顶部导航栏的外层容器 -->
 
   <!-- 使用Element UI的el-menu组件来创建导航栏 -->
-  <el-menu class="topBar" router :default-active="this.$route.fullPath" mode="horizontal" :ellipsis="false">
+  <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false" >
 
     <!-- 左侧的标题图片 -->
-    <el-menu-item style="position: absolute; left: 2%; height: 100%;" index="0">
+    <el-menu-item style="position: absolute; left: 2%; height: 100%; " index="0">
       <el-image style="width: 75%; height: auto;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
@@ -39,16 +39,30 @@
 
     </template>
 
+    <el-menu-item style="position: absolute; right: 2%; height: 100%;" index="0" >
+      <el-row>
+        <el-col :span="8">
+          <el-image style="width: 80%; height: auto; top: -25%;" src="/src/assets/avatar.png"/>
+        </el-col>
+        <el-col :span="16">
+          <div class="text" @click.stop="handleClick">User</div>
+        </el-col>
+      </el-row>
+    </el-menu-item>
+
     <!-- 右侧的弹性盒子，用于自动填充剩余空间 -->
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
   </el-menu>
 </template>
 
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { useRoute, useRouter} from 'vue-router'
 // 导入菜单选项配置文件
 import config from '../config/config.json';
+
+const router = useRouter()
+const route = useRoute()
 
 interface MenuItem {
   index: string;
@@ -56,14 +70,12 @@ interface MenuItem {
   mainMenu: string;
 }
 
-export default defineComponent({
-  name: 'TopBar',
-  data() {
-    return {
-      menuItems: config.menuItems as MenuItem[]
-    }
-  },
-});
+const menuItems = config.menuItems as MenuItem[];
+
+const handleClick = () =>{
+  router.push({ path: "/info"})
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -83,6 +95,19 @@ export default defineComponent({
   font-size: 18px;
   font-weight: bold;
   color: #ffffff;
+}
+
+.text {
+  z-index: 999;
+  display: flex;
+  font-size: 18px;
+  align-items: center; /* 垂直居中 */
+  left: 15%;
+}
+
+.text:hover {
+  color: #0066ff;      /* 鼠标悬停时的颜色 */
+  cursor: pointer;  /* 鼠标悬停时的光标样式 */
 }
 
 //.sub-menu {
