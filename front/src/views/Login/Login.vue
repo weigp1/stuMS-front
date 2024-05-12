@@ -1,6 +1,6 @@
 <template>
   <meta charset="charset=utf-8"/>
-    <div class="bgimg">
+    <div class="bg-img">
       <div>
         <el-card class="card">
           <el-input v-model="input_account" class="account" placeholder="账号"/>
@@ -9,7 +9,7 @@
           登录
           </el-button>
           <input type="file" id="file-input"/>
-          <el-button class="getpass">
+          <el-button class="getPass">
           忘记密码
           </el-button>
           <el-button class="help">
@@ -25,8 +25,9 @@
 import {ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {UserStore} from '../../stores/UserStore.js'
-import {Login, Test_Login} from '../../api/api.js'
+import {Login} from '../../api/api.js'
 import {downloadFile,uploadFile,getPresignedURL} from '../../api/resource.js'
+import {ElMessage} from "element-plus";
 
 const router = useRouter()
 const route = useRoute()
@@ -44,14 +45,14 @@ const call_login = () => {
   // 调用Login函数进行登录操作
   Login(user).then(response => {
     const {code, data} = response;  // 从响应中解构出状态码和数据
-    if (code == 200) {
+    if (code === 200) {
       // 更新用户登录状态和存储用户信息
       userStore.login(user);
       // 存储JWT Token
       localStorage.setItem('jwtToken', response.token);
       router.push('/home');
     } 
-    else if(code == 4004)
+    else if(code === 4004)
     {
       ElMessage.error('登录已过期，请重新登录！');
       userStore.logout();
@@ -86,7 +87,7 @@ const call_login = () => {
 </script>
 
 <style scoped>
-.bgimg{
+.bg-img{
   position: fixed;
   height: 100%;
   width: 100%;
@@ -96,9 +97,9 @@ const call_login = () => {
 .login{
   position: absolute;
   left: 59px;
-  top: 147.59px;
+  top: 148px;
   width: 280px;
-  height: 52.03px;
+  height: 52px;
   border-radius: 10px;
   opacity: 1;
   border: none;
@@ -121,11 +122,11 @@ const call_login = () => {
   left: 59px;
   top: 86px;
   width: 281px;
-  height: 38.22px;
+  height: 38px;
   opacity: 1;
 }
 
-.getpass{
+.getPass{
   position: absolute;
   left: 45px;
   top: 224px;

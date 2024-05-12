@@ -22,16 +22,6 @@ function Login(params)
   });
 }
 
-function Login(params) 
-{
-  return request({
-    url: 'auth-service/auth/login',
-    method: 'GET',
-    mock: false,
-    params: params,
-  });
-}
-
 /* 用户相关 */
 
 
