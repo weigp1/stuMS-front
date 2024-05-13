@@ -4,13 +4,13 @@
   <!-- 使用Element UI的el-menu组件来创建导航栏 -->
   <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false" >
 
+    <!-- 左侧的弹性盒子，用于自动填充剩余空间 -->
+    <div class="弹性盒子" :style="{ flexGrow: 1 }" />
+
     <!-- 左侧的标题图片 -->
     <el-menu-item style="position: absolute; left: 2%; height: 100%; " index="0">
       <el-image style="width: 75%; height: auto;" src="/src/assets/sysu.png"/>
     </el-menu-item>
-
-    <!-- 左右两侧的弹性盒子，用于自动填充剩余空间 -->
-    <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
     <!-- 遍历menuItems数组，渲染菜单项 -->
     <template v-for="item in menuItems">
@@ -28,12 +28,12 @@
           <!-- 设置子菜单的标题 -->
           <template #title>{{ item.label }}</template>
           <!-- 遍历子菜单项 -->
-          <template v-for="subItem in menuItems">
-            <el-menu-item :index="item.index + '?category=' + subItem.index"
-                          v-if="subItem.mainMenu == item.index">
-              {{ subItem.label }}
-            </el-menu-item>
-          </template>
+<!--          <template v-for="subItem in menuItems">-->
+<!--            <el-menu-item :index="item.index + '?category=' + subItem.index"-->
+<!--                          v-if="subItem.mainMenu == item.index">-->
+<!--              {{ subItem.label }}-->
+<!--            </el-menu-item>-->
+<!--          </template>-->
         </el-sub-menu>
       </template>
 
@@ -102,7 +102,7 @@ const handleClick = () =>{
   display: flex;
   font-size: 18px;
   align-items: center; /* 垂直居中 */
-  left: 15%;
+  justify-content: center;
 }
 
 .text:hover {

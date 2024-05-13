@@ -1,165 +1,183 @@
 <template>
   <TopBar></TopBar>
   <div class="centered">
-  <el-form
-      :label-position="'top'"
-      :model="ruleForm"
-      :rules="rules"
-      :size="formSize"
-      :inline="true"
-      ref="ruleFormRef"
-      style="max-width: 80vw"
-      label-width="auto"
-      class="demo-ruleForm"
-      status-icon
-  >
 
-    <el-col :span="6">
-      <el-form-item label="姓名" prop="SName">
-        <el-input v-model="ruleForm.SName" />
-      </el-form-item>
-    </el-col>
+    <el-row>
+      <el-col span="4">
+        <div class="left">
+          <el-tabs class="demo-tabs" v-model="activeName" :tab-position="tabPosition" @tab-click="handleClick" router>
+            <el-tab-pane label="基本信息" name="first"></el-tab-pane>
+            <el-tab-pane label="成绩信息" name="second"></el-tab-pane>
+          </el-tabs>
+        </div>
+      </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="学生类别" prop="SCategory">
-        <el-select v-model="ruleForm.SCategory" placeholder="">
-          <el-option label="境内生" value="0" />
-          <el-option label="港澳台生" value="1" />
-          <el-option label="国际生" value="2" />
-        </el-select>
-      </el-form-item>
-    </el-col>
+      <el-col span="20">
+        <el-form
+            :label-position="'top'"
+            :model="ruleForm"
+            :rules="rules"
+            :size="formSize"
+            :inline="true"
+            ref="ruleFormRef"
+            style="max-width: 50vw"
+            label-width="auto"
+            class="demo-ruleForm"
+            status-icon
+        >
 
-    <el-col :span="6">
-      <el-form-item label="性别" prop="SGender">
-        <el-radio-group v-model="ruleForm.SGender">
-          <el-radio border value="0" name="SGender">男</el-radio>
-          <el-radio border value="1" name="SGender">女</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </el-col>
+          <div class="right" v-if="showFirst">
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="姓名" prop="SName">
+                  <el-input v-model="ruleForm.SName" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="学号" prop="SID">
-        <el-input v-model="ruleForm.SID" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="学生类别" prop="SCategory">
+                  <el-select v-model="ruleForm.SCategory" placeholder="">
+                    <el-option label="境内生" value="0" />
+                    <el-option label="港澳台生" value="1" />
+                    <el-option label="国际生" value="2" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="身份证号" prop="SIDNum">
-        <el-input v-model="ruleForm.SIDNum" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="性别" prop="SGender">
+                  <el-radio-group v-model="ruleForm.SGender">
+                    <el-radio border value="0" name="SGender">男</el-radio>
+                    <el-radio border value="1" name="SGender">女</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="出生年月" prop="SYear">
-            <el-date-picker
-                v-model="ruleForm.SYear"
-                type="date"
-                label="date"
-                placeholder=""
-                style="width: 100%"
-            />
-          </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="学号" prop="SID">
+                  <el-input v-model="ruleForm.SID" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="培养层次" prop="SLevel">
-        <el-select v-model="ruleForm.SLevel" placeholder="">
-          <el-option label="本科生" value="0" />
-          <el-option label="硕士研究生" value="1" />
-          <el-option label="博士研究生" value="2" />
-        </el-select>
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="身份证号" prop="SIDNum">
+                  <el-input v-model="ruleForm.SIDNum" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="政治面貌" prop="SOutlook">
-        <el-select v-model="ruleForm.SOutlook" placeholder="">
-          <el-option label="群众" value="0" />
-          <el-option label="共青团员" value="1" />
-          <el-option label="中共预备党员" value="2" />
-          <el-option label="中共党员" value="3" />
-        </el-select>
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="出生年月" prop="SYear">
+                      <el-date-picker
+                          v-model="ruleForm.SYear"
+                          type="date"
+                          label="date"
+                          placeholder=""
+                          style="width: 100%"
+                      />
+                    </el-form-item>
+              </el-col>
 
-    <!--    这里需要显示省市信息，需要导包-->
-    <el-col :span="6">
-      <el-form-item label="籍贯" prop="SPlace">
-        <el-input v-model="ruleForm.SPlace" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="培养层次" prop="SLevel">
+                  <el-select v-model="ruleForm.SLevel" placeholder="">
+                    <el-option label="本科生" value="0" />
+                    <el-option label="硕士研究生" value="1" />
+                    <el-option label="博士研究生" value="2" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="宿舍" prop="SDorm">
-        <el-input v-model="ruleForm.SDorm" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="政治面貌" prop="SOutlook">
+                  <el-select v-model="ruleForm.SOutlook" placeholder="">
+                    <el-option label="群众" value="0" />
+                    <el-option label="共青团员" value="1" />
+                    <el-option label="中共预备党员" value="2" />
+                    <el-option label="中共党员" value="3" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="联系电话" prop="SPhone">
-        <el-input v-model="ruleForm.SPhone" />
-      </el-form-item>
-    </el-col>
+              <!--    这里需要显示省市信息，需要导包-->
+              <el-col :span="8">
+                <el-form-item label="籍贯" prop="SPlace">
+                  <el-input v-model="ruleForm.SPlace" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="微信账号" prop="SWechat">
-        <el-input v-model="ruleForm.SWechat" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="宿舍" prop="SDorm">
+                  <el-input v-model="ruleForm.SDorm" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="联系邮箱" prop="SMail">
-        <el-input v-model="ruleForm.SMail" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="联系电话" prop="SPhone">
+                  <el-input v-model="ruleForm.SPhone" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="家庭地址" prop="SHome">
-        <el-input v-model="ruleForm.SHome" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="微信账号" prop="SWechat">
+                  <el-input v-model="ruleForm.SWechat" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="紧急联系人姓名" prop="CName">
-        <el-input v-model="ruleForm.CName" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="联系邮箱" prop="SMail">
+                  <el-input v-model="ruleForm.SMail" />
+                </el-form-item>
+              </el-col>
 
-    <el-col :span="6">
-      <el-form-item label="紧急联系人电话" prop="CPhone">
-        <el-input v-model="ruleForm.CPhone" />
-      </el-form-item>
-    </el-col>
+              <el-col :span="8">
+                <el-form-item label="家庭地址" prop="SHome">
+                  <el-input v-model="ruleForm.SHome" />
+                </el-form-item>
+              </el-col>
 
-<!--    计数选项-->
-<!--    <el-form-item label="Activity count" prop="count">-->
-<!--      <el-select-v2-->
-<!--          v-model="ruleForm.count"-->
-<!--          placeholder="Activity count"-->
-<!--          :options="options"-->
-<!--      />-->
-<!--    </el-form-item>-->
+              <el-col :span="8">
+                <el-form-item label="紧急联系人姓名" prop="CName">
+                  <el-input v-model="ruleForm.CName" />
+                </el-form-item>
+              </el-col>
 
-<!--    按钮-->
-<!--    <el-form-item label="Instant delivery" prop="delivery">-->
-<!--      <el-switch v-model="ruleForm.delivery" />-->
-<!--    </el-form-item>-->
+              <el-col :span="8">
+                <el-form-item label="紧急联系人电话" prop="CPhone">
+                  <el-input v-model="ruleForm.CPhone" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+        <!--    计数选项-->
+        <!--    <el-form-item label="Activity count" prop="count">-->
+        <!--      <el-select-v2-->
+        <!--          v-model="ruleForm.count"-->
+        <!--          placeholder="Activity count"-->
+        <!--          :options="options"-->
+        <!--      />-->
+        <!--    </el-form-item>-->
 
-<!--    长文本-->
-<!--    <el-form-item label="Activity form" prop="desc">-->
-<!--      <el-input v-model="ruleForm.desc" type="textarea" />-->
-<!--    </el-form-item>-->
+        <!--    按钮-->
+        <!--    <el-form-item label="Instant delivery" prop="delivery">-->
+        <!--      <el-switch v-model="ruleForm.delivery" />-->
+        <!--    </el-form-item>-->
 
-    <el-col :span="6" :offset="9">
-      <el-form-item>
-        <el-button style="margin:0 auto;" type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
-        <el-button style="margin:0 auto;" @click="resetForm(ruleFormRef)">重置</el-button>
-      </el-form-item>
-    </el-col>
+        <!--    长文本-->
+        <!--    <el-form-item label="Activity form" prop="desc">-->
+        <!--      <el-input v-model="ruleForm.desc" type="textarea" />-->
+        <!--    </el-form-item>-->
 
-  </el-form>
+            <el-col :span="6" :offset="9">
+              <el-form-item>
+                <el-button style="margin:0 auto;" type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
+                <el-button style="margin:0 auto;" @click="resetForm(ruleFormRef)">重置</el-button>
+              </el-form-item>
+            </el-col>
+
+          </div>
+
+        </el-form>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -211,7 +229,6 @@ const ruleForm = reactive<RuleForm>({
   CName: '',
   CPhone: '',
 })
-
 
 const rules = reactive<FormRules<RuleForm>>({
   SID: [
@@ -307,6 +324,39 @@ const resetForm = (formEl: FormInstance | undefined) => {
 //   label: `${idx + 2000}`,
 // })).slice(0, 1001);
 
+import type { TabsInstance } from 'element-plus'
+const tabPosition = ref<TabsInstance['tabPosition']>('left')
+
+const activeName = ref('first')
+const showFirst  = ref(true)
+const showSecond = ref(false)
+const showThird  = ref(false)
+
+const handleClick = (tab, event) => {
+  console.log(tab, event)
+
+  if (tab.paneName === 'first') {
+    showFirst.value = true
+    router.push({ query: { category: '1' } });
+  } else {
+    showFirst.value = false
+  }
+
+  if (tab.paneName === 'second') {
+    showSecond.value = true
+    router.push({ query: { category: '2' } });
+  } else {
+    showSecond.value = false
+  }
+
+  if (tab.paneName === 'third') {
+    showThird.value = true
+    router.push({ query: { category: '3' } });
+  } else {
+    showThird.value = false
+  }
+}
+
 </script>
 
 
@@ -319,5 +369,25 @@ const resetForm = (formEl: FormInstance | undefined) => {
     background-image: url("../../assets/background.jpg");
     background-repeat: no-repeat;
     background-size: cover;
+  }
+
+  .demo-tabs > .el-tabs__content {
+    top: 20vh;
+    padding: 32px;
+    color: #6b778c;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  .left{
+    top: 20vh;
+    width: auto;
+  }
+
+  .right {
+    height: 100vh;
+    width: auto;
+    left: 15vh;
+    top : 20vh;
   }
 </style>
