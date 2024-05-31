@@ -35,7 +35,7 @@
   import { useAuthStore, useUserStore } from '@/store'
   import api from '@/api'
   
-  const title = import.meta.env.VITE_TITLE // 环境变量中读取
+  // const title = import.meta.env.VITE_TITLE // 环境变量中读取
   
   const userStore = useUserStore()
   const authStore = useAuthStore()
