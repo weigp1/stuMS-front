@@ -7,7 +7,8 @@
         <div class="left">
           <el-tabs class="demo-tabs" v-model="activeName" :tab-position="tabPosition" @tab-click="handleClick" router>
             <el-tab-pane label="基本信息" name="first"></el-tab-pane>
-            <el-tab-pane label="成绩信息" name="second"></el-tab-pane>
+            <el-tab-pane label="联系信息" name="second"></el-tab-pane>
+            <el-tab-pane label="成绩信息" name="third"></el-tab-pane>
           </el-tabs>
         </div>
       </el-col>
@@ -29,13 +30,13 @@
           <div class="right" v-if="showFirst">
             <el-row>
               <el-col :span="8">
-                <el-form-item label="姓名" prop="SName">
+                <el-form-item label="姓名" prop="SName" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SName" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="学生类别" prop="SCategory">
+                <el-form-item label="学生类别" prop="SCategory" style="margin: 0 auto; width: 90%;">
                   <el-select v-model="ruleForm.SCategory" placeholder="">
                     <el-option label="境内生" value="0" />
                     <el-option label="港澳台生" value="1" />
@@ -45,7 +46,7 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="性别" prop="SGender">
+                <el-form-item label="性别" prop="SGender" style="margin: 0 auto; width: 90%;">
                   <el-radio-group v-model="ruleForm.SGender">
                     <el-radio border value="0" name="SGender">男</el-radio>
                     <el-radio border value="1" name="SGender">女</el-radio>
@@ -54,19 +55,19 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="学号" prop="SID">
+                <el-form-item label="学号" prop="SID" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SID" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="身份证号" prop="SIDNum">
+                <el-form-item label="身份证号" prop="SIDNum" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SIDNum" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="出生年月" prop="SYear">
+                <el-form-item label="出生年月" prop="SYear" style="margin: 0 auto; width: 90%;">
                       <el-date-picker
                           v-model="ruleForm.SYear"
                           type="date"
@@ -78,7 +79,7 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="培养层次" prop="SLevel">
+                <el-form-item label="培养层次" prop="SLevel" style="margin: 0 auto; width: 90%;">
                   <el-select v-model="ruleForm.SLevel" placeholder="">
                     <el-option label="本科生" value="0" />
                     <el-option label="硕士研究生" value="1" />
@@ -88,7 +89,7 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="政治面貌" prop="SOutlook">
+                <el-form-item label="政治面貌" prop="SOutlook" style="margin: 0 auto; width: 90%;">
                   <el-select v-model="ruleForm.SOutlook" placeholder="">
                     <el-option label="群众" value="0" />
                     <el-option label="共青团员" value="1" />
@@ -100,80 +101,96 @@
 
               <!--    这里需要显示省市信息，需要导包-->
               <el-col :span="8">
-                <el-form-item label="籍贯" prop="SPlace">
+                <el-form-item label="籍贯" prop="SPlace" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SPlace" />
                 </el-form-item>
               </el-col>
 
+              <el-col :span="8" style="margin: 0 auto; width: 90%;">
+                <el-form-item>
+                  <el-button style="margin:0 auto;" type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
+                  <el-button style="margin:0 auto;" @click="resetForm(ruleFormRef)">重置</el-button>
+                </el-form-item>
+              </el-col>
+
+            </el-row>
+          </div>
+
+          <div class="right" v-if="showSecond">
+            <el-row>
               <el-col :span="8">
-                <el-form-item label="宿舍" prop="SDorm">
+                <el-form-item label="宿舍" prop="SDorm" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SDorm" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="联系电话" prop="SPhone">
+                <el-form-item label="联系电话" prop="SPhone" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SPhone" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="微信账号" prop="SWechat">
+                <el-form-item label="微信账号" prop="SWechat" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SWechat" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="联系邮箱" prop="SMail">
+                <el-form-item label="联系邮箱" prop="SMail" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SMail" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="家庭地址" prop="SHome">
+                <el-form-item label="家庭地址" prop="SHome" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.SHome" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="紧急联系人姓名" prop="CName">
+                <el-form-item label="紧急联系人姓名" prop="CName" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.CName" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="紧急联系人电话" prop="CPhone">
+                <el-form-item label="紧急联系人电话" prop="CPhone" style="margin: 0 auto; width: 90%;">
                   <el-input v-model="ruleForm.CPhone" />
                 </el-form-item>
               </el-col>
+
+              <!--              填充-->
+              <el-col :span="8"></el-col>
+              <el-col :span="8"></el-col>
+
+              <el-col :span="8" style="margin: 0 auto; width: 90%;">
+                <el-form-item>
+                  <el-button style="margin:0 auto;" type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
+                  <el-button style="margin:0 auto;" @click="resetForm(ruleFormRef)">重置</el-button>
+                </el-form-item>
+              </el-col>
             </el-row>
-        <!--    计数选项-->
-        <!--    <el-form-item label="Activity count" prop="count">-->
-        <!--      <el-select-v2-->
-        <!--          v-model="ruleForm.count"-->
-        <!--          placeholder="Activity count"-->
-        <!--          :options="options"-->
-        <!--      />-->
-        <!--    </el-form-item>-->
-
-        <!--    按钮-->
-        <!--    <el-form-item label="Instant delivery" prop="delivery">-->
-        <!--      <el-switch v-model="ruleForm.delivery" />-->
-        <!--    </el-form-item>-->
-
-        <!--    长文本-->
-        <!--    <el-form-item label="Activity form" prop="desc">-->
-        <!--      <el-input v-model="ruleForm.desc" type="textarea" />-->
-        <!--    </el-form-item>-->
-
-            <el-col :span="6" :offset="9">
-              <el-form-item>
-                <el-button style="margin:0 auto;" type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
-                <el-button style="margin:0 auto;" @click="resetForm(ruleFormRef)">重置</el-button>
-              </el-form-item>
-            </el-col>
-
           </div>
+
+    <!--    计数选项-->
+    <!--    <el-form-item label="Activity count" prop="count">-->
+    <!--      <el-select-v2-->
+    <!--          v-model="ruleForm.count"-->
+    <!--          placeholder="Activity count"-->
+    <!--          :options="options"-->
+    <!--      />-->
+    <!--    </el-form-item>-->
+
+    <!--    按钮-->
+    <!--    <el-form-item label="Instant delivery" prop="delivery">-->
+    <!--      <el-switch v-model="ruleForm.delivery" />-->
+    <!--    </el-form-item>-->
+
+    <!--    长文本-->
+    <!--    <el-form-item label="Activity form" prop="desc">-->
+    <!--      <el-input v-model="ruleForm.desc" type="textarea" />-->
+    <!--    </el-form-item>-->
 
         </el-form>
       </el-col>
@@ -182,7 +199,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import axios from "axios";
+import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TopBar from "../../components/TopBar.vue";
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
@@ -302,21 +320,46 @@ const rules = reactive<FormRules<RuleForm>>({
   ],
 })
 
+/* 提交表单 */
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
-      console.log('submit!')
+      try {
+        const response = await axios.post('/api/submit', ruleForm)
+        console.log('submit success!', response)
+      } catch (error) {
+        console.error('submit error!', error)
+      }
     } else {
       console.log('error submit!', fields)
     }
   })
 }
 
+/* 重置表单 */
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
 }
+
+/* 根据学号获得数据 */
+const fetchData = async (sid) => {
+  try {
+    const response = await axios.get(`/api/student/${sid}`)
+    Object.assign(ruleForm, response.data)
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+  }
+}
+
+onMounted(() => {
+  const sid = (route.query.sid || '') as string
+  if (sid) {
+    ruleForm.SID = sid
+    fetchData(sid)
+  }
+})
 
 // 计数选项
 // const options = Array.from({ length: 1001 }, (_, idx) => ({
@@ -330,7 +373,7 @@ const tabPosition = ref<TabsInstance['tabPosition']>('left')
 const activeName = ref('first')
 const showFirst  = ref(true)
 const showSecond = ref(false)
-const showThird  = ref(false)
+const showThird = ref(false)
 
 const handleClick = (tab, event) => {
   console.log(tab, event)
@@ -371,23 +414,46 @@ const handleClick = (tab, event) => {
     background-size: cover;
   }
 
-  .demo-tabs > .el-tabs__content {
-    top: 20vh;
-    padding: 32px;
-    color: #6b778c;
-    font-size: 32px;
+  :deep(.el-tabs__item) {
+    /* 修改为您想要的文字大小 */
+    font-size: 20px!important;
     font-weight: 600;
   }
 
+  :deep(.el-tabs__nav-wrap::after) {
+    /* 去掉下划线 */
+    position: static !important;
+  }
+
   .left{
-    top: 20vh;
-    width: auto;
+    display: flex;
+    justify-content: center;
+
+    top: 5vh;
+    width: 15vw;
+    height:70vh;
+    left: -2vw;
+
+    padding-top: 5vh;
+
+    border-radius: 20px;
+    background-color: white;
   }
 
   .right {
-    height: 100vh;
+    display: flex;
+    justify-content: center;
+
+    top : 5vh;
     width: auto;
-    left: 15vh;
-    top : 20vh;
+    height: 70vh;
+    right: -2vw;
+
+    padding-top: 5vh;
+    padding-left: 2vh;
+    padding-right: 2vh;
+
+    border-radius: 20px;
+    background-color: white;
   }
 </style>
