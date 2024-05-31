@@ -1,13 +1,14 @@
-<!-- TODO: 完成侧边栏 -->
 <script setup>
-import {  usePermissionStore } from '@/store'
-// import { useAppStore, usePermissionStore } from '@/store'
-// import { isExternal, renderCustomIcon, renderIcon } from '@/utils'
+import { computed, nextTick, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { NMenu } from 'naive-ui'
+import { usePermissionStore, useTagStore } from '@/store'
+import { renderIcon } from '@/utils'
 
 const router = useRouter() // 获取路由信息
 const curRoute = useRoute() // 进行路由跳转
 const permissionStore = usePermissionStore()
-// const appStore = useAppStore()
+const tagStore = useTagStore()
 
 const activeKey = computed(() => curRoute.meta?.activeMenu || curRoute.name)
 
@@ -18,15 +19,16 @@ const menuOptions = computed(() => {
 })
 
 // 点击标签, 自动展开菜单栏, 选中对应菜单
-const menuRef = $ref(null)
+const menuRef = ref(null)
 watch(curRoute, async () => {
   await nextTick()
-  menuRef.showOption()
+  menuRef.value.showOption()
 })
 
 function resolvePath(basePath, path) {
-  if (isExternal(path))
+  if (isExternal(path)) {
     return path
+  }
   return (
     `/${[basePath, path]
       .filter(path => !!path && path !== '/')
@@ -35,7 +37,6 @@ function resolvePath(basePath, path) {
   )
 }
 
-// ! TODO 需要理解
 // 根据路由获取菜单项
 function getMenuItem(route, basePath = '') {
   let menuItem = {
@@ -46,14 +47,14 @@ function getMenuItem(route, basePath = '') {
     order: route.meta?.order || 0,
   }
 
-  const visibleChildren = route.children
-    ?.filter(item => item.name && !item.isHidden) ?? []
+  const visibleChildren = route.children?.filter(e => e.name && !e.isHidden) ?? []
 
-  if (!visibleChildren.length)
+  if (!visibleChildren.length) {
     return menuItem
+  }
 
-  if (visibleChildren.length === 1) {
-    // 单个子路由处理
+  // 目录不展示子菜单
+  if (route.isCatalogue) {
     const singleRoute = visibleChildren[0]
     menuItem = {
       label: singleRoute.meta?.title || singleRoute.name,
@@ -83,27 +84,41 @@ function getMenuItem(route, basePath = '') {
 }
 
 function getIcon(meta) {
-  if (meta?.customIcon)
-    return renderCustomIcon(meta.customIcon, { size: 18 })
-  if (meta?.icon)
+  if (meta?.icon) {
     return renderIcon(meta.icon, { size: 18 })
+  }
   return null
 }
 
-function handleMenuSelect(key, item) {
+function handleMenuSelect(_, item) {
   if (isExternal(item.path)) {
     window.open(item.path)
+    return
   }
-  else {
-    (item.path === curRoute.path)
-      ? appStore.reloadPage()
-      : router.push(item.path)
+
+  if (item.path === curRoute.path) {
+    return
   }
+
+  // 如果 tagStore 中没有该 tag, 需要重新渲染
+  if (!tagStore.tags.some(e => e.path === item.path)) {
+    tagStore.updateAliveKey(item.key)
+  }
+  router.push(item.path)
+}
+
+/**
+ * 是否是外链
+ * @param {string} path
+ * @returns {boolean} 是否是外链
+ */
+function isExternal(path) {
+  return /^(https?:|mailto:|tel:)/.test(path)
 }
 </script>
 
 <template>
-  <n-menu
+  <NMenu
     ref="menuRef"
     class="side-menu"
     :indent="18"

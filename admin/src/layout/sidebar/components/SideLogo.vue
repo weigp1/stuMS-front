@@ -1,18 +1,20 @@
-<!--  TODO: logo暂时未定，import的已搞定 -->
 <script setup>
 import { useThemeStore } from '@/store'
-const { collapsed } = storeToRefs(useThemeStore())
+
+const themeStore = useThemeStore()
 const title = import.meta.env.VITE_TITLE
 </script>
 
 <template>
-  <router-link f-c-c h-60 to="/">
-    <icon-custom-logo text-36 color-primary />
+  <RouterLink class="h-[60px] flex items-center justify-center" to="/">
+    <div class="h-full flex items-center justify-center">
+      <img src="/image/logo.svg" alt="logo" class="h-[36px] w-[36px]">
+    </div>
     <h2
-      v-show="!collapsed"
-      flex-shrink-0 max-w-140 ml-10 text-16 color-primary font-bold
+      v-show="!themeStore.collapsed"
+      class="ml-2 max-w-[150px] flex-shrink-0 text-base text-primary font-bold dark:text-white"
     >
       {{ title }}
     </h2>
-  </router-link>
+  </RouterLink>
 </template>

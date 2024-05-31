@@ -1,119 +1,92 @@
-<!-- TODO:  -->
 <script setup>
-import { useAppStore, useTagsStore } from '@/store'
-import { renderIcon } from '@/utils'
+import { computed, h } from 'vue'
+import { useRoute } from 'vue-router'
+import { NDropdown } from 'naive-ui'
+
+import { useTagStore } from '@/store'
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  currentPath: {
-    type: String,
-    default: '',
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
+  show: { type: Boolean, default: false },
+  currentPath: { type: String, default: '' },
+  x: { type: Number, default: 0 },
+  y: { type: Number, default: 0 },
 })
 
 const emit = defineEmits(['update:show'])
 
-const tagsStore = useTagsStore()
-const appStore = useAppStore()
+const route = useRoute()
+const tagStore = useTagStore()
 
-// 右键菜单选项
 const options = computed(() => [
   {
     label: '重新加载',
     key: 'reload',
-    disabled: props.currentPath !== tagsStore.activeTag, // 只能重新加载当前标签
-    icon: renderIcon('mdi:refresh', { size: '14px' }),
+    disabled: props.currentPath !== tagStore.activeTag, // 只能重新加载当前标签
+    icon: () => h('i', { class: 'i-mdi:refresh' }),
   },
   {
     label: '关闭',
     key: 'close',
-    disabled: tagsStore.tags.length <= 1, // 只有一个标签
-    icon: renderIcon('mdi:close', { size: '14px' }),
+    disabled: tagStore.tags.length <= 1, // 只有一个标签时, 不能关闭
+    icon: () => h('i', { class: 'i-mdi:close' }),
   },
   {
     label: '关闭其他',
     key: 'close-other',
-    disabled: tagsStore.tags.length <= 1, // 只有一个标签
-    icon: renderIcon('mdi:arrow-expand-horizontal', { size: '14px' }),
+    disabled: tagStore.tags.length <= 1, // 只有一个标签时, 不能关闭其他
+    icon: () => h('i', { class: 'i-mdi:arrow-expand-horizontal' }),
   },
   {
     label: '关闭左侧',
     key: 'close-left',
-    // 只有一个标签 或者 当前选中的是第一个标签
-    disabled: tagsStore.tags.length <= 1 || props.currentPath === tagsStore.tags[0].path,
-    icon: renderIcon('mdi:arrow-expand-left', { size: '14px' }),
+    // 只有一个标签 或者 当前选中的是第一个标签, 不能关闭左侧
+    disabled: tagStore.tags.length <= 1 || props.currentPath === tagStore.tags[0].path,
+    icon: () => h('i', { class: 'i-mdi:arrow-expand-left' }),
   },
   {
     label: '关闭右侧',
     key: 'close-right',
-    // 只有一个标签 或者 当前选中的是最后一个标签
-    disabled:
-      tagsStore.tags.length <= 1
-      || props.currentPath === tagsStore.tags[tagsStore.tags.length - 1].path,
-    icon: renderIcon('mdi:arrow-expand-right', { size: '14px' }),
+    // 只有一个标签 或者 当前选中的是最后一个标签, 不能关闭右侧
+    disabled: tagStore.tags.length <= 1 || props.currentPath === tagStore.tags[tagStore.tags.length - 1].path,
+    icon: () => h('i', { class: 'i-mdi:arrow-expand-right' }),
   },
 ])
 
-const route = useRoute()
-// 重置 KeepAlive
-function resetKeepAlive() {
-  if (route.meta?.keepAlive)
-    appStore.setAliveKeys(route.name, +new Date())
-}
-// TODO: 标签关闭时会重置 KeepAlive
 const actionMap = new Map([
   [
     'reload',
     () => {
-      resetKeepAlive()
-      appStore.reloadPage()
+      // 重新加载, 不管是不是 keepAlive, 都要重新获取数据
+      tagStore.updateAliveKey(route.name)
+      tagStore.reloadTag()
     },
   ],
   [
     'close',
     () => {
-      resetKeepAlive()
-      tagsStore.removeTag(props.currentPath)
+      // resetKeepAlive()
+      tagStore.removeTag(props.currentPath)
     },
   ],
   [
     'close-other',
-    () => {
-      tagsStore.removeOther(props.currentPath)
-    },
+    () => tagStore.removeOther(props.currentPath),
   ],
   [
     'close-left',
-    () => {
-      tagsStore.removeLeft(props.currentPath)
-    },
+    () => tagStore.removeLeft(props.currentPath),
   ],
   [
     'close-right',
-    () => {
-      tagsStore.removeRight(props.currentPath)
-    },
+    () => tagStore.removeRight(props.currentPath),
   ],
 ])
 
 function handleHideDropdown() {
-  // 配合父组件中使用 v-model:show="show" 来使用
-  emit('update:show', false) // 通知父组件更新了 show 的值为 false
+  emit('update:show', false)
 }
 
 function handleSelect(key) {
-  // console.log('右键菜单选择: ', key)
   const actionFn = actionMap.get(key)
   actionFn && actionFn()
   handleHideDropdown()
@@ -121,7 +94,7 @@ function handleSelect(key) {
 </script>
 
 <template>
-  <n-dropdown
+  <NDropdown
     :show="show"
     :options="options"
     :x="x"
