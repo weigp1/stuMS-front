@@ -12,7 +12,7 @@ import request from './request';
 // };
 
 /* 登录相关 */
-function Login(params) 
+function login(params) 
 {
   return request({
     url: 'auth-service/auth/login',
@@ -23,7 +23,15 @@ function Login(params)
 }
 
 /* 用户相关 */
-
+function getuser(params)
+{
+  return request({
+  url: 'user-service/user/one-user',
+  method: 'GET',
+  mock: false,
+  params: params,
+  }); 
+}
 
 /* 综测相关 */
 
@@ -190,5 +198,5 @@ function selectStudyRecords(params)
 /* 分数相关 */
 
 export {
-  Login
+  login, getuser
 };
