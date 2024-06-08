@@ -3,12 +3,12 @@
     <div class="bg-img">
       <div>
         <el-card class="card">
+          <input type="file" id="file-input"/>
           <el-input v-model="input_account" class="account" placeholder="账号"/>
           <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
-          <el-button class="login" @click="call_login()">
+          <el-button class="login" @click="download()">
           登录
           </el-button>
-          <input type="file" id="file-input"/>
           <el-button class="getPass">
           忘记密码
           </el-button>
@@ -25,8 +25,8 @@
 import {ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {UserStore} from '../../stores/UserStore.js'
-import {Login} from '../../api/api.js'
-import {downloadFile,uploadFile,getPresignedURL} from '../../api/resource.js'
+import {login, getuser} from '../../api/api.js'
+import {downloadFile,uploadFile} from '../../api/resource.js'
 import {ElMessage} from "element-plus";
 
 const router = useRouter()
@@ -39,50 +39,56 @@ let input_password = ref('')
 // 处理登录操作
 const call_login = () => {
   
-  // 从输入框中获取用户名和密码，构建用户对象
-  let user = { 'SID': input_account.value, 'SPassword': input_password.value };
+  // 从输入框中获取用户名和密码
+  let account = { 'SID': input_account.value, 'SPassword': input_password.value };
+
+  let approved = false
   
   // 调用Login函数进行登录操作
-  Login(user).then(response => {
+  login(account).then(response => {
     const {code, data} = response;  // 从响应中解构出状态码和数据
     if (code === 200) {
-      // 更新用户登录状态和存储用户信息
-      userStore.login(user);
-      // 存储JWT Token
       localStorage.setItem('jwtToken', response.token);
-      router.push('/home');
+      approved = true;
     } 
     else if(code === 4004)
     {
-      ElMessage.error('登录已过期，请重新登录！');
+      ElMessage.error('登录已无效，请重新登录！');
       userStore.logout();
       router.push('/home');
     }
     }).catch(error => {
         console.error('Error:', error);
     });
+    if(approved)
+    {
+      account = { 'SID': input_account.value}
+      // 获取用户信息
+      getuser(account).then(response => {
+        userStore.login(response)
+      })
+    }
+
 }
 
-// // 上传示例
-// const upload = () => {
-//   const fileInput = document.getElementById('file-input');
-//   try {
-//     const bucketName = 'homepage';
-//     const objectName = fileInput.files[0].name; // 获取选中的文件名作为对象名
-//     const expiryTimeInSeconds = 60 * 60; // 设置过期时间为1小时
-//     getPresignedURL(bucketName, objectName, expiryTimeInSeconds)
-//       .then(presignedURL => {
-//         console.log(presignedURL);
-//         uploadFile(presignedURL, fileInput.files[0]); // 传递选中的文件对象
-//       })
-//       .catch(error => {
-//         console.error('Error:', error.message);
-//       });
-//   } catch (error) {
-//     console.error('Error:', error.message);
-//   }
-// };
+// 上传示例
+const upload = () => {
+  const fileInput = document.getElementById('file-input');
+  try {
+    const bucketName = 'homepage';
+    const objectName = fileInput.files[0].name; // 获取选中的文件名作为对象名
+    uploadFile(bucketName, objectName, fileInput.files[0]); // 传递选中的文件对象
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+};
 
+// 上传示例
+const download = () => {
+  const bucketName = 'homepage';
+  const objectName = 'front.txt';
+  downloadFile(bucketName, objectName);
+};
 
 </script>
 
