@@ -11,7 +11,7 @@ export function setupStore(app) {
 }
 
 export * from './modules/permission'
-// export * from './modules/tag'
+export * from './modules/tag'
 export * from './modules/theme'
-// export * from './modules/user'
-// export * from './modules/auth'
+export * from './modules/user'
+export * from './modules/auth'
