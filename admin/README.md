@@ -23,12 +23,16 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 - 基于 TypeScript
 - Vue3
 - VueUse: 服务于 Vue Composition API 的工具集
-- Unocss: 原子化 CSS
+- Unocss: 原子化 CSS (https://unocss.nodejs.cn/config/) 
 - Pinia
 - Vue Router 
 - Axios 
 - Naive UI
 - ...
+
+// 安装unocss和三个预设，第一个是工具类预设，第二个是属性化模式支持，第三个是icon支持
+// pnpm i -D unocss @unocss/preset-uno @unocss/preset-attributify @unocss/preset-icons
+
 
 
 其他:
@@ -144,7 +148,7 @@ npm install -g pnpm
 
 ```bash
 # 1、进入后台前端项目根目录
-cd gin-blog-admin
+cd admin
 
 # 2、安装依赖
 pnpm install
