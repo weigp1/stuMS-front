@@ -3,10 +3,9 @@
     <div class="bg-img">
       <div>
         <el-card class="card">
-          <input type="file" id="file-input"/>
           <el-input v-model="input_account" class="account" placeholder="账号"/>
           <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
-          <el-button class="login" @click="download()">
+          <el-button class="login" @click="call_login()">
           登录
           </el-button>
           <el-button class="getPass">
@@ -46,7 +45,7 @@ const call_login = () => {
   
   // 调用Login函数进行登录操作
   login(account).then(response => {
-    const {code, data} = response;  // 从响应中解构出状态码和数据
+    const {code, data} = response;
     if (code === 200) {
       localStorage.setItem('jwtToken', response.token);
       approved = true;
@@ -58,37 +57,39 @@ const call_login = () => {
       router.push('/home');
     }
     }).catch(error => {
-        console.error('Error:', error);
+        console.error('Error:', error.message);
     });
     if(approved)
     {
-      account = { 'SID': input_account.value}
+      account = { 'SID': input_account.value};
       // 获取用户信息
       getuser(account).then(response => {
         userStore.login(response)
-      })
+      }).catch(error => {
+        console.error('Error:', error.message);
+      });
     }
 
 }
 
-// 上传示例
-const upload = () => {
-  const fileInput = document.getElementById('file-input');
-  try {
-    const bucketName = 'homepage';
-    const objectName = fileInput.files[0].name; // 获取选中的文件名作为对象名
-    uploadFile(bucketName, objectName, fileInput.files[0]); // 传递选中的文件对象
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
+// // 上传示例
+// const upload = () => {
+//   const fileInput = document.getElementById('file-input');
+//   try {
+//     const bucketName = 'homepage';
+//     const objectName = fileInput.files[0].name; // 获取选中的文件名作为对象名
+//     uploadFile(bucketName, objectName, fileInput.files[0]); // 传递选中的文件对象
+//   } catch (error) {
+//     console.error('Error:', error.message);
+//   }
+// };
 
-// 上传示例
-const download = () => {
-  const bucketName = 'homepage';
-  const objectName = 'front.txt';
-  downloadFile(bucketName, objectName);
-};
+// // 下载示例
+// const download = () => {
+//   const bucketName = 'homepage';
+//   const objectName = 'front.txt';
+//   downloadFile(bucketName, objectName);
+// };
 
 </script>
 
