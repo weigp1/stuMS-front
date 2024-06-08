@@ -1,11 +1,11 @@
-// import { h } from 'vue'
-// import { Icon } from '@iconify/vue'
-// import { NIcon } from 'naive-ui'
+import { h } from 'vue'
+import { Icon } from '@iconify/vue'
+import { NIcon } from 'naive-ui'
 import dayjs from 'dayjs'
 
-// export * from './http'
-// export * from './local'
-// export * from './naiveTool'
+export * from './http'
+export * from './local'
+export * from './naiveTools'
 
 // 相对图片地址 => 完整的图片路径, 用于本地文件上传
 // 如果包含 http 说明是 Web 图片资源
@@ -32,21 +32,21 @@ export function formatDate(date = undefined, format = 'YYYY-MM-DD') {
 /**
  * 使用 NIcon 渲染图标
  */
-// export function renderIcon(icon, props = { size: 12 }) {
-//   return () => h(NIcon, props, { default: () => h(Icon, { icon }) })
-// }
+export function renderIcon(icon, props = { size: 12 }) {
+  return () => h(NIcon, props, { default: () => h(Icon, { icon }) })
+}
 
-// 前端导出, 传入文件内容和文件名称
-// export function downloadFile(content, fileName) {
-//   const aEle = document.createElement('a') // 创建下载链接
-//   aEle.download = fileName // 设置下载的名称
-//   aEle.style.display = 'none'// 隐藏的可下载链接
-//   // 字符内容转变成 blob 地址
-//   const blob = new Blob([content])
-//   aEle.href = URL.createObjectURL(blob)
-//   // 绑定点击时间
-//   document.body.appendChild(aEle)
-//   aEle.click()
-//   // 然后移除
-//   document.body.removeChild(aEle)
-// }
+前端导出, 传入文件内容和文件名称
+export function downloadFile(content, fileName) {
+  const aEle = document.createElement('a') // 创建下载链接
+  aEle.download = fileName // 设置下载的名称
+  aEle.style.display = 'none'// 隐藏的可下载链接
+  // 字符内容转变成 blob 地址
+  const blob = new Blob([content])
+  aEle.href = URL.createObjectURL(blob)
+  // 绑定点击时间
+  document.body.appendChild(aEle)
+  aEle.click()
+  // 然后移除
+  document.body.removeChild(aEle)
+}
