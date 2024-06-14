@@ -6,6 +6,7 @@ import api from '@/api'
 
 export const useAuthStore = defineStore('auth', {
   persist: {
+    // TODO: 需更改
     key: 'gvb_admin_auth',
     paths: ['token'],
   },
