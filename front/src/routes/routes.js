@@ -5,8 +5,7 @@ export const basicRoutes = [
   {
     name: 'Login',
     path: '/login',
-    component: () => import('@/views/login.vue'),
-    // component: () => import('@/views/login/login.vue'),
+    component: () => import('@/views/Login.vue'),
     isHidden: true,
     meta: {
       title: '登录页',
