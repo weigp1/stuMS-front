@@ -1,6 +1,6 @@
 <template>
   <meta charset="charset=utf-8"/>
-    <div class="bg-img">
+    <div class="centered">
       <div>
         <el-card class="card">
           <el-input v-model="input_account" class="account" placeholder="账号"/>
@@ -8,12 +8,15 @@
           <el-button class="login" @click="call_login()">
           登录
           </el-button>
-          <el-button class="getPass">
-          忘记密码
+          <sapn style="display: flex;justify-content: center">
+            <el-button class="getPass">
+            忘记密码
+            </el-button>
+            <el-button class="help">
+            需要帮助
           </el-button>
-          <el-button class="help">
-          需要帮助
-          </el-button>
+          </sapn>
+
         </el-card>
       </div>
     </div>
@@ -23,34 +26,45 @@
 <script  setup>
 import {ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {UserStore} from '../../stores/UserStore.js'
-import {login, getuser} from '../../api/api.js'
+import {UserStore} from '../../stores/user'
+import {AuthStore} from '../../stores/auth'
+import {login} from '../../api/api.js'
 import {downloadFile,uploadFile} from '../../api/resource.js'
 import {ElMessage} from "element-plus";
 
 const router = useRouter()
-const route = useRoute()
-const userStore = UserStore();
+const userStore = UserStore()
+const authStore = AuthStore()
 
 let input_account = ref('')
 let input_password = ref('')
 
 // 处理登录操作
-const call_login = () => {
-  
+async function call_login() {
+  if (!input_account.value || !input_password.value) {
+    ElMessage.info('请输入用户名和密码')
+    return
+  }
   // 从输入框中获取用户名和密码
   let account = { 'SID': input_account.value, 'SPassword': input_password.value };
-
-  let approved = false
   
-  // 调用Login函数进行登录操作
-  login(account).then(response => {
-    const {code, data} = response;
-    if (code === 200) {
-      localStorage.setItem('jwtToken', response.token);
-      approved = true;
-    } 
-    else if(code === 4004)
+  login(account).then(async response => {
+    const {code, data} = response
+    if(code === 200)
+    {
+      authStore.setToken(response.token)
+      await userStore.login()
+      ElMessage.success('登录成功')
+      // 根据 URL 中的 redirect 进行跳转
+      if (query.redirect) {
+        const path = query.redirect
+        Reflect.deleteProperty(query, 'redirect')
+        router.push({ path, query })
+      } else {
+        router.push('/')
+      }
+    }
+    else if(code === 301)
     {
       ElMessage.error('登录已无效，请重新登录！');
       userStore.logout();
@@ -59,17 +73,6 @@ const call_login = () => {
     }).catch(error => {
         console.error('Error:', error.message);
     });
-    if(approved)
-    {
-      account = { 'SID': input_account.value};
-      // 获取用户信息
-      getuser(account).then(response => {
-        userStore.login(response)
-      }).catch(error => {
-        console.error('Error:', error.message);
-      });
-    }
-
 }
 
 // // 上传示例
@@ -93,88 +96,74 @@ const call_login = () => {
 
 </script>
 
-<style scoped>
-.bg-img{
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background-size:100% 100%;
+<<style scoped>
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url("../../assets/background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.login{
-  position: absolute;
-  left: 59px;
-  top: 148px;
-  width: 280px;
-  height: 52px;
-  border-radius: 10px;
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50vh;
+  padding: 2vh;
+  opacity: 1;
+  color: aliceblue;
+  border-radius: 2vh;
+}
+
+.account, .password {
+  display: flex;
+  justify-content: center;
+  width: 35vh;
+  height: 5vh;
+  opacity: 1;
+  margin-bottom: 2vh;
+  font-size: 2vh;
+}
+
+.login {
+  display: flex;
+  justify-content: center;
+  width: 35vh;
+  height: 5.2vh;
+  border-radius: 1vh;
+  margin-bottom: 2vh;
   opacity: 1;
   border: none;
   background-color: rgba(12, 64, 196, 0.58);
-  font-size: 18px;
+  font-size: 2.5vh;
   color: aliceblue;
 }
 
-.account{
-  position: absolute;
-  left: 59px;
-  top: 31px;
-  width: 280px;
-  height: 38px;
-  opacity: 1;
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2vh;
 }
 
-.password{
-  position: absolute;
-  left: 59px;
-  top: 86px;
-  width: 281px;
-  height: 38px;
-  opacity: 1;
-}
-
-.getPass{
-  position: absolute;
-  left: 45px;
-  top: 224px;
-  width: 90px;
-  height: 28px;
+.getPass, .help {
   opacity: 1;
   border: none;
-  font-family: DM Sans;
   font-weight: bold;
-  line-height: 26px;
   text-align: center;
   letter-spacing: 0;
-  font-size: 15px;
-  color: rgba(35, 101, 255, 0.6)
-}
-
-.help{
-  position: absolute;
-  left: 240px;
-  top: 224px;
-  width: 90px;
-  height: 28px;
-  opacity: 1;
-  border: none;
-  font-family: DM Sans;
-  font-weight: bold;
-  line-height: 26px;
-  text-align: center;
-  letter-spacing: 0;
-  font-size: 15px;
+  font-size: 2vh;
   color: rgba(35, 101, 255, 0.6);
 }
 
-.card{
-  position: absolute;
-  left: 904px;
-  top: 253px;
-  width: 399px;
-  height: 275px;
-  opacity: 1;
-  color: aliceblue;
+.getPass {
+  margin-right: 1vh;
+}
+
+.help {
+  margin-left: 1vh;
 }
 </style>
-  

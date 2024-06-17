@@ -1,15 +1,6 @@
-/* 整个项目api的管理 */
+/* 项目api的管理 */
 
 import request from './request';
-// function Test_Login(params) 
-// {
-//   return request({
-//     url: 'auth-service/auth/login',
-//     method: 'GET',
-//     mock: true,
-//     params: params,
-//   });
-// };
 
 /* 登录相关 */
 function login(params) 
@@ -23,7 +14,7 @@ function login(params)
 }
 
 /* 用户相关 */
-function getuser(params)
+function getUser(params)
 {
   return request({
   url: 'user-service/user/one-user',
@@ -198,5 +189,5 @@ function selectStudyRecords(params)
 /* 分数相关 */
 
 export {
-  login, getuser
+  login, getUser
 };
