@@ -5,7 +5,8 @@ import { UserStore } from '../stores/user'
 
 const routes = [
     { path: '/', redirect: '/login' },
-    { name: 'Login', path: '/login', component: () => import("../views/Login/Login.vue") },
+    { name: 'Login', path: '/login', component: () => import("../views/Login/Login.vue")},
+    { name: 'ForgotPassword', path: '/forgot-password', component: () => import("../views/Login/ForgotPassword.vue") },
     { name: 'Home', path: '/home', component: () => import("../views/Home/Home.vue") },
     { name: 'Info', path: '/info', component: () => import("../views/Info/Info.vue") },
     { name: 'Plan', path: '/plan', component: () => import("../views/Plan/Plan.vue") },

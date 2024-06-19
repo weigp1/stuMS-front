@@ -1,7 +1,7 @@
 /* 环境配置文件 */
 
 const EnvConfig = {
-    baseApi: 'http://127.0.0.1/',
+    baseApi: 'http://1.12.37.226/',
     mockApi: ' /mock/',
 };
 

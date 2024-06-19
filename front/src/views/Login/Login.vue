@@ -1,36 +1,36 @@
 <template>
   <meta charset="charset=utf-8"/>
-    <div class="centered">
-      <div>
-        <el-card class="card">
-          <el-input v-model="input_account" class="account" placeholder="账号"/>
-          <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
-          <el-button class="login" @click="call_login()">
+  <div class="centered">
+    <div>
+      <el-card class="card">
+        <el-input v-model="input_account" class="account" placeholder="账号"/>
+        <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
+        <el-button class="login" @click="call_login()">
           登录
-          </el-button>
-          <sapn style="display: flex;justify-content: center">
-            <el-button class="getPass">
+        </el-button>
+        <span style="display: flex; justify-content: center; position: relative;">
+          <el-button class="getPass" @click="router.push('/forgot-password');">
             忘记密码
-            </el-button>
-            <el-button class="help">
+          </el-button>
+          <el-button class="help" @mouseover="showContactInfo" @mouseleave="hideContactInfo">
             需要帮助
           </el-button>
-          </sapn>
-
-        </el-card>
-      </div>
+          <div v-if="showContact" class="contact-info">
+            请联系: xxx-xxx-xxxx
+          </div>
+        </span>
+      </el-card>
     </div>
-
+  </div>
 </template>
-  
-<script  setup>
-import {ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {UserStore} from '../../stores/user'
-import {AuthStore} from '../../stores/auth'
-import {login} from '../../api/api.js'
-import {downloadFile,uploadFile} from '../../api/resource.js'
-import {ElMessage} from "element-plus";
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { UserStore } from '../../stores/user'
+import { AuthStore } from '../../stores/auth'
+import { login } from '../../api/api.js'
+import { ElMessage } from "element-plus"
 
 const router = useRouter()
 const userStore = UserStore()
@@ -39,23 +39,23 @@ const authStore = AuthStore()
 let input_account = ref('')
 let input_password = ref('')
 
+let showContact = ref(false)
+
 // 处理登录操作
 async function call_login() {
   if (!input_account.value || !input_password.value) {
     ElMessage.info('请输入用户名和密码')
     return
   }
-  // 从输入框中获取用户名和密码
-  let account = { 'SID': input_account.value, 'SPassword': input_password.value };
+  let account = { 'SID': input_account.value, 'SPassword': input_password.value }
   
-  login(account).then(async response => {
-    const {code, data} = response
-    if(code === 200)
-    {
+  try {
+    let response = await login(account)
+    const { code, data } = response
+    if (code === 200) {
       authStore.setToken(response.token)
       await userStore.login()
       ElMessage.success('登录成功')
-      // 根据 URL 中的 redirect 进行跳转
       if (query.redirect) {
         const path = query.redirect
         Reflect.deleteProperty(query, 'redirect')
@@ -63,40 +63,26 @@ async function call_login() {
       } else {
         router.push('/')
       }
+    } else if (code === 301) {
+      ElMessage.error('登录已无效，请重新登录！')
+      userStore.logout()
+      router.push('/home')
     }
-    else if(code === 301)
-    {
-      ElMessage.error('登录已无效，请重新登录！');
-      userStore.logout();
-      router.push('/home');
-    }
-    }).catch(error => {
-        console.error('Error:', error.message);
-    });
+  } catch (error) {
+    console.error('Error:', error.message)
+  }
 }
 
-// // 上传示例
-// const upload = () => {
-//   const fileInput = document.getElementById('file-input');
-//   try {
-//     const bucketName = 'homepage';
-//     const objectName = fileInput.files[0].name; // 获取选中的文件名作为对象名
-//     uploadFile(bucketName, objectName, fileInput.files[0]); // 传递选中的文件对象
-//   } catch (error) {
-//     console.error('Error:', error.message);
-//   }
-// };
+function showContactInfo() {
+  showContact.value = true
+}
 
-// // 下载示例
-// const download = () => {
-//   const bucketName = 'homepage';
-//   const objectName = 'front.txt';
-//   downloadFile(bucketName, objectName);
-// };
-
+function hideContactInfo() {
+  showContact.value = false
+}
 </script>
 
-<<style scoped>
+<style scoped>
 .centered {
   display: flex;
   justify-content: center;
@@ -165,5 +151,17 @@ async function call_login() {
 
 .help {
   margin-left: 1vh;
+}
+
+.contact-info {
+  position: absolute;
+  top: 4vh;
+  left: 16vh;
+  width: 20vh;
+  background-color: white;
+  padding: 1vh;
+  border-radius: 1vh;
+  font-size: 1.8vh;
+  color: rgba(35, 101, 255, 0.6);
 }
 </style>

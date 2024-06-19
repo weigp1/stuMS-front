@@ -13,6 +13,28 @@ function login(params)
   });
 }
 
+// (params: { 'Email': input_email.value}
+function sendVerificationCode(params) 
+{
+  return request({
+    url: 'auth-service/auth/verification',
+    method: 'GET',
+    mock: false,
+    params: params,
+  });
+}
+
+// params: { 'Email': input_email.value, 'verificationCode': input_verification_code.value, 'newPassword': input_new_password.value}
+function resetPassword(params) 
+{
+  return request({
+    url: 'auth-service/auth/resetPassword',
+    method: 'GET',
+    mock: false,
+    params: params,
+  });
+}
+
 /* 用户相关 */
 function getUser(params)
 {
@@ -189,5 +211,5 @@ function selectStudyRecords(params)
 /* 分数相关 */
 
 export {
-  login, getUser
+  login, sendVerificationCode, resetPassword, getUser
 };
