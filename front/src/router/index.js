@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { setupRouterGuard } from './guard'
 import { AuthStore } from '../stores/auth'
-import { UserStore } from '../stores/user'
 
 const routes = [
-    { path: '/', redirect: '/login' },
+    { path: '/', redirect: '/home' },
+    { name: 'Home', path: '/home', component: () => import("../views/Home/Home.vue") },
     { name: 'Login', path: '/login', component: () => import("../views/Login/Login.vue")},
     { name: 'ForgotPassword', path: '/forgot-password', component: () => import("../views/Login/ForgotPassword.vue") },
-    { name: 'Home', path: '/home', component: () => import("../views/Home/Home.vue") },
     { name: 'Info', path: '/info', component: () => import("../views/Info/Info.vue") },
     { name: 'Plan', path: '/plan', component: () => import("../views/Plan/Plan.vue") },
     { name: 'Detail', path: '/detail', component: () => import("../views/Detail/Detail.vue") },
@@ -21,16 +20,12 @@ const router = createRouter({
 
 async function setupRouter() {
     const authStore = AuthStore()
-    if (!authStore.token) 
-    {
-        authStore.toLogin()
-    }
+    // if (!authStore.token) 
+    // {
+    //     authStore.toLogin()
+    // }
 
     try {
-        const userStore = UserStore()
-        if (!userStore.currentUser) {
-        await userStore.login()
-        }
         setupRouterGuard(router)
     }
     catch (err) {

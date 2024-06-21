@@ -78,10 +78,20 @@ async function downloadFile(bucketName, objectName) {
   }
 }
 
+// 下载文件函数
+async function fileUrl(bucketName, objectName) {
+  try {
+    // 获取预签名URL
+    const presignedURL = await GetPresignedURL(bucketName, objectName);
+    return presignedURL;
+  } catch (error) {
+    console.error('Error: ', error.message);
+  }
+}
 
 // 导出上传文件和下载文件函数
 export {
-  uploadFile, downloadFile
+  uploadFile, downloadFile, fileUrl
 };
 
 

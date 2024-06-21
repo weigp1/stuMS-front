@@ -6,8 +6,9 @@ import request from './request';
 function login(params) 
 {
   return request({
-    url: 'auth-service/auth/login',
+    url: '/auth-service/auth/login',
     method: 'GET',
+    withCredentials: true, 
     mock: false,
     params: params,
   });
@@ -17,18 +18,17 @@ function login(params)
 function sendVerificationCode(params) 
 {
   return request({
-    url: 'auth-service/auth/verification',
+    url: '/auth-service/mail/send',
     method: 'GET',
     mock: false,
     params: params,
   });
 }
 
-// params: { 'Email': input_email.value, 'verificationCode': input_verification_code.value, 'newPassword': input_new_password.value}
-function resetPassword(params) 
+function confirmVerificationCode(params) 
 {
   return request({
-    url: 'auth-service/auth/resetPassword',
+    url: '/auth-service/mail/valid',
     method: 'GET',
     mock: false,
     params: params,
@@ -39,7 +39,7 @@ function resetPassword(params)
 function getUser(params)
 {
   return request({
-  url: 'user-service/user/one-user',
+  url: '/user-service/user/one-user',
   method: 'GET',
   mock: false,
   params: params,
@@ -211,5 +211,5 @@ function selectStudyRecords(params)
 /* 分数相关 */
 
 export {
-  login, sendVerificationCode, resetPassword, getUser
+  login, sendVerificationCode, confirmVerificationCode, getUser
 };

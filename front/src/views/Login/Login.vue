@@ -26,13 +26,15 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { UserStore } from '../../stores/user'
 import { AuthStore } from '../../stores/auth'
 import { login } from '../../api/api.js'
 import { ElMessage } from "element-plus"
 
 const router = useRouter()
+const { query } = useRoute()
+
 const userStore = UserStore()
 const authStore = AuthStore()
 
@@ -47,26 +49,26 @@ async function call_login() {
     ElMessage.info('请输入用户名和密码')
     return
   }
-  let account = { 'SID': input_account.value, 'SPassword': input_password.value }
+  let account = { 'SID': input_account.value, 'password': input_password.value }
   
   try {
     let response = await login(account)
     const { code, data } = response
     if (code === 200) {
-      authStore.setToken(response.token)
-      await userStore.login()
+      authStore.setToken(response.data)
+      let sid = { 'SID': input_account.value }
+      await userStore.login(sid)
       ElMessage.success('登录成功')
       if (query.redirect) {
         const path = query.redirect
         Reflect.deleteProperty(query, 'redirect')
         router.push({ path, query })
       } else {
-        router.push('/')
+        router.push('/home')
       }
     } else if (code === 301) {
       ElMessage.error('登录已无效，请重新登录！')
       userStore.logout()
-      router.push('/home')
     }
   } catch (error) {
     console.error('Error:', error.message)
@@ -80,6 +82,8 @@ function showContactInfo() {
 function hideContactInfo() {
   showContact.value = false
 }
+
+
 </script>
 
 <style scoped>

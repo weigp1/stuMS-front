@@ -19,6 +19,7 @@ export const AuthStore = defineStore('auth', {
       })
     },
     resetLoginState() {
+      this.token = null
       UserStore().$reset()
       this.$reset()
     },

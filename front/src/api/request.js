@@ -17,19 +17,25 @@ service.interceptors.request.use((req) => {
   if (token) {
     req.headers.token = token;
   }
-  return req; 
+
+  // 添加头部信息
+  req.headers['Content-Type'] = 'application/json';
+  req.headers['Access-Control-Allow-Origin'] = '*';
+
+  return req;
 });
+
 
 // 请求之后的拦截器
 service.interceptors.response.use(
   (res) => {
     const { code, data } = res.data
     const authStore = AuthStore()
-    if (code === 4004) {
+    if (code === 4003) {
       authStore.forceOffline()
       return ;
     }
-    return Promise.resolve(res.data);
+    return res.data;
   },
   (error) => {
     ElMessage.error('网络请求出错！');

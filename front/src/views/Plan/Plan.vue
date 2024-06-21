@@ -2,13 +2,25 @@
   <div class="container">
     <TopBar></TopBar>
     <div class="pdfContainer">
-      <embed src="http://43.136.61.147:9000/plan/软件工程学院本科生奖学金综合素质测评实施方案0407.pdf" type="application/pdf" width="100%" height="100%" />
+      <embed :src="file_url" type="application/pdf" width="100%" height="100%" />
     </div>
   </div>
 </template>
 
 <script setup>
-import TopBar from "../../components/TopBar.vue";
+import { ref, onMounted } from 'vue'
+import TopBar from '../../components/TopBar.vue'
+import { fileUrl } from '../../api/resource.js'// 根据实际路径调整
+
+let file_url = ref('')
+
+async function getFileUrl() {
+  file_url.value = await fileUrl("plan", "软件工程学院本科生奖学金综合素质测评实施方案.pdf")
+}
+
+onMounted(() => {
+  getFileUrl()
+})
 </script>
 
 <style scoped>
