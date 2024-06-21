@@ -76,7 +76,7 @@
   </el-row>
 
   <!--添加弹窗-->
-  <el-dialog v-model="dialogFormVisible" title="表单添加-论文发表" width="460" draggable>
+  <el-dialog v-model="dialogFormVisible" title="表单添加-论文发表" width="460">
     <el-form :model="form" label-width="90px" label-position="top" class="centered-form">
 
       <el-form-item label="论文标题">
