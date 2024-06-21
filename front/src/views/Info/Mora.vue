@@ -18,7 +18,7 @@
           <a :href="scope.row.link" target="_blank">下 载 </a>
         </template>
       </el-table-column>
-      <el-table-column prop="remark" label="备注"/>
+      <el-table-column prop="remarks" label="备注"/>
 
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
@@ -41,12 +41,11 @@
   </el-row>
 
   <!--添加弹窗-->
-  <el-dialog v-model="dialogFormVisible" title="表单添加-思想道德类" width="500">
-
-    <el-form :model="form">
+  <el-dialog v-model="dialogFormVisible" title="表单添加-思想道德类" width="460">
+    <el-form :model="form" label-width="0" label-position="top" class="centered-form">
 
       <el-form-item label="奖项名" label-width="100px">
-        <el-input v-model="form.title" autocomplete="off" style="width: 60%"/>
+        <el-input v-model="form.title" autocomplete="off" style="width: 100%" placeholder="请填写奖项名"/>
       </el-form-item>
 
       <el-form-item label="获奖时间" label-width="100px">
@@ -54,17 +53,17 @@
               v-model="form.date"
               type="date"
               label="date"
-              placeholder=""
-              style="width: 60%"
+              placeholder="请选择"
+              style="width: 100%"
           />
       </el-form-item>
 
       <el-form-item label="证明材料" label-width="100px">
-        <el-input v-model="form.link" autocomplete="off" style="width: 60%"/>
+        <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请填写证明材料"/>
       </el-form-item>
 
-      <el-form-item  label="备注" label-width="100px">
-        <el-input v-model="form.remark" autocomplete="off" style="width: 60%"/>
+      <el-form-item label="备注">
+        <el-input v-model="form.remarks" type="textarea" maxlength="50" show-word-limit placeholder="请输入备注，限制最长50字"/>
       </el-form-item>
 
     </el-form>
@@ -93,19 +92,19 @@ const MoraTableData = ref([
     title: '全国三好学生',
     date: '2022-08-22',
     link: 'https://123.com',
-    remark: '颁奖日期为08-27'
+    remarks: '颁奖日期为08-27'
   },
   {
     title: '省级三好学生',
     date: '2022-05-22',
     link: 'https://123.com',
-    remark: '颁奖日期为06-01'
+    remarks: '颁奖日期为06-01'
   },
   {
     title: '校级优秀共青团员',
     date: '2024-05-04',
     link: 'https://123.com',
-    remark: '无'
+    remarks: '无'
   },
 ]);
 
@@ -119,7 +118,7 @@ const form = reactive({
   title: '',
   date: '',
   link: '',
-  remark: ''
+  remarks: ''
 });
 
 </script>

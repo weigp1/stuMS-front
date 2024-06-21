@@ -1,11 +1,239 @@
-<script setup>
-
-</script>
-
 <template>
+  <el-row>
+    <el-table
+        :data="PatentTableData"
+        style="width: 100%; max-width: 68vw; min-width: 68vw;"
+        max-height="55vh"
+        :header-cell-style="{'text-align':'center'}"
+        :cell-style="{'text-align':'center'}"
+        fit
+        stripe
+        highlight-current-row
+    >
+      <el-table-column fixed type="index" label="序号" width="65px"/>
+      <el-table-column prop="title" label="专利名称"/>
+      <el-table-column prop="type" label="专利类型"/>
+      <el-table-column prop="application_num" label="专利申请号"/>
+      <el-table-column prop="certificate_num" label="专利证书编号"/>
+      <el-table-column prop="team" label="全部发明人"/>
+      <el-table-column prop="acceptance" label="是否已受理"/>
+      <el-table-column prop="acceptance_date" label="受理时间" sortable/>
+      <el-table-column prop="my_release" label="是否已公开"/>
+      <el-table-column prop="release_date" label="公开时间" sortable/>
+      <el-table-column prop="empower" label="是否已授权"/>
+      <el-table-column prop="empower_date" label="授权时间" sortable/>
+      <el-table-column prop="transferred" label="是否已转让"/>
+      <el-table-column prop="transferred_date" label="转让时间" sortable/>
+      <el-table-column prop="transferred_income" label="转让收入" sortable/>
+      <el-table-column prop="link_name" label="证明材料文件名"/>
+      <el-table-column prop="link" label="证明材料">
+        <template #default="scope">
+          <a :href="scope.row.link" target="_blank">下 载 </a>
+        </template>
+      </el-table-column>
+      <el-table-column prop="remarks" label="备注"/>
+
+      <el-table-column fixed="right" label="操作">
+        <template #default="scope">
+          <el-button link type="primary" size="large" @click="deleteRow(scope.$index)">
+            <el-icon class="el-icon--center"><Delete /></el-icon>
+          </el-button>
+        </template>
+      </el-table-column>
+
+    </el-table>
+
+    <el-button
+        class="mt-4"
+        type="primary"
+        style="position: absolute; width: 10%; height: 8%; right: 10px; bottom: 20px;"
+        @click="dialogFormVisible = true"
+    >
+      添 加
+    </el-button>
+  </el-row>
+
+  <!--添加弹窗-->
+  <el-dialog v-model="dialogFormVisible" title="表单添加-专利" width="460">
+    <el-form :model="form" label-width="90px" label-position="top" class="centered-form">
+
+      <el-form-item label="专利名称">
+        <el-input v-model="form.title" autocomplete="off" style="width: 100%" placeholder="请输入专利名称"/>
+      </el-form-item>
+
+      <el-form-item label="专利类型">
+        <el-select v-model="form.type" placeholder="请选择专利类型" style="width: 100%">
+          <el-option label="发明专利" value="发明专利"></el-option>
+          <el-option label="实用新型" value="实用新型"></el-option>
+          <el-option label="外观设计" value="外观设计"></el-option>
+          <el-option label="PCT国际申请" value="PCT国际申请"></el-option>
+          <el-option label="其他" value="其他"></el-option>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="专利申请号">
+        <el-input v-model="form.application_num" autocomplete="off" style="width: 100%" placeholder="请输入专利申请号"/>
+      </el-form-item>
+
+      <el-form-item label="专利证书编号">
+        <el-input v-model="form.certificate_num" autocomplete="off" style="width: 100%" placeholder="请输入专利证书编号"/>
+      </el-form-item>
+
+      <el-form-item label="全部发明人">
+        <el-input v-model="form.team" autocomplete="off" style="width: 100%" placeholder="请按申请人顺序完整填写"/>
+        <span style="font-size: 12px;">请按申请人顺序完整填写</span>
+      </el-form-item>
+
+      <el-form-item label="是否已受理">
+        <el-radio-group v-model="form.acceptance">
+          <el-radio label="是">是</el-radio>
+          <el-radio label="否">否</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item v-if="form.acceptance === '是'" label="受理时间">
+        <el-date-picker
+            v-model="form.acceptance_date"
+            type="date"
+            placeholder="请选择受理时间"
+            style="width: 100%"
+        />
+      </el-form-item>
+
+      <el-form-item label="是否已公开">
+        <el-radio-group v-model="form.my_release">
+          <el-radio label="是">是</el-radio>
+          <el-radio label="否">否</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item v-if="form.my_release === '是'" label="公开时间">
+        <el-date-picker
+            v-model="form.release_date"
+            type="date"
+            placeholder="请选择公开时间"
+            style="width: 100%"
+        />
+      </el-form-item>
+
+      <el-form-item label="是否已授权">
+        <el-radio-group v-model="form.empower">
+          <el-radio label="是">是</el-radio>
+          <el-radio label="否">否</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item v-if="form.empower === '是'" label="授权时间">
+        <el-date-picker
+            v-model="form.empower_date"
+            type="date"
+            placeholder="请选择授权时间"
+            style="width: 100%"
+        />
+      </el-form-item>
+
+      <el-form-item label="是否已转让">
+        <el-radio-group v-model="form.transferred">
+          <el-radio label="是">是</el-radio>
+          <el-radio label="否">否</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item v-if="form.transferred === '是'" label="转让时间">
+        <el-date-picker
+            v-model="form.transferred_date"
+            type="date"
+            placeholder="请选择转让时间"
+            style="width: 100%"
+        />
+      </el-form-item>
+
+      <el-form-item v-if="form.transferred === '是'" label="转让收入">
+        <el-input v-model="form.transferred_income" autocomplete="off" style="width: 100%" placeholder="请输入转让收入"/>
+      </el-form-item>
+
+      <el-form-item label="证明材料文件名">
+        <el-input v-model="form.link_name" autocomplete="off" style="width: 100%" placeholder="请输入证明材料文件名"/>
+      </el-form-item>
+
+      <el-form-item label="证明材料">
+        <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请输入证明材料的链接"/>
+      </el-form-item>
+
+      <el-form-item label="备注">
+        <el-input v-model="form.remarks" type="textarea" autocomplete="off" maxlength="50" show-word-limit style="width: 100%" placeholder="选填，限制最长50字"/>
+      </el-form-item>
+
+    </el-form>
+
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button
+            type="primary"
+            @click="dialogFormVisible = false">
+          提交
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 
 </template>
 
-<style scoped>
+<script lang="ts" setup>
+import { Delete } from "@element-plus/icons-vue";
+import { reactive, ref } from "vue";
 
+// 默认显示
+const PatentTableData = ref([
+  {
+    title: '智能家居控制系统',
+    type: '发明专利',
+    application_num: 'CN123456789A',
+    certificate_num: 'CN123456789B',
+    team: '张三, 李四, 王五',
+    acceptance: '是',
+    acceptance_date: '2023-01-15',
+    my_release: '是',
+    release_date: '2023-06-20',
+    empower: '是',
+    empower_date: '2023-12-25',
+    transferred: '否',
+    transferred_date: '',
+    transferred_income: '',
+    link_name: '智能家居控制系统专利证书',
+    link: 'https://example.com/patent1',
+    remarks: '暂无'
+  },
+]);
+
+const deleteRow = (index: number) => {
+  PatentTableData.value.splice(index, 1);
+};
+
+const dialogFormVisible = ref(false);
+
+const form = reactive({
+  title: '',
+  type: '',
+  application_num: '',
+  certificate_num: '',
+  team: '',
+  acceptance: '',
+  acceptance_date: '',
+  my_release: '',
+  release_date: '',
+  empower: '',
+  empower_date: '',
+  transferred: '',
+  transferred_date: '',
+  transferred_income: '',
+  link_name: '',
+  link: '',
+  remarks: ''
+});
+
+</script>
+
+<style scoped>
 </style>

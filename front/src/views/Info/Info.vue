@@ -15,6 +15,9 @@
             <el-tab-pane label="比赛获奖" name="seventh"></el-tab-pane>
             <el-tab-pane label="论文发表" name="eighth"></el-tab-pane>
             <el-tab-pane label="专利发明" name="ninth"></el-tab-pane>
+            <el-tab-pane label="软件著作" name="tenth"></el-tab-pane>
+            <el-tab-pane label="专著出版" name="eleventh"></el-tab-pane>
+            <el-tab-pane label="赴外交流" name="twelfth"></el-tab-pane>
           </el-tabs>
         </div>
       </el-col>
@@ -223,6 +226,23 @@
 <!--         论文发表-->
         <div class="right" v-if="showEighth">
           <Paper/>
+        </div>
+
+<!--        专利-->
+        <div class="right" v-if="showNinth">
+          <Patent/>
+        </div>
+
+        <div class="right" v-if="showTenth">
+          <CopyRight/>
+        </div>
+
+        <div class="right" v-if="showEleventh">
+          <Publication/>
+        </div>
+
+        <div class="right" v-if="showTwelfth">
+          <Exchange/>
         </div>
 
 <!--         专利发明-->
@@ -450,6 +470,9 @@ onMounted(() => {
 
 import type { TabsInstance } from 'element-plus'
 import Patent from "./Patent.vue";
+import CopyRight from "./CopyRight.vue";
+import Publication from "./Publication.vue";
+import Exchange from "./Exchange.vue";
 const tabPosition = ref<TabsInstance['tabPosition']>('left')
 
 const activeName = ref('first')
@@ -462,6 +485,9 @@ const showSixth = ref(false)
 const showSeventh = ref(false)
 const showEighth = ref(false)
 const showNinth = ref(false)
+const showTenth = ref(false)
+const showEleventh = ref(false)
+const showTwelfth = ref(false)
 
 
 const handleClick = (tab, event) => {
@@ -529,6 +555,28 @@ const handleClick = (tab, event) => {
   } else {
     showNinth.value = false
   }
+
+  if (tab.paneName === 'tenth') {
+    showTenth.value = true
+    router.push({ query: { category: '10' } });
+  } else {
+    showTenth.value = false
+  }
+
+  if (tab.paneName === 'eleventh') {
+    showEleventh.value = true
+    router.push({ query: { category: '11' } });
+  } else {
+    showEleventh.value = false
+  }
+
+  if (tab.paneName === 'twelfth') {
+    showTwelfth.value = true
+    router.push({ query: { category: '12' } });
+  } else {
+    showTwelfth.value = false
+  }
+
 }
 
 </script>
@@ -568,7 +616,7 @@ const handleClick = (tab, event) => {
     height:70vh;
     left: -2vw;
 
-    padding-top: 5vh;
+    padding-top: 0;
 
     border-radius: 20px;
     background-color: white;
