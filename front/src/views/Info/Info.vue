@@ -1,33 +1,40 @@
 <template>
   <TopBar></TopBar>
-  <div class="centered">
+  <el-row>
+    <div class="centered">
 
-    <el-row>
-      <el-col span="4">
+      <el-col span="2">
         <div class="left">
           <el-tabs class="demo-tabs" v-model="activeName" :tab-position="tabPosition" @tab-click="handleClick" router>
             <el-tab-pane label="基本信息" name="first"></el-tab-pane>
             <el-tab-pane label="联系信息" name="second"></el-tab-pane>
             <el-tab-pane label="成绩信息" name="third"></el-tab-pane>
+            <el-tab-pane label="思想道德" name="fourth"></el-tab-pane>
+            <el-tab-pane label="志愿活动" name="fifth"></el-tab-pane>
+            <el-tab-pane label="社会工作" name="sixth"></el-tab-pane>
+            <el-tab-pane label="比赛获奖" name="seventh"></el-tab-pane>
+            <el-tab-pane label="论文发表" name="eighth"></el-tab-pane>
+            <el-tab-pane label="专利发明" name="ninth"></el-tab-pane>
           </el-tabs>
         </div>
       </el-col>
 
-      <el-col span="20">
-        <el-form
-            :label-position="'top'"
-            :model="ruleForm"
-            :rules="rules"
-            :size="formSize"
-            :inline="true"
-            ref="ruleFormRef"
-            style="max-width: 50vw"
-            label-width="auto"
-            class="demo-ruleForm"
-            status-icon
-        >
+      <el-col span="22">
+<!--        基本信息-->
+        <div class="right" v-if="showFirst">
+          <el-form
+              :label-position="'top'"
+              :model="ruleForm"
+              :rules="rules"
+              :size="formSize"
+              :inline="true"
+              ref="ruleFormRef"
+              style="max-width: 60vw"
+              label-width="auto"
+              class="demo-ruleForm"
+              status-icon
+          >
 
-          <div class="right" v-if="showFirst">
             <el-row>
               <el-col :span="8">
                 <el-form-item label="姓名" prop="SName" style="margin: 0 auto; width: 90%;">
@@ -114,9 +121,23 @@
               </el-col>
 
             </el-row>
-          </div>
+          </el-form>
+        </div>
 
-          <div class="right" v-if="showSecond">
+<!--        联系信息-->
+        <div class="right" v-if="showSecond">
+          <el-form
+              :label-position="'top'"
+              :model="ruleForm"
+              :rules="rules"
+              :size="formSize"
+              :inline="true"
+              ref="ruleFormRef"
+              style="max-width: 60vw"
+              label-width="auto"
+              class="demo-ruleForm"
+              status-icon
+          >
             <el-row>
               <el-col :span="8">
                 <el-form-item label="宿舍" prop="SDorm" style="margin: 0 auto; width: 90%;">
@@ -171,7 +192,59 @@
                 </el-form-item>
               </el-col>
             </el-row>
-          </div>
+          </el-form>
+        </div>
+
+<!--         成绩信息-->
+        <div class="right" v-if="showThird">
+          <Score/>
+        </div>
+
+<!--         思想道德-->
+        <div class="right" v-if="showFourth">
+          <Mora/>
+        </div>
+
+<!--        志愿服务-->
+        <div class="right" v-if="showFifth">
+          <Volunteer/>
+        </div>
+
+<!--         社会工作-->
+        <div class="right" v-if="showSixth">
+          <Work/>
+        </div>
+
+<!--         比赛获奖-->
+        <div class="right" v-if="showSeventh">
+          <Contest/>
+        </div>
+
+<!--         论文发表-->
+        <div class="right" v-if="showEighth">
+          <Paper/>
+        </div>
+
+<!--         专利发明-->
+<!--        <div class="right" v-if="showNinth">-->
+<!--          <Patent/>-->
+<!--        </div>-->
+
+<!--          删除弹窗-->
+<!--          <el-dialog v-model="deleteVisible" width="20vw">-->
+<!--            <span>确认删除？该操作不可逆！</span>-->
+<!--            <template #footer #default="scope">-->
+<!--              <div class="dialog-footer">-->
+<!--                <el-button @click="deleteVisible = false">取消</el-button>-->
+<!--                <el-button-->
+<!--                    type="primary"-->
+<!--                    @click="deleteVisible = false"-->
+<!--                    @click.prevent="deleteRow(scope.$index)">-->
+<!--                  确认删除-->
+<!--                </el-button>-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-dialog>-->
 
     <!--    计数选项-->
     <!--    <el-form-item label="Activity count" prop="count">-->
@@ -192,17 +265,25 @@
     <!--      <el-input v-model="ruleForm.desc" type="textarea" />-->
     <!--    </el-form-item>-->
 
-        </el-form>
       </el-col>
-    </el-row>
-  </div>
+    </div>
+  </el-row>
 </template>
 
 <script lang="ts" setup>
+
+import Mora from "./Mora.vue";
+import Score from "./Score.vue";
+import Volunteer from "./Volunteer.vue";
+import Work from "./Work.vue";
+import Contest from "./Contest.vue";
+import Paper from "./Paper.vue";
+// import Patent from "./Patent.vue"
+import TopBar from "../../components/TopBar.vue";
+
 import axios from "axios";
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import TopBar from "../../components/TopBar.vue";
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 
 const router = useRouter()
@@ -368,12 +449,20 @@ onMounted(() => {
 // })).slice(0, 1001);
 
 import type { TabsInstance } from 'element-plus'
+import Patent from "./Patent.vue";
 const tabPosition = ref<TabsInstance['tabPosition']>('left')
 
 const activeName = ref('first')
 const showFirst  = ref(true)
 const showSecond = ref(false)
 const showThird = ref(false)
+const showFourth = ref(false)
+const showFifth = ref(false)
+const showSixth = ref(false)
+const showSeventh = ref(false)
+const showEighth = ref(false)
+const showNinth = ref(false)
+
 
 const handleClick = (tab, event) => {
   console.log(tab, event)
@@ -398,6 +487,48 @@ const handleClick = (tab, event) => {
   } else {
     showThird.value = false
   }
+
+  if (tab.paneName === 'fourth') {
+    showFourth.value = true
+    router.push({ query: { category: '4' } });
+  } else {
+    showFourth.value = false
+  }
+
+  if (tab.paneName === 'fifth') {
+    showFifth.value = true
+    router.push({ query: { category: '5' } });
+  } else {
+    showFifth.value = false
+  }
+
+  if (tab.paneName === 'sixth') {
+    showSixth.value = true
+    router.push({ query: { category: '6' } });
+  } else {
+    showSixth.value = false
+  }
+
+  if (tab.paneName === 'seventh') {
+    showSeventh.value = true
+    router.push({ query: { category: '7' } });
+  } else {
+    showSeventh.value = false
+  }
+
+  if (tab.paneName === 'eighth') {
+    showEighth.value = true
+    router.push({ query: { category: '8' } });
+  } else {
+    showEighth.value = false
+  }
+
+  if (tab.paneName === 'ninth') {
+    showNinth.value = true
+    router.push({ query: { category: '9' } });
+  } else {
+    showNinth.value = false
+  }
 }
 
 </script>
@@ -409,6 +540,7 @@ const handleClick = (tab, event) => {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    width: 150vw;
     background-image: url("../../assets/background.jpg");
     background-repeat: no-repeat;
     background-size: cover;
@@ -418,6 +550,8 @@ const handleClick = (tab, event) => {
     /* 修改为您想要的文字大小 */
     font-size: 20px!important;
     font-weight: 600;
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 
   :deep(.el-tabs__nav-wrap::after) {
@@ -445,15 +579,16 @@ const handleClick = (tab, event) => {
     justify-content: center;
 
     top : 5vh;
-    width: auto;
+    width: 70vw;
     height: 70vh;
     right: -2vw;
 
     padding-top: 5vh;
-    padding-left: 2vh;
-    padding-right: 2vh;
+    padding-left: 1vh;
+    padding-right: 1vh;
 
     border-radius: 20px;
     background-color: white;
   }
+
 </style>
