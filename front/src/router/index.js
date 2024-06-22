@@ -20,10 +20,10 @@ const router = createRouter({
 
 async function setupRouter() {
     const authStore = AuthStore()
-    // if (!authStore.token) 
-    // {
-    //     authStore.toLogin()
-    // }
+    if (!authStore.token) 
+    {
+        authStore.toLogin()
+    }
 
     try {
         setupRouterGuard(router)

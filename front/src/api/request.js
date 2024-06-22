@@ -18,10 +18,6 @@ service.interceptors.request.use((req) => {
     req.headers.token = token;
   }
 
-  // 添加头部信息
-  req.headers['Content-Type'] = 'application/json';
-  req.headers['Access-Control-Allow-Origin'] = '*';
-
   return req;
 });
 
