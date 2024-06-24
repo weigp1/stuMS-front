@@ -27,9 +27,6 @@ function createPermissionGuard(router) {
       if (['/login'].includes(to.path)) {
         return true
       }
-      else if (['/plan'].includes(to.path)) {
-        return true
-      }
       else
       {
         ElMessage.error('请先登录！')

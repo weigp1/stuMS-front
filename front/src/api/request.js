@@ -17,7 +17,6 @@ service.interceptors.request.use((req) => {
   if (token) {
     req.headers.token = token;
   }
-
   return req;
 });
 
