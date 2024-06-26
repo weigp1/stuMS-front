@@ -1,14 +1,13 @@
 /* 项目api的管理 */
 
 import request from './request';
-
 /* 登录相关 */
 function login(params) 
 {
   return request({
-    url: '/auth-service/auth/login',
+    url: '/auth-service/auth/login/user',
     method: 'GET',
-    withCredentials: true, 
+    // withCredentials: true, 
     mock: false,
     params: params,
   });
