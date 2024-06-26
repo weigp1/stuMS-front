@@ -9,7 +9,7 @@
 
     <!-- 左侧的标题图片 -->
     <el-menu-item style="position: absolute; left: 2%; height: 100%; " index="0">
-      <el-image style="width: 75%; height: auto;" src="/src/assets/sysu.png"/>
+      <el-image style="width: 18vw; height: auto;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
     <!-- 遍历menuItems数组，渲染菜单项 -->

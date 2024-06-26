@@ -149,20 +149,68 @@ import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 
 const ContTableData = ref([
-  // Sample data, replace with your actual data
   {
-    name: '数学建模竞赛',
+    name: '中国大学生数学建模竞赛',
     organization: '中国大学生数学建模竞赛组委会',
     date: '2023-05',
     title: '一等奖',
-    level: '校级',
+    level: '国家级',
     rank: '一等奖',
-    team: '小红+21310000、小明+21310001',
-    link_name: '证明材料文件名',
+    team: '张力德、吴凯丽',
+    link_name: '21314390_王宏宇_1001',
+    link: 'https://example.com',
+    remarks: '无'
+  },
+  {
+    name: '中山大学英语演讲比赛',
+    organization: '中山大学大学生英语竞赛组委会',
+    date: '2023-03',
+    title: '优秀奖',
+    level: '校级',
+    rank: '优秀奖',
+    team: '李德伟、王思雨',
+    link_name: '21314390_王宏宇_1003',
+    link: 'https://example.com',
+    remarks: '无'
+  },
+  {
+    name: 'RoboCom国际机器人设计大赛',
+    organization: '工业与信息化部、RoboCom国际竞赛组织委员会',
+    date: '2022-07',
+    title: '三等奖',
+    level: '市级',
+    rank: '三等奖',
+    team: '王宏宇、孙鹏林、陈峰起、刘邦云',
+    link_name: '21314390_王宏宇_1004',
+    link: 'https://example.com',
+    remarks: '无'
+  },
+  {
+    name: '程序设计竞赛',
+    organization: '全国大学生程序设计竞赛组委会',
+    date: '2023-01',
+    title: '特等奖',
+    level: '国家级',
+    rank: '特等奖',
+    team: '王宏宇、林晓、周勇',
+    link_name: '21314390_王宏宇_1005',
+    link: 'https://example.com',
+    remarks: '顽强拼搏奖'
+  },
+  {
+    name: '艺术设计比赛',
+    organization: '全国大学生艺术设计竞赛组委会',
+    date: '2022-10',
+    title: '一等奖',
+    level: '省级',
+    rank: '一等奖',
+    team: '王宏宇、张伟、黄婷',
+    link_name: '21314390_王宏宇_1006',
     link: 'https://example.com',
     remarks: '无'
   }
 ]);
+
 
 const dialogFormVisible = ref(false);
 
