@@ -65,14 +65,18 @@ async function call_login() {
       ElMessage.success('登录成功')
 
       // 保存token到cookie
-      const cookieOptions = {
+      if (rememberMe.value)
+      {
+        const cookieOptions = {
         expires: rememberMe.value ? 1 : null, // 1天有效期或会话结束时失效
         sameSite: 'Strict',                  // 防止CSRF攻击
         // secure: true,                        // 仅通过HTTPS传输
         // httpOnly: true                       // 防止客户端脚本访问cookie
+        }
+        Cookies.set('authToken', data, cookieOptions)
+        Cookies.set('SID', input_account.value, cookieOptions)
       }
-      Cookies.set('authToken', data, cookieOptions)
-      Cookies.set('SID', input_account.value, cookieOptions)
+
 
       if (query.redirect) {
         const path = query.redirect
