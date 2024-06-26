@@ -12,7 +12,7 @@
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
     <!-- 左侧的标题图片 -->
-    <el-menu-item style="position: absolute; left: 2%; height: 100%; " index="0">
+    <el-menu-item style="position: absolute; left: 0; height: 100%; " index="0">
       <el-image style="width: 18vw; height: auto;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
@@ -46,7 +46,7 @@
     <el-menu-item style="position: absolute; right: 2%; height: 100%;" index="0" >
       <el-row>
         <el-col :span="8">
-          <el-image style="width: 80%; height: auto; top: -25%;" src="/src/assets/avatar.png"/>
+          <el-image style="width: 100%; height: auto; top: -20%;" src="/src/assets/avatar.png"/>
         </el-col>
         <el-col :span="16">
           <div class="text" @click.stop="handleClick">User</div>
