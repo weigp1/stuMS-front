@@ -3,7 +3,7 @@
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
     <el-menu-item style="position: absolute; left: 2%; height: 100%;" index="0">
-      <el-image style="width: 75%; height: auto;" src="/src/assets/sysu.png"/>
+      <el-image style="width: 100%; height: 100%;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
     <template v-for="item in menuItems">
@@ -20,7 +20,7 @@
     <el-menu-item style="position: absolute; right: 2%; height: 100%; border-radius: 10px;" index="0">
       <el-row>
         <el-col :span="8">
-          <el-image style="width: 80%; height: auto; top: -25%;" src="/src/assets/avatar.png"/>
+          <el-image style="width: 90%; height: auto; top: -10%;" src="/src/assets/avatar.png"/>
         </el-col>
         <el-col :span="8">
           <div class="user" @click.stop="handleUserClick">用户</div>
