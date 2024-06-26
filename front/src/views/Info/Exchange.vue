@@ -63,14 +63,14 @@
 
       <el-form-item label="事由类型">
         <el-select v-model="form.type" placeholder="请选择事由类型" style="width: 100%">
-          <el-option label="交换项目" value="交换项目"></el-option>
-          <el-option label="学术会议" value="学术会议"></el-option>
-          <el-option label="短期学术交流" value="短期学术交流"></el-option>
-          <el-option label="短期课程" value="短期课程"></el-option>
-          <el-option label="汉语教师志愿者" value="汉语教师志愿者"></el-option>
-          <el-option label="实习" value="实习"></el-option>
-          <el-option label="竞赛" value="竞赛"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="交换项目" :value="1"></el-option>
+          <el-option label="学术会议" :value="2"></el-option>
+          <el-option label="短期学术交流" :value="3"></el-option>
+          <el-option label="短期课程" :value="4"></el-option>
+          <el-option label="汉语教师志愿者" :value="5"></el-option>
+          <el-option label="实习" :value="6"></el-option>
+          <el-option label="竞赛" :value="7"></el-option>
+          <el-option label="其他" :value="8"></el-option>
         </el-select>
         <span style="font-size: 12px;">若“事由类型”选其他，请在备注中填写</span>
       </el-form-item>
@@ -93,8 +93,8 @@
 
       <el-form-item label="项目期限">
         <el-select v-model="form.duration" placeholder="请选择项目期限" style="width: 100%">
-          <el-option label="长期（180天以上）" value="长期（180天以上）"></el-option>
-          <el-option label="短期（180天以下）" value="短期（180天以下）"></el-option>
+          <el-option label="长期（180天以上）" :value="1"></el-option>
+          <el-option label="短期（180天以下）" :value="2"></el-option>
         </el-select>
       </el-form-item>
 
@@ -114,42 +114,41 @@
             placeholder="请选择返校时间"
             style="width: 100%"
         />
-        <el-checkbox v-model="form.is_still" label="至今">至今</el-checkbox>
       </el-form-item>
 
       <el-form-item label="目前状态">
         <el-select v-model="form.current_status" placeholder="请选择目前状态" style="width: 100%">
-          <el-option label="已返校" value="已返校"></el-option>
-          <el-option label="在外" value="在外"></el-option>
-          <el-option label="即将赴外" value="即将赴外"></el-option>
+          <el-option label="已返校" :value="1"></el-option>
+          <el-option label="在外" :value="2"></el-option>
+          <el-option label="即将赴外" :value="3"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="是否已完成申报/报备">
         <el-radio-group v-model="form.flag1" style="width: 100%">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item label="是否已参加行前教育">
         <el-radio-group v-model="form.flag2" style="width: 100%">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item label="是否已签订承诺书">
         <el-radio-group v-model="form.flag3" style="width: 100%">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item label="是否已开展谈心谈话">
         <el-radio-group v-model="form.flag4" style="width: 100%">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -173,7 +172,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button
             type="primary"
-            @click="dialogFormVisible = false">
+            @click="submitForm(form)">
           提交
         </el-button>
       </div>
@@ -185,7 +184,10 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
+import { submitExchange } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
 
+const userStore = UserStore()
 // 默认显示
 const OverseasExchangeData = ref([
   {
@@ -210,32 +212,55 @@ const OverseasExchangeData = ref([
   // 更多数据...
 ]);
 
-const deleteRow = (index: number) => {
-  OverseasExchangeData.value.splice(index, 1);
-};
+// const deleteRow = (index: number) => {
+//   OverseasExchangeData.value.splice(index, 1);
+// };
 
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  title: '',
-  type: '',
-  funding_source: '',
-  country: '',
-  city: '',
-  institution: '',
-  duration: '',
-  date_start: '',
-  date_end: '',
-  current_status: '',
-  flag1: '',
-  flag2: '',
-  flag3: '',
-  flag4: '',
-  link_name: '',
-  link: '',
-  remarks: '',
-  is_still: false
+  city: "",
+  comment: "",
+  country: "",
+  current_status: "",
+  date_end: "",
+  date_start: "",
+  duration: "",
+  flag1: "",
+  flag2: "",
+  flag3: "",
+  flag4: "",
+  funding_source: "",
+  institution: "",
+  link: "",
+  link_name: "",
+  pid: "",
+  remarks: "",
+  sid: "",
+  status_one: "",
+  status_two: "",
+  title: "",
+  type: ""
 });
+
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
+
+
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitExchange(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
 
 </script>
 

@@ -53,12 +53,12 @@
 
       <el-form-item label="比赛类别">
         <el-select v-model="form.type" placeholder="请选择">
-          <el-option label="学科竞赛" value="学科竞赛"></el-option>
-          <el-option label="文娱比赛" value="文娱比赛"></el-option>
-          <el-option label="体育比赛" value="体育比赛"></el-option>
-          <el-option label="实践活动" value="实践活动"></el-option>
-          <el-option label="征文比赛" value="征文比赛"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="学科竞赛" :value="1"></el-option>
+          <el-option label="文娱比赛" :value="2"></el-option>
+          <el-option label="体育比赛" :value="3"></el-option>
+          <el-option label="实践活动" :value="4"></el-option>
+          <el-option label="征文比赛" :value="5"></el-option>
+          <el-option label="其他" :value="6"></el-option>
         </el-select>
         <span style="font-size: 12px;">请严格按照比赛通知、奖状信息填写</span>
       </el-form-item>
@@ -83,35 +83,35 @@
 
       <el-form-item label="成果级别">
         <el-select v-model="form.level" placeholder="请选择">
-          <el-option label="国际级" value="国际级"></el-option>
-          <el-option label="国家级" value="国家级"></el-option>
-          <el-option label="省部级" value="省部级"></el-option>
-          <el-option label="校级" value="校级"></el-option>
-          <el-option label="院级" value="院级"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="国际级" :value="1"></el-option>
+          <el-option label="国家级" :value="2"></el-option>
+          <el-option label="省部级" :value="3"></el-option>
+          <el-option label="校级" :value="4"></el-option>
+          <el-option label="院级" :value="5"></el-option>
+          <el-option label="其他" :value="6"></el-option>
         </el-select>
         <span style="font-size: 12px;">全国性行业协会主办赛事等同省部级</span>
       </el-form-item>
 
       <el-form-item label="比赛名次">
         <el-select v-model="form.rank" placeholder="请选择">
-          <el-option label="特等奖" value="特等奖"></el-option>
-          <el-option label="一等奖" value="一等奖"></el-option>
-          <el-option label="二等奖" value="二等奖"></el-option>
-          <el-option label="三等奖" value="三等奖"></el-option>
-          <el-option label="冠军" value="冠军"></el-option>
-          <el-option label="亚军" value="亚军"></el-option>
-          <el-option label="季军" value="季军"></el-option>
-          <el-option label="金奖" value="金奖"></el-option>
-          <el-option label="银奖" value="银奖"></el-option>
-          <el-option label="铜奖" value="铜奖"></el-option>
-          <el-option label="第一名" value="第一名"></el-option>
-          <el-option label="第二名" value="第二名"></el-option>
-          <el-option label="第三名" value="第三名"></el-option>
-          <el-option label="第四名" value="第四名"></el-option>
-          <el-option label="第五名" value="第五名"></el-option>
-          <el-option label="第六名" value="第六名"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="特等奖" :value="1"></el-option>
+          <el-option label="一等奖" :value="2"></el-option>
+          <el-option label="二等奖" :value="3"></el-option>
+          <el-option label="三等奖" :value="4"></el-option>
+          <el-option label="冠军" :value="5"></el-option>
+          <el-option label="亚军" :value="6"></el-option>
+          <el-option label="季军" :value="7"></el-option>
+          <el-option label="金奖" :value="8"></el-option>
+          <el-option label="银奖" :value="9"></el-option>
+          <el-option label="铜奖" :value="10"></el-option>
+          <el-option label="第一名" :value="11"></el-option>
+          <el-option label="第二名" :value="12"></el-option>
+          <el-option label="第三名" :value="13"></el-option>
+          <el-option label="第四名" :value="14"></el-option>
+          <el-option label="第五名" :value="15"></el-option>
+          <el-option label="第六名" :value="16"></el-option>
+          <el-option label="其他" :value="17"></el-option>
         </el-select>
         <span style="font-size: 12px;">冠军、金牌等同于第一名，亚军、银牌等同于第二名，季军、铜牌等同于第三名</span>
       </el-form-item>
@@ -138,7 +138,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false; addRow()">提交</el-button>
+        <el-button type="primary" @click="submitForm(form)">提交</el-button>
       </div>
     </template>
   </el-dialog>
@@ -147,109 +147,117 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
+import { select, submitCompetition } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+import { onMounted } from 'vue';
 
+
+const userStore = UserStore()
 const ContTableData = ref([
-  {
-    name: '中国大学生数学建模竞赛',
-    organization: '中国大学生数学建模竞赛组委会',
-    date: '2023-05',
-    title: '一等奖',
-    level: '国家级',
-    rank: '一等奖',
-    team: '张力德、吴凯丽',
-    link_name: '21314390_王宏宇_1001',
-    link: 'https://example.com',
-    remarks: '无'
-  },
-  {
-    name: '中山大学英语演讲比赛',
-    organization: '中山大学大学生英语竞赛组委会',
-    date: '2023-03',
-    title: '优秀奖',
-    level: '校级',
-    rank: '优秀奖',
-    team: '李德伟、王思雨',
-    link_name: '21314390_王宏宇_1003',
-    link: 'https://example.com',
-    remarks: '无'
-  },
-  {
-    name: 'RoboCom国际机器人设计大赛',
-    organization: '工业与信息化部、RoboCom国际竞赛组织委员会',
-    date: '2022-07',
-    title: '三等奖',
-    level: '市级',
-    rank: '三等奖',
-    team: '王宏宇、孙鹏林、陈峰起、刘邦云',
-    link_name: '21314390_王宏宇_1004',
-    link: 'https://example.com',
-    remarks: '无'
-  },
-  {
-    name: '程序设计竞赛',
-    organization: '全国大学生程序设计竞赛组委会',
-    date: '2023-01',
-    title: '特等奖',
-    level: '国家级',
-    rank: '特等奖',
-    team: '王宏宇、林晓、周勇',
-    link_name: '21314390_王宏宇_1005',
-    link: 'https://example.com',
-    remarks: '顽强拼搏奖'
-  },
-  {
-    name: '艺术设计比赛',
-    organization: '全国大学生艺术设计竞赛组委会',
-    date: '2022-10',
-    title: '一等奖',
-    level: '省级',
-    rank: '一等奖',
-    team: '王宏宇、张伟、黄婷',
-    link_name: '21314390_王宏宇_1006',
-    link: 'https://example.com',
-    remarks: '无'
-  }
+  // Sample data, replace with your actual data
+  // {
+  //   name: '数学建模竞赛',
+  //   organization: '中国大学生数学建模竞赛组委会',
+  //   date: '2023-05',
+  //   title: '一等奖',
+  //   level: '校级',
+  //   rank: '一等奖',
+  //   team: '小红+21310000、小明+21310001',
+  //   link_name: '证明材料文件名',
+  //   link: 'https://example.com',
+  //   remarks: '无'
+  // }
 ]);
-
 
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  type: '',
-  name: '',
-  organization: '',
-  date: '',
-  title: '',
-  level: '',
-  rank: '',
-  team: '',
-  link_name: '',
-  link: '',
-  remarks: ''
+  comment: "",
+  date: "",
+  idx: "",
+  level: "",
+  link: "",
+  link_name: "",
+  my_rank: "",
+  name: "",
+  organization: "",
+  pid: "",
+  remarks: "",
+  score: "",
+  sid: "",
+  status_one: 0,
+  status_two: -1,
+  team: "",
+  title: "",
+  type: ""
 });
+
+import { format } from 'date-fns';
+
+onMounted(async () => {
+  try {
+    const params = {'SID': userStore.currentUser.sid, 'table': "competition"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: format(new Date(item.date), 'yyyy-MM-dd') // 假设 date 是需要格式化的字段
+      // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
+    }));
+
+    // 更新 ContTableData
+    ContTableData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
+
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
+
+
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitCompetition(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
 
 const deleteRow = (index: number) => {
   ContTableData.value.splice(index, 1);
 };
 
-const addRow = () => {
-  ContTableData.value.push({ ...form });
-  resetForm();
-};
+// const addRow = () => {
+//   ContTableData.value.push({ ...form });
+//   resetForm();
+// };
 
-const resetForm = () => {
-  form.type = '';
-  form.name = '';
-  form.organization = '';
-  form.date = '';
-  form.title = '';
-  form.level = '';
-  form.rank = '';
-  form.team = '';
-  form.link_name = '';
-  form.link = '';
-  form.remarks = '';
-};
+// const resetForm = () => {
+//   form.type = '';
+//   form.name = '';
+//   form.organization = '';
+//   form.date = '';
+//   form.title = '';
+//   form.level = '';
+//   form.rank = '';
+//   form.team = '';
+//   form.link_name = '';
+//   form.link = '';
+//   form.remarks = '';
+// };
 
 </script>
 

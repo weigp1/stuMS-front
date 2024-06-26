@@ -54,13 +54,13 @@
 
       <el-form-item label="第几发明人">
         <el-select v-model="form.author_level" placeholder="请选择发明人类型" style="width: 100%">
-          <el-option label="通讯" value="通讯"></el-option>
-          <el-option label="一作" value="一作"></el-option>
-          <el-option label="通讯+一作" value="通讯+一作"></el-option>
-          <el-option label="通讯+共同一作" value="通讯+共同一作"></el-option>
-          <el-option label="共同一作" value="共同一作"></el-option>
-          <el-option label="二作" value="二作"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="通讯" :value="1"></el-option>
+          <el-option label="一作" :value="2"></el-option>
+          <el-option label="通讯+一作" :value="3"></el-option>
+          <el-option label="通讯+共同一作" :value="4"></el-option>
+          <el-option label="共同一作" :value="5"></el-option>
+          <el-option label="二作" :value="6"></el-option>
+          <el-option label="其他" :value="7"></el-option>
         </el-select>
       </el-form-item>
 
@@ -71,8 +71,8 @@
 
       <el-form-item label="申请状态">
         <el-select v-model="form.application_status" placeholder="请选择申请状态" style="width: 100%">
-          <el-option label="申请中" value="申请中"></el-option>
-          <el-option label="收到证书" value="收到证书"></el-option>
+          <el-option label="申请中" :value="1"></el-option>
+          <el-option label="收到证书" :value="2"></el-option>
         </el-select>
       </el-form-item>
 
@@ -104,7 +104,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button
             type="primary"
-            @click="dialogFormVisible = false">
+            @click="submitForm(form)">
           提交
         </el-button>
       </div>
@@ -116,6 +116,10 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
+import { submitCopyright } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+
+const userStore = UserStore()
 
 // 默认显示
 const SoftwareCopyrightData = ref([
@@ -132,22 +136,48 @@ const SoftwareCopyrightData = ref([
   // 更多数据...
 ]);
 
-const deleteRow = (index: number) => {
-  SoftwareCopyrightData.value.splice(index, 1);
-};
+// const deleteRow = (index: number) => {
+//   SoftwareCopyrightData.value.splice(index, 1);
+// };
 
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  title: '',
-  author_level: '',
-  team: '',
-  application_status: '',
-  date: '',
-  link_name: '',
-  link: '',
-  remarks: ''
+  application_status: "",
+  author_level: "",
+  comment: "",
+  date: "",
+  idx: "",
+  link: "",
+  link_name: "",
+  pid: "",
+  remarks: "",
+  score: "",
+  sid: "",
+  status_one: "",
+  status_two: "",
+  team: "",
+  title: ""
 });
+
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
+
+
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitCopyright(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
 
 </script>
 

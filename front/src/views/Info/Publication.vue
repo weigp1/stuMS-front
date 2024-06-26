@@ -56,13 +56,13 @@
 
       <el-form-item label="第几作者">
         <el-select v-model="form.author_level" placeholder="请选择作者类型" style="width: 100%">
-          <el-option label="通讯" value="通讯"></el-option>
-          <el-option label="一作" value="一作"></el-option>
-          <el-option label="通讯+一作" value="通讯+一作"></el-option>
-          <el-option label="通讯+共同一作" value="通讯+共同一作"></el-option>
-          <el-option label="共同一作" value="共同一作"></el-option>
-          <el-option label="二作" value="二作"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="通讯" :value="1"></el-option>
+          <el-option label="一作" :value="2"></el-option>
+          <el-option label="通讯+一作" :value="3"></el-option>
+          <el-option label="通讯+共同一作" :value="4"></el-option>
+          <el-option label="共同一作" :value="5"></el-option>
+          <el-option label="二作" :value="6"></el-option>
+          <el-option label="其他" :value="7"></el-option>
         </el-select>
       </el-form-item>
 
@@ -77,11 +77,11 @@
 
       <el-form-item label="著作类别">
         <el-select v-model="form.type" placeholder="请选择著作类别" style="width: 100%">
-          <el-option label="研究型著作" value="研究型著作"></el-option>
-          <el-option label="教材" value="教材"></el-option>
-          <el-option label="译著" value="译著"></el-option>
-          <el-option label="编著" value="编著"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="研究型著作" :value="1"></el-option>
+          <el-option label="教材" :value="2"></el-option>
+          <el-option label="译著" :value="3"></el-option>
+          <el-option label="编著" :value="4"></el-option>
+          <el-option label="其他" :value="5"></el-option>
         </el-select>
       </el-form-item>
 
@@ -117,7 +117,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button
             type="primary"
-            @click="dialogFormVisible = false">
+            @click="submitForm(form)">
           提交
         </el-button>
       </div>
@@ -129,6 +129,10 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
+import { submitPublication } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+
+const userStore = UserStore()
 
 // 默认显示
 const BookPublicationData = ref([
@@ -147,24 +151,50 @@ const BookPublicationData = ref([
   // 更多数据...
 ]);
 
-const deleteRow = (index: number) => {
-  BookPublicationData.value.splice(index, 1);
-};
+// const deleteRow = (index: number) => {
+//   BookPublicationData.value.splice(index, 1);
+// };
 
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  title: '',
-  author_level: '',
-  team: '',
-  publisher: '',
-  type: '',
-  date: '',
-  ISBN: '',
-  link_name: '',
-  link: '',
-  remarks: ''
+  author_level: "",
+  comment: "",
+  date: "",
+  idx: "",
+  isbn: "",
+  link: "",
+  link_name: "",
+  pid: "",
+  publisher: "",
+  remarks: "",
+  score: "",
+  sid: "",
+  status_one: "",
+  status_two: "",
+  team: "",
+  title: "",
+  type: ""
 });
+
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
+
+
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitPublication(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
 
 </script>
 

@@ -63,11 +63,11 @@
 
       <el-form-item label="专利类型">
         <el-select v-model="form.type" placeholder="请选择专利类型" style="width: 100%">
-          <el-option label="发明专利" value="发明专利"></el-option>
-          <el-option label="实用新型" value="实用新型"></el-option>
-          <el-option label="外观设计" value="外观设计"></el-option>
-          <el-option label="PCT国际申请" value="PCT国际申请"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="发明专利" :value="1"></el-option>
+          <el-option label="实用新型" :value="2"></el-option>
+          <el-option label="外观设计" :value="3"></el-option>
+          <el-option label="PCT国际申请" :value="4"></el-option>
+          <el-option label="其他" :value="5"></el-option>
         </el-select>
       </el-form-item>
 
@@ -86,12 +86,12 @@
 
       <el-form-item label="是否已受理">
         <el-radio-group v-model="form.acceptance">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="form.acceptance === '是'" label="受理时间">
+      <el-form-item v-if="form.acceptance === 1 " label="受理时间">
         <el-date-picker
             v-model="form.acceptance_date"
             type="date"
@@ -102,12 +102,12 @@
 
       <el-form-item label="是否已公开">
         <el-radio-group v-model="form.my_release">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="form.my_release === '是'" label="公开时间">
+      <el-form-item v-if="form.my_release === 1" label="公开时间">
         <el-date-picker
             v-model="form.release_date"
             type="date"
@@ -118,12 +118,12 @@
 
       <el-form-item label="是否已授权">
         <el-radio-group v-model="form.empower">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="form.empower === '是'" label="授权时间">
+      <el-form-item v-if="form.empower === 1" label="授权时间">
         <el-date-picker
             v-model="form.empower_date"
             type="date"
@@ -134,12 +134,12 @@
 
       <el-form-item label="是否已转让">
         <el-radio-group v-model="form.transferred">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="form.transferred === '是'" label="转让时间">
+      <el-form-item v-if="form.transferred === 1" label="转让时间">
         <el-date-picker
             v-model="form.transferred_date"
             type="date"
@@ -148,7 +148,7 @@
         />
       </el-form-item>
 
-      <el-form-item v-if="form.transferred === '是'" label="转让收入">
+      <el-form-item v-if="form.transferred === 1" label="转让收入">
         <el-input v-model="form.transferred_income" autocomplete="off" style="width: 100%" placeholder="请输入转让收入"/>
       </el-form-item>
 
@@ -171,7 +171,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button
             type="primary"
-            @click="dialogFormVisible = false">
+            @click="submitForm(form)">
           提交
         </el-button>
       </div>
@@ -183,7 +183,12 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
+import { submitPatent } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
 
+const userStore = UserStore()
+
+const dialogFormVisible = ref(false);
 // 默认显示
 const PatentTableData = ref([
   {
@@ -207,31 +212,76 @@ const PatentTableData = ref([
   },
 ]);
 
-const deleteRow = (index: number) => {
-  PatentTableData.value.splice(index, 1);
-};
-
-const dialogFormVisible = ref(false);
-
 const form = reactive({
-  title: '',
-  type: '',
-  application_num: '',
-  certificate_num: '',
-  team: '',
-  acceptance: '',
-  acceptance_date: '',
-  my_release: '',
-  release_date: '',
-  empower: '',
-  empower_date: '',
-  transferred: '',
-  transferred_date: '',
-  transferred_income: '',
-  link_name: '',
-  link: '',
-  remarks: ''
+  acceptance: "",
+  acceptance_date: "",
+  application_num: "",
+  certificate_num: "",
+  comment: "",
+  empower: "",
+  empower_date: "",
+  idx: "",
+  link: "",
+  link_name: "",
+  my_release: "",
+  pid: "",
+  release_date: "",
+  remarks: "",
+  score: "",
+  sid: "",
+  status_one: 0,
+  status_two: -1,
+  team: "",
+  title: "",
+  transferred: "",
+  transferred_date: "",
+  type: ""
 });
+
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
+
+
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitPatent(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
+
+// const deleteRow = (index: number) => {
+//   PatentTableData.value.splice(index, 1);
+// };
+//
+// const dialogFormVisible = ref(false);
+//
+// const form = reactive({
+//   title: '',
+//   type: '',
+//   application_num: '',
+//   certificate_num: '',
+//   team: '',
+//   acceptance: '',
+//   acceptance_date: '',
+//   my_release: '',
+//   release_date: '',
+//   empower: '',
+//   empower_date: '',
+//   transferred: '',
+//   transferred_date: '',
+//   transferred_income: '',
+//   link_name: '',
+//   link: '',
+//   remarks: ''
+// });
 
 </script>
 

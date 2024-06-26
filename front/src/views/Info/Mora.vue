@@ -42,23 +42,22 @@
 
   <!--添加弹窗-->
   <el-dialog v-model="dialogFormVisible" title="表单添加-思想道德类" width="460">
-    <el-form :model="form" label-width="0" label-position="top" class="centered-form">
+    <el-form :model="form" label-width="100px" label-position="top" class="centered-form">
 
-      <el-form-item label="奖项名" label-width="100px">
+      <el-form-item label="奖项名">
         <el-input v-model="form.title" autocomplete="off" style="width: 100%" placeholder="请填写奖项名"/>
       </el-form-item>
 
-      <el-form-item label="获奖时间" label-width="100px">
-          <el-date-picker
-              v-model="form.date"
-              type="date"
-              label="date"
-              placeholder="请选择"
-              style="width: 100%"
-          />
+      <el-form-item label="获奖时间">
+        <el-date-picker
+            v-model="form.date"
+            type="date"
+            placeholder="请选择"
+            style="width: 100%"
+        />
       </el-form-item>
 
-      <el-form-item label="证明材料" label-width="100px">
+      <el-form-item label="证明材料">
         <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请填写证明材料"/>
       </el-form-item>
 
@@ -71,11 +70,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button
-            type="primary"
-            @click="dialogFormVisible = false">
-          提交
-        </el-button>
+        <el-button type="primary" @click="submitForm(form)">提交</el-button>
       </div>
     </template>
   </el-dialog>
@@ -85,8 +80,9 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
+import { submitMorality } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js'
 
-// 默认显示
 const MoraTableData = ref([
   {
     title: '全国三好学生',
@@ -113,13 +109,43 @@ const deleteRow = (index: number) => {
 };
 
 const dialogFormVisible = ref(false);
+const userStore = UserStore()
 
 const form = reactive({
   title: '',
   date: '',
   link: '',
-  remarks: ''
+  remarks: '',
+  comment: '',
+  idx: '',
+  link_name: '', // 这个字段感觉可以删
+  pid: '',
+  score: '',
+  sid: '',
+  status_one: '',
+  status_two: ''
 });
+
+const submitForm = async (form) => {
+  // console.log(userStore.currentUser);
+  form.sid = userStore.currentUser.sid;
+  // form.comment = "xxx";
+  // form.link_name = "xxx";
+  // form.score = "0";
+  form.status_one = 0;
+  form.status_two = -1;
+  // form.idx = "1";
+  // 提交表单数据
+  try {
+    // 调用 submitMorality 函数提交表单数据
+    const response = await submitMorality(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
 
 </script>
 

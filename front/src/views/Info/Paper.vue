@@ -85,8 +85,8 @@
 
       <el-form-item label="论文类型">
         <el-select v-model="form.type" placeholder="请选择论文类型" style="width: 100%">
-          <el-option label="会议论文" value="会议论文"></el-option>
-          <el-option label="期刊论文" value="期刊论文"></el-option>
+          <el-option label="会议论文" :value="1"></el-option>
+          <el-option label="期刊论文" :value="2"></el-option>
         </el-select>
       </el-form-item>
 
@@ -97,13 +97,13 @@
 
       <el-form-item label="作者类型">
         <el-select v-model="form.author_level" placeholder="请选择作者类型" style="width: 100%">
-          <el-option label="通讯" value="通讯"></el-option>
-          <el-option label="一作" value="一作"></el-option>
-          <el-option label="通讯+一作" value="通讯+一作"></el-option>
-          <el-option label="通讯+共同一作" value="通讯+共同一作"></el-option>
-          <el-option label="共同一作" value="共同一作"></el-option>
-          <el-option label="二作" value="二作"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="通讯" :value="1"></el-option>
+          <el-option label="一作" :value="2"></el-option>
+          <el-option label="通讯+一作" :value="3"></el-option>
+          <el-option label="通讯+共同一作" :value="4"></el-option>
+          <el-option label="共同一作" :value="5"></el-option>
+          <el-option label="二作" :value="6"></el-option>
+          <el-option label="其他" :value="7"></el-option>
         </el-select>
       </el-form-item>
 
@@ -126,9 +126,9 @@
 
       <el-form-item label="发表状态">
         <el-select v-model="form.published_status" placeholder="请选择发表状态" style="width: 100%">
-          <el-option label="已投稿" value="已投稿"></el-option>
-          <el-option label="已接收" value="已接收"></el-option>
-          <el-option label="正式发表" value="正式发表"></el-option>
+          <el-option label="已投稿" :value="1"></el-option>
+          <el-option label="已接收" :value="2"></el-option>
+          <el-option label="正式发表" :value="3"></el-option>
         </el-select>
       </el-form-item>
 
@@ -170,31 +170,31 @@
 
       <el-form-item label="CCF推荐情况">
         <el-select v-model="form.CCF" placeholder="请选择CCF推荐情况" style="width: 100%">
-          <el-option label="CCF-A" value="CCF-A"></el-option>
-          <el-option label="CCF-B" value="CCF-B"></el-option>
-          <el-option label="CCF-C" value="CCF-C"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="CCF-A" :value="1"></el-option>
+          <el-option label="CCF-B" :value="2"></el-option>
+          <el-option label="CCF-C" :value="3"></el-option>
+          <el-option label="其他"   :value="4"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="中科院分区">
         <el-select v-model="form.partition" placeholder="请选择中科院分区" style="width: 100%">
-          <el-option label="一区" value="一区"></el-option>
-          <el-option label="二区" value="二区"></el-option>
-          <el-option label="三区" value="三区"></el-option>
-          <el-option label="不适用" value="不适用"></el-option>
+          <el-option label="一区" :value="1"></el-option>
+          <el-option label="二区" :value="2"></el-option>
+          <el-option label="三区" :value="3"></el-option>
+          <el-option label="不适用" :value="4"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="期刊收录情况">
         <el-select v-model="form.inclusion" placeholder="请选择期刊收录情况" style="width: 100%">
-          <el-option label="CSSCI" value="CSSCI"></el-option>
-          <el-option label="CSCD" value="CSCD"></el-option>
-          <el-option label="SCI" value="SCI"></el-option>
-          <el-option label="SSCI" value="SSCI"></el-option>
-          <el-option label="EI" value="EI"></el-option>
-          <el-option label="A&HCI" value="A&HCI"></el-option>
-          <el-option label="其他" value="其他"></el-option>
+          <el-option label="CSSCI" :value="1"></el-option>
+          <el-option label="CSCD" :value="2"></el-option>
+          <el-option label="SCI" :value="3"></el-option>
+          <el-option label="SSCI" :value="4"></el-option>
+          <el-option label="EI" :value="5"></el-option>
+          <el-option label="A&HCI" :value="6"></el-option>
+          <el-option label="其他" :value="7"></el-option>
         </el-select>
       </el-form-item>
 
@@ -208,24 +208,24 @@
 
       <el-form-item label="是否获最佳论文奖">
         <el-radio-group v-model="form.award_flag">
-          <el-radio label="是">是</el-radio>
-          <el-radio label="否">否</el-radio>
+          <el-radio label="是" :value="1">是</el-radio>
+          <el-radio label="否" :value="2">否</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item label="是否国际合作">
         <el-select v-model="form.collaborative_one" placeholder="请选择是否国际合作" style="width: 100%">
-          <el-option label="国外合作" value="国外合作"></el-option>
-          <el-option label="港澳台合作" value="港澳台合作"></el-option>
-          <el-option label="非国际合作" value="非国际合作"></el-option>
+          <el-option label="国外合作" :value="1"></el-option>
+          <el-option label="港澳台合作" :value="2"></el-option>
+          <el-option label="非国际合作" :value="3"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="是否本单位合作">
         <el-select v-model="form.collaborative_two" placeholder="请选择是否本单位合作" style="width: 100%">
-          <el-option label="校内合作" value="校内合作"></el-option>
-          <el-option label="院内合作" value="院内合作"></el-option>
-          <el-option label="否" value="否"></el-option>
+          <el-option label="校内合作" :value="1"></el-option>
+          <el-option label="院内合作" :value="2"></el-option>
+          <el-option label="否" :value="3"></el-option>
         </el-select>
       </el-form-item>
 
@@ -248,7 +248,7 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button
             type="primary"
-            @click="dialogFormVisible = false; addRow()">
+            @click="submitForm(form)">
           提交
         </el-button>
       </div>
@@ -259,6 +259,9 @@
 <script lang="ts" setup>
 import {reactive, ref} from "vue";
 import { Delete } from "@element-plus/icons-vue";
+import { submitPaper } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+
 // 默认显示
 const PaperTableData = ref([
   // 示例数据
@@ -299,44 +302,76 @@ const deleteRow = (index: number) => {
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  title: '',
-  type: '',
-  publish: '',
   author_level: '',
   authors: '',
-  corresponding_author: '',
-  issn_cn: '',
-  factor: 0,
-  published_status: '',
-  submission_date: '',
-  received_date: '',
-  publication_date: '',
-  range: '',
-  DOI_PMID: '',
-  CCF: '',
-  partition: '',
-  inclusion: '',
-  publisher: '',
-  language: '',
   award_flag: '',
+  ccf: '',
   collaborative_one: '',
   collaborative_two: '',
-  link_name: '',
+  comment: '',
+  corresponding_author: '',
+  doi_PMID: '',
+  factor: '',
+  idx: '',
+  inclusion: '',
+  issn_CN: '',
+  language: '',
   link: '',
-  remarks: ''
+  link_name: '',
+  my_partition: '',
+  my_range: '',
+  pid: '',
+  publication_date: '',
+  publish: '',
+  published_status: '',
+  publisher: '',
+  received_date: '',
+  remarks: '',
+  score: '',
+  sid: '',
+  status_one: '',
+  status_two: '',
+  submission_date: '',
+  title: '',
+  type: ''
 });
 
-const addRow = () => {
-  PaperTableData.value.push({ ...form });
-  resetForm();
-};
+// const addRow = () => {
+//   PaperTableData.value.push({ ...form });
+//   dialogFormVisible.value = false;
+//   resetForm();
+// };
 
-const resetForm = () => {
-  Object.keys(form).forEach(key => {
-    form[key] = '';
-  });
-  form.factor = 0;
-};
+// const resetForm = () => {
+//   Object.keys(form).forEach(key => {
+//     form[key] = '';
+//   });
+//   form.factor = 0;
+// };
+
+
+const userStore = UserStore()
+
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  console.log(form);
+
+
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitPaper(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
+
+
 </script>
 
 <style scoped>

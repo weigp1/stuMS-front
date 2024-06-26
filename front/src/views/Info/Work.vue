@@ -76,7 +76,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false; addRow()">提交</el-button>
+        <el-button type="primary" @click="submitForm(form)">提交</el-button>
       </div>
     </template>
   </el-dialog>
@@ -85,6 +85,10 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
+import { submitSocialWork } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+
+const userStore = UserStore()
 
 const WorkTableData = ref([
   // Sample data, replace with your actual data
@@ -101,31 +105,57 @@ const WorkTableData = ref([
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  title: '',
-  date_start: '',
-  date_end: '',
-  link_name: '',
-  link: '',
-  remarks: ''
+  comment: "",
+  date_end: "",
+  date_start: "",
+  idx: "",
+  link: "",
+  link_name: "",
+  pid: "",
+  remarks: "",
+  score: "",
+  sid: "",
+  status_one: "",
+  status_two: "",
+  title: ""
 });
 
-const deleteRow = (index: number) => {
-  WorkTableData.value.splice(index, 1);
-};
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
 
-const addRow = () => {
-  WorkTableData.value.push({ ...form });
-  resetForm();
-};
 
-const resetForm = () => {
-  form.title = '';
-  form.date_start = '';
-  form.date_end = '';
-  form.link_name = '';
-  form.link = '';
-  form.remarks = '';
-};
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitSocialWork(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
+
+// const deleteRow = (index: number) => {
+//   WorkTableData.value.splice(index, 1);
+// };
+//
+// const addRow = () => {
+//   WorkTableData.value.push({ ...form });
+//   resetForm();
+// };
+//
+// const resetForm = () => {
+//   form.title = '';
+//   form.date_start = '';
+//   form.date_end = '';
+//   form.link_name = '';
+//   form.link = '';
+//   form.remarks = '';
+// };
 
 </script>
 

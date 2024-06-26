@@ -60,21 +60,21 @@
 
       <el-form-item label="活动类型">
         <el-select v-model="form.type" placeholder="请选择活动类型">
-          <el-option label="助学支教" value="助学支教"/>
-          <el-option label="文化文艺服务" value="文化文艺服务"/>
-          <el-option label="科学普及" value="科学普及"/>
-          <el-option label="理论政策宣讲" value="理论政策宣讲"/>
-          <el-option label="敬老服务" value="敬老服务"/>
-          <el-option label="助残服务" value="助残服务"/>
-          <el-option label="文明交通" value="文明交通"/>
-          <el-option label="卫生环保" value="卫生环保"/>
-          <el-option label="扶贫帮困" value="扶贫帮困"/>
-          <el-option label="体育活动" value="体育活动"/>
-          <el-option label="迎新活动" value="迎新活动"/>
-          <el-option label="三下乡" value="三下乡"/>
-          <el-option label="会务工作" value="会务工作"/>
-          <el-option label="医疗服务" value="医疗服务"/>
-          <el-option label="其他" value="其他"/>
+          <el-option label="助学支教" :value="1"/>
+          <el-option label="文化文艺服务" :value="2"/>
+          <el-option label="科学普及" :value="3"/>
+          <el-option label="理论政策宣讲" :value="4"/>
+          <el-option label="敬老服务" :value="5"/>
+          <el-option label="助残服务" :value="6"/>
+          <el-option label="文明交通" :value="7"/>
+          <el-option label="卫生环保" :value="8"/>
+          <el-option label="扶贫帮困" :value="9"/>
+          <el-option label="体育活动" :value="10"/>
+          <el-option label="迎新活动" :value="11"/>
+          <el-option label="三下乡" :value="12"/>
+          <el-option label="会务工作" :value="13"/>
+          <el-option label="医疗服务" :value="14"/>
+          <el-option label="其他" :value="15"/>
         </el-select>
       </el-form-item>
 
@@ -107,7 +107,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false; addRow()">提交</el-button>
+        <el-button type="primary" @click="submitForm(form)">提交</el-button>
       </div>
     </template>
   </el-dialog>
@@ -116,6 +116,10 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
+import { submitVolunteer } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+
+const userStore = UserStore()
 
 const VolTableData = ref([
   // Sample data, replace with your actual data
@@ -135,37 +139,62 @@ const VolTableData = ref([
 const dialogFormVisible = ref(false);
 
 const form = reactive({
-  title: '',
-  organization: '',
-  type: '',
-  date_start: '',
-  date_end: '',
-  duration: '',
-  link_name: '',
-  link: '',
-  remarks: ''
+  comment: "",
+  date_end: "",
+  date_start: "",
+  duration: "",
+  idx: "",
+  link: "",
+  link_name: "",
+  organization: "",
+  pid: "",
+  remarks: "",
+  sid: "",
+  status_one: "",
+  status_two: "",
+  title: "",
+  type: ""
 });
 
-const deleteRow = (index: number) => {
-  VolTableData.value.splice(index, 1);
-};
+const submitForm = async (form) => {
+  form.sid = userStore.currentUser.sid;
+  form.status_one = "0";
+  form.status_two = "-1";
+  // console.log(form);
 
-const addRow = () => {
-  VolTableData.value.push({ ...form });
-  resetForm();
-};
 
-const resetForm = () => {
-  form.title = '';
-  form.organization = '';
-  form.type = '';
-  form.date_start = '';
-  form.date_end = '';
-  form.duration = '';
-  form.link_name = '';
-  form.link = '';
-  form.remarks = '';
-};
+  // 提交表单数据
+  try {
+    // 调用 submitPaper 函数提交表单数据
+    const response = await submitVolunteer(form);
+    console.log('提交成功!', response);
+    // 处理成功后的逻辑，比如关闭弹窗等
+    dialogFormVisible.value = false;
+  } catch (error) {
+    console.error('提交失败!', error);
+  }
+}
+
+// const deleteRow = (index: number) => {
+//   VolTableData.value.splice(index, 1);
+// };
+//
+// const addRow = () => {
+//   VolTableData.value.push({ ...form });
+//   resetForm();
+// };
+//
+// const resetForm = () => {
+//   form.title = '';
+//   form.organization = '';
+//   form.type = '';
+//   form.date_start = '';
+//   form.date_end = '';
+//   form.duration = '';
+//   form.link_name = '';
+//   form.link = '';
+//   form.remarks = '';
+// };
 
 </script>
 
