@@ -20,7 +20,7 @@
     <el-menu-item style="position: absolute; right: 2%; height: 100%; border-radius: 10px;" index="0">
       <el-row>
         <el-col :span="8">
-          <el-image style="width: 80%; height: auto; top: -25%;" src="/src/assets/avatar.png"/>
+          <el-image style="width: 90%; height: auto; top: -10%;" src="/src/assets/avatar.png"/>
         </el-col>
         <el-col :span="8">
           <div class="user" @click.stop="handleUserClick">用户</div>
