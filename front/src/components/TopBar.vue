@@ -1,4 +1,8 @@
 <template>
+
+  <div class="top-bar">
+    <img src="/src/assets/topBar.png" alt="Top Bar">
+  </div>
   <!-- 顶部导航栏的外层容器 -->
 
   <!-- 使用Element UI的el-menu组件来创建导航栏 -->
@@ -115,5 +119,19 @@ const handleClick = () =>{
 //  font-weight: bold;
 //  color: #078d18;
 //}
+
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 15vh;
+  z-index: 200;
+}
+
+.top-bar img {
+  width: 100%;
+  height: 100%;
+}
 
 </style>
