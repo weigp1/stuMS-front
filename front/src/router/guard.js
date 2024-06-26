@@ -24,7 +24,7 @@ function createPermissionGuard(router) {
     // 没有 Token
     else{
       // login 不需要 token 即可访问
-      if (['/login'].includes(to.path)) {
+      if (['/login','/forgot-password'].includes(to.path)) {
         return true
       }
       else
