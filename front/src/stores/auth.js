@@ -2,6 +2,7 @@ import { unref } from 'vue'
 import { defineStore } from 'pinia'
 import { UserStore } from './user'
 import { router } from '../router'
+import { ElMessage } from "element-plus"
 
 export const AuthStore = defineStore('auth', {
   state: () => ({

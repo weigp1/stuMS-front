@@ -38,7 +38,7 @@ async function uploadFile(bucketName, objectName, file) {
 // 定义函数来向服务器请求预签名 URL
 async function GetPresignedURL(bucketName, objectName) {
   try {
-    const response = await axios.get('http://localhost:3000/GetObjectPresignedURL', {
+    const response = await axios.get('http://43.136.61.147:3000/GetObjectPresignedURL', {
       params: {
         bucketName,
         objectName,

@@ -5,6 +5,7 @@
       <el-card class="card">
         <el-input v-model="input_account" class="account" placeholder="账号"/>
         <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
+        <el-checkbox v-model="rememberMe">记住我</el-checkbox>
         <el-button class="login" @click="call_login()">
           登录
         </el-button>
@@ -24,13 +25,15 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { UserStore } from '../../stores/user'
 import { AuthStore } from '../../stores/auth'
 import { login } from '../../api/api.js'
 import { ElMessage } from "element-plus"
+import Cookies from 'js-cookie'
 
 const router = useRouter()
 const { query } = useRoute()
@@ -40,6 +43,7 @@ const authStore = AuthStore()
 
 let input_account = ref('')
 let input_password = ref('')
+let rememberMe = ref(false)
 
 let showContact = ref(false)
 
@@ -55,10 +59,25 @@ async function call_login() {
     let response = await login(account)
     const { code, data } = response
     if (code === 200) {
-      authStore.setToken(response.data)
+      authStore.setToken(data)
       let sid = { 'SID': input_account.value }
       await userStore.login(sid)
       ElMessage.success('登录成功')
+
+      // 保存token到cookie
+      if (rememberMe.value)
+      {
+        const cookieOptions = {
+        expires: rememberMe.value ? 1 : null, // 1天有效期或会话结束时失效
+        sameSite: 'Strict',                  // 防止CSRF攻击
+        // secure: true,                        // 仅通过HTTPS传输
+        // httpOnly: true                       // 防止客户端脚本访问cookie
+        }
+        Cookies.set('authToken', data, cookieOptions)
+        Cookies.set('SID', input_account.value, cookieOptions)
+      }
+
+
       if (query.redirect) {
         const path = query.redirect
         Reflect.deleteProperty(query, 'redirect')
@@ -83,7 +102,23 @@ function hideContactInfo() {
   showContact.value = false
 }
 
-
+// 应用初始化时检查cookie中的token
+onMounted(() => {
+  const token = Cookies.get('authToken')
+  const sid = Cookies.get('SID')
+  if (token) {
+    console.log('token:', token)
+    authStore.setToken(token)
+    userStore.login({ 'SID': sid })
+      .then(() => {
+        router.push('/home')
+      })
+      .catch(error => {
+        console.error('Error:', error.message)
+        userStore.logout()
+      })
+  }
+})
 </script>
 
 <style scoped>
