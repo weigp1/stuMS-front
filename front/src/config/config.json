@@ -18,7 +18,17 @@
         {
             "index": "/audit",
             "label": "审核进度",
-            "mainMenu": "noSub"
+            "mainMenu": "hasSub"
+        },
+        {
+            "index": "personal",
+            "label": "个人信息",
+            "mainMenu": "/audit"
+        },
+        {
+            "index": "overall",
+            "label": "综测项目",
+            "mainMenu": "/audit"
         }
     ]
 }

@@ -2,7 +2,7 @@
 
   <el-image
       src="/src/assets/topBar.png"
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 20%; z-index: 998;"
+      style="position: fixed; top: 0; left: 0; width: 100%; height: 15%; z-index: 998;"
       alt="Top Bar"
   />
 
@@ -17,10 +17,20 @@
       <template v-if="item.mainMenu === 'noSub'">
         <el-menu-item :index="item.index" class="menu">{{ item.label }}</el-menu-item>
       </template>
+
       <template v-if="item.mainMenu === 'hasSub'">
-        <el-sub-menu :index="item.index">
-          <template #title>{{ item.label }}</template>
+        <el-sub-menu :index="item.index" class="menu">
+          <template #title>
+            <span class="menu-title">{{ item.label }}</span>
+          </template>
+          <template v-for="subItem in menuItems">
+            <el-menu-item :index="item.index + '?category=' + subItem.index"
+                          v-if="subItem.mainMenu == item.index" class="submenu-item">
+              {{ subItem.label }}
+            </el-menu-item>
+          </template>
         </el-sub-menu>
+
       </template>
     </template>
 
@@ -41,8 +51,6 @@
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
   </el-menu>
 </template>
-
-
 
 <script lang="ts" setup>
 import { useRoute, useRouter} from 'vue-router'
@@ -67,7 +75,6 @@ const handleUserClick = () => {
   router.push({ path: "/info" })
 }
 
-
 const handleLogoutClick = () => {
   // 删除cookie
   Cookies.remove('authToken')
@@ -75,8 +82,6 @@ const handleLogoutClick = () => {
   // 跳转到登录页面
   authStore.logout()
 }
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -94,8 +99,37 @@ const handleLogoutClick = () => {
 .menu {
   font-size: 18px;
   font-weight: bold;
+  border: 0;
   color: #ffffff;
 }
+
+.menu-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff; /* 白色字体 */
+}
+
+.submenu-item {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000; /* 黑色字体 */
+  text-align: center; /* 水平居中 */
+  min-width: 135px !important;
+}
+
+.el-sub-menu .el-sub-menu__title {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+}
+
+.el-menu--horizontal.el-menu {
+  border-bottom: 0;
+}
+
+.el-menu--collapse .el-menu .el-submenu, .el-menu--popup{
+  min-width: 135px !important;
+}
+
 
 .user {
   z-index: 999;

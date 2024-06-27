@@ -1,15 +1,30 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import {ref, computed, onMounted, watch} from 'vue';
 import TopBar from "../../components/TopBar.vue";
-import { ElTable, ElTableColumn, ElDialog } from 'element-plus';
+import { ElCard, ElDialog, ElSelect, ElOption } from 'element-plus';
+import {useRoute} from "vue-router";
+
+// 导入图标
+import YesIcon from '../../assets/status/Yes.png';
+import WaitIcon from '../../assets/status/Wait.png';
+import NoIcon from '../../assets/status/No.png';
 
 // 模拟从数据库读取的数据
 const rawData = ref([]);
 
+// personalVisible=true 表示读取个人信息，即category='personal'
+const personalVisible = ref(false);
+
 // 筛选和排序选项
 const selectedOption = ref('政治思想道德类');
-const sortBy = ref('time');
-const selectedCategory = ref('personal');
+
+// 选项数据
+const options = ref([
+  { value: '政治思想道德类', label: '政治思想道德类' },
+  { value: '文体实践类', label: '文体实践类' },
+  { value: '社会工作类', label: '社会工作类' },
+  { value: '学习、竞赛及科研成果类', label: '学习、竞赛及科研成果类' },
+]);
 
 // 弹窗控制和内容
 const dialogVisible = ref(false);
@@ -28,18 +43,21 @@ const fetchData = () => {
     { id: 7, class: '社会工作类', date: '2023-07-01', name: '奖项7', remarks: '备注7', status: 2, category: 'personal' },
     { id: 8, class: '学习、竞赛及科研成果类', date: '2023-08-01', name: '奖项8', remarks: '备注8', status: 2, category: 'overall' },
     { id: 9, class: '政治思想道德类', date: '2023-09-01', name: '奖项9', remarks: '备注99999', status: 2, category: 'personal' },
-    { id: 10, class: '文体实践类', date: '2023-10-01', name: '奖项10', remarks: '备注10', status: 0, category: 'overall' }
+    { id: 10, class: '文体实践类', date: '2023-10-01', name: '奖项10', remarks: '备注10', status: 0, category: 'overall' },
+    { id: 11, class: '政治思想道德类', date: '2023-11-01', name: '奖项11', remarks: '备注1111', status: 0, category: 'overall' },
+    { id: 12, class: '政治思想道德类', date: '2024-11-01', name: '奖项12', remarks: '备注123331', status: 0, category: 'personal' }
   ];
 };
 
 // 根据筛选和排序选项处理数据
 const filteredData = computed(() => {
+
   let data = rawData.value;
 
-  // 根据选中的类别过滤数据
-  if (selectedCategory.value === 'personal') {
+  // 筛选数据
+  if (personalVisible.value) {
     data = data.filter(item => item.category === 'personal');
-  } else if (selectedCategory.value === 'overall') {
+  } else {
     data = data.filter(item => item.category === 'overall');
   }
 
@@ -61,62 +79,76 @@ const getStatusText = (status) => {
 };
 
 const getStatusStyle = (status) => {
-  if (status === 0) return { color: 'black' };
-  if (status === 1) return { color: 'green' };
-  if (status === 2) return { color: 'red' };
+  if (status === 0) return {color: 'orange'};
+  if (status === 1) return {color: 'green'};
+  if (status === 2) return {color: 'red'};
 };
+
+const getStatusIcon = (status) => {
+  if (status === 0) return WaitIcon;
+  if (status === 1) return YesIcon;
+  if (status === 2) return NoIcon;
+};
+
+const route = useRoute();
+
+const updateVisibility = () => {
+  if (route.query.category === 'personal') {
+    personalVisible.value = true;
+  } else if (route.query.category === 'overall') {
+    personalVisible.value = false;
+  }
+};
+
+watch(
+    () => route.query.category,
+    updateVisibility
+);
 
 onMounted(() => {
   fetchData();
+  updateVisibility();
 });
+
 </script>
 
 <template>
   <div class="box">
-    <TopBar />
-    <br>
-    <br>
-    <br>
-    <br>
+    <TopBar/>
     <div class="content">
       <div class="filter-bar">
-        <button @click="selectedCategory = 'personal'" :class="{ active: selectedCategory === 'personal' }">个人成绩</button>
-        <button @click="selectedCategory = 'overall'" :class="{ active: selectedCategory === 'overall' }">综测成绩</button>
+        <el-select v-model="selectedOption" filterable placeholder="请选择">
+          <el-option
+              class="select_item"
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
       </div>
 
-      <div class="options">
-        <select v-model="selectedOption">
-          <option value="政治思想道德类">政治思想道德类</option>
-          <option value="文体实践类">文体实践类</option>
-          <option value="社会工作类">社会工作类</option>
-          <option value="学习、竞赛及科研成果类">学习、竞赛及科研成果类</option>
-        </select>
-      </div>
-
-      <el-table :data="filteredData" style="width: 100%" :default-sort="{prop: 'date', order: 'descending'}">
-        <el-table-column prop="class" label="类别" width="200"></el-table-column>
-        <el-table-column prop="date" label="日期" sortable width="200"></el-table-column>
-        <el-table-column prop="name" label="奖项" width="800"></el-table-column>
-        <el-table-column prop="status" label="状态" sortable width="100">
-          <template #default="scope">
-            <span :style="getStatusStyle(scope.row.status)">
-              {{ getStatusText(scope.row.status) }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="remarks" label="审核意见" width="100">
-          <template #default="scope">
-            <div>
-              <label v-if="scope.row.remarks.length > 3" @click="showRemarks(scope.row.remarks)">....</label>
-              <span v-else>{{ scope.row.remarks }}</span>
+      <div class="card-container">
+        <el-card v-for="item in filteredData" :key="item.id" class="card" shadow="hover"
+                 @click="showRemarks(item.remarks)">
+          <div class="card-content">
+            <div class="status-icon">
+              <img :src="getStatusIcon(item.status)" alt="status icon"/>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="options" label="操作" width="100"></el-table-column>
-      </el-table>
+            <div class="card-text">
+              <p>类别: {{ item.class }}</p>
+              <p>日期: {{ item.date }}</p>
+              <p>奖项: {{ item.name }}</p>
+              <p :style="getStatusStyle(item.status)">状态: {{ getStatusText(item.status) }}</p>
+            </div>
+          </div>
+        </el-card>
+      </div>
 
       <el-dialog v-model="dialogVisible" title="审核意见">
-        <p>{{ dialogContent }}</p>
+        <div class="dialog-content">
+          <p>{{ dialogContent }}</p>
+        </div>
       </el-dialog>
 
     </div>
@@ -125,50 +157,92 @@ onMounted(() => {
 
 <style scoped>
 .box {
-  height: 100vh;
+  min-height: 100vh;
   background-image: url("../../assets/background.jpg");
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .content {
+  top: 15vh;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .filter-bar {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.filter-bar button {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  cursor: pointer;
-}
-
-.filter-bar button.active {
-  background-color: #007bff;
-  color: white;
-}
-
-.options {
-  display: flex;
+  justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-.options select {
-  margin-right: 1rem;
+.el-select {
+  min-width: 200px;
 }
 
-
-.radio-group label {
-  margin-right: 1rem;
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
 }
 
-label {
-  color: blue;
+.card {
+  width: 50vh;
+  min-width: 50vh;
+  margin-bottom: 1rem;
+  border-radius: 20px;
   cursor: pointer;
-  text-decoration: underline;
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.status-icon {
+  flex: 1;
+  display: flex;
+}
+
+.status-icon img {
+  width: 10vh;
+  height: auto;
+  flex-direction: column;
+  justify-content: center;
+  left: 3vh;
+}
+
+.card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card p {
+  margin: 0.5rem 0;
+}
+
+.dialog-content {
+  min-height: 60vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 1000px) {
+  .card {
+    width: 45%;
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    width: 100%;
+  }
 }
 </style>
