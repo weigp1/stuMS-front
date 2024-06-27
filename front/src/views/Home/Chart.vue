@@ -39,6 +39,12 @@ export default {
         },
         {
           imagePath: "/src/assets/homePage/homeChartPic3.jpg",
+        },
+        {
+          imagePath: "/src/assets/homePage/homeChartPic4.jpg",
+        },
+        {
+          imagePath: "/src/assets/homePage/homeChartPic5.jpg",
         }
       ]
     }

@@ -1,124 +1,113 @@
 <template>
-  <meta charset="charset=utf-8"/>
+  <meta charset="charset=utf-8" />
   <div class="centered">
-    <div>
-      <el-card class="card">
-        <el-input v-model="input_account" class="account" placeholder="账号"/>
-        <el-input v-model="input_password" class="password" type="password" placeholder="密码"/>
+    <div v-if="!showLoginForm">
+      <el-card class="login-box">
+        <h1>用户登录</h1>
+        <el-button class="account-login" @click="showLoginForm = true">账号登录</el-button>
+      </el-card>
+    </div>
+    <div v-else>
+      <el-card class="login-box">
+        <el-input v-model="input_account" class="account" placeholder="账号" />
+        <el-input v-model="input_password" class="password" type="password" placeholder="密码" />
         <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-        <el-button class="login" @click="call_login()">
-          登录
-        </el-button>
+        <el-button class="login" @click="call_login()">登录</el-button>
         <span style="display: flex; justify-content: center; position: relative;">
-          <el-button class="getPass" @click="router.push('/forgot-password');">
-            忘记密码
-          </el-button>
-          <el-button class="help" @mouseover="showContactInfo" @mouseleave="hideContactInfo">
-            需要帮助
-          </el-button>
-          <div v-if="showContact" class="contact-info">
-            请联系: xxx-xxx-xxxx
-          </div>
+          <el-button class="getPass" @click="router.push('/forgot-password');">忘记密码</el-button>
+          <el-button class="help" @mouseover="showContactInfo" @mouseleave="hideContactInfo">需要帮助</el-button>
+          <div v-if="showContact" class="contact-info">请联系: xxx-xxx-xxxx</div>
         </span>
       </el-card>
     </div>
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { UserStore } from '../../stores/user'
-import { AuthStore } from '../../stores/auth'
-import { login } from '../../api/api.js'
-import { ElMessage } from "element-plus"
-import Cookies from 'js-cookie'
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { UserStore } from '../../stores/user';
+import { AuthStore } from '../../stores/auth';
+import { login } from '../../api/api.js';
+import { ElMessage } from "element-plus";
+import Cookies from 'js-cookie';
 
-const router = useRouter()
-const { query } = useRoute()
+const router = useRouter();
+const { query } = useRoute();
 
-const userStore = UserStore()
-const authStore = AuthStore()
+const userStore = UserStore();
+const authStore = AuthStore();
 
-let input_account = ref('')
-let input_password = ref('')
-let rememberMe = ref(false)
+let input_account = ref('');
+let input_password = ref('');
+let rememberMe = ref(false);
+let showLoginForm = ref(false);
+let showContact = ref(false);
 
-let showContact = ref(false)
-
-// 处理登录操作
 async function call_login() {
   if (!input_account.value || !input_password.value) {
-    ElMessage.info('请输入用户名和密码')
-    return
+    ElMessage.info('请输入用户名和密码');
+    return;
   }
-  let account = { 'SID': input_account.value, 'password': input_password.value }
-  
+  let account = { 'SID': input_account.value, 'password': input_password.value };
+
   try {
-    let response = await login(account)
-    const { code, data } = response
+    let response = await login(account);
+    const { code, data } = response;
     if (code === 200) {
-      authStore.setToken(data)
-      let sid = { 'SID': input_account.value }
-      await userStore.login(sid)
-      ElMessage.success('登录成功')
+      authStore.setToken(data);
+      let sid = { 'SID': input_account.value };
+      await userStore.login(sid);
+      ElMessage.success('登录成功');
 
-      // 保存token到cookie
-      if (rememberMe.value)
-      {
+      if (rememberMe.value) {
         const cookieOptions = {
-        expires: rememberMe.value ? 1 : null, // 1天有效期或会话结束时失效
-        sameSite: 'Strict',                  // 防止CSRF攻击
-        // secure: true,                        // 仅通过HTTPS传输
-        // httpOnly: true                       // 防止客户端脚本访问cookie
-        }
-        Cookies.set('authToken', data, cookieOptions)
-        Cookies.set('SID', input_account.value, cookieOptions)
+          expires: rememberMe.value ? 1 : null,
+          sameSite: 'Strict',
+        };
+        Cookies.set('authToken', data, cookieOptions);
+        Cookies.set('SID', input_account.value, cookieOptions);
       }
-
 
       if (query.redirect) {
-        const path = query.redirect
-        Reflect.deleteProperty(query, 'redirect')
-        router.push({ path, query })
+        const path = query.redirect;
+        Reflect.deleteProperty(query, 'redirect');
+        router.push({ path, query });
       } else {
-        router.push('/home')
+        router.push('/home');
       }
     } else if (code === 301) {
-      ElMessage.error('登录已无效，请重新登录！')
-      userStore.logout()
+      ElMessage.error('登录已无效，请重新登录！');
+      userStore.logout();
     }
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', error.message);
   }
 }
 
 function showContactInfo() {
-  showContact.value = true
+  showContact.value = true;
 }
 
 function hideContactInfo() {
-  showContact.value = false
+  showContact.value = false;
 }
 
-// 应用初始化时检查cookie中的token
 onMounted(() => {
-  const token = Cookies.get('authToken')
-  const sid = Cookies.get('SID')
+  const token = Cookies.get('authToken');
+  const sid = Cookies.get('SID');
   if (token) {
-    console.log('token:', token)
-    authStore.setToken(token)
+    authStore.setToken(token);
     userStore.login({ 'SID': sid })
-      .then(() => {
-        router.push('/home')
-      })
-      .catch(error => {
-        console.error('Error:', error.message)
-        userStore.logout()
-      })
+        .then(() => {
+          router.push('/home');
+        })
+        .catch(error => {
+          console.error('Error:', error.message);
+          userStore.logout();
+        });
   }
-})
+});
 </script>
 
 <style scoped>
@@ -127,51 +116,71 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url("../../assets/background.jpg");
+  width: 100vw;
+  background-image: url("../../assets/login.jpg");
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.card {
+.login-box {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  width: 50vh;
-  padding: 2vh;
-  opacity: 1;
-  color: aliceblue;
-  border-radius: 2vh;
+  background: rgba(255, 255, 255, 0.8);
+  height: 45vh;
+  width: 25vw;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.login-box h1 {
+  text-align: center;
+  width: 15vw;
+  top: 15vh;
+  color: black;
+}
+
+.account-login {
+  display: flex;
+  justify-content: center;
+  background-color: #007bff;
+  bottom: 18vh;
+  color: white;
+  border: none;
+  height: 6vh;
+  width: 15vw;
+  margin-top: 50vh;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .account, .password {
   display: flex;
   justify-content: center;
+  top: 15px;
   width: 35vh;
-  height: 5vh;
+  height: 6vh;
   opacity: 1;
-  margin-bottom: 2vh;
+  margin-bottom: 3vh;
   font-size: 2vh;
 }
 
 .login {
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 35vh;
   height: 5.2vh;
+  cursor: pointer;
   border-radius: 1vh;
   margin-bottom: 2vh;
+  margin-top: 2vh;
   opacity: 1;
   border: none;
-  background-color: rgba(12, 64, 196, 0.58);
+  background-color: #007bff;
   font-size: 2.5vh;
   color: aliceblue;
-}
-
-.button-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 2vh;
 }
 
 .getPass, .help {
@@ -181,26 +190,27 @@ onMounted(() => {
   text-align: center;
   letter-spacing: 0;
   font-size: 2vh;
-  color: rgba(35, 101, 255, 0.6);
+  color: #007bff;
+  background-color: transparent;
 }
 
 .getPass {
-  margin-right: 1vh;
+  margin-right: 2vh;
 }
 
 .help {
-  margin-left: 1vh;
+  margin-left: 2vh;
 }
 
 .contact-info {
   position: absolute;
-  top: 4vh;
+  top: 3vh;
   left: 16vh;
   width: 20vh;
-  background-color: white;
+  background-color: transparent;
   padding: 1vh;
   border-radius: 1vh;
   font-size: 1.8vh;
-  color: rgba(35, 101, 255, 0.6);
+  color: #007bff;
 }
 </style>
