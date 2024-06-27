@@ -94,7 +94,7 @@
       </el-form-item>
 
       <el-form-item label="比赛名次">
-        <el-select v-model="form.rank" placeholder="请选择">
+        <el-select v-model="form.my_rank" placeholder="请选择">
           <el-option label="特等奖" :value="1"></el-option>
           <el-option label="一等奖" :value="2"></el-option>
           <el-option label="二等奖" :value="3"></el-option>
@@ -147,7 +147,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
-import { select, submitCompetition } from '../../api/api.js';
+import {deleteByPID, select, submitCompetition} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import { onMounted } from 'vue';
 
@@ -192,10 +192,49 @@ const form = reactive({
   type: ""
 });
 
+const levelMaps = {
+  1: '国际级',
+  2: '国家级',
+  3: '省部级',
+  4: '校级',
+  5: '院级',
+  6: '其他'
+};
+
+const rankMaps = {
+  1: '特等奖',
+  2: '一等奖',
+  3: '二等奖',
+  4: '三等奖',
+  5: '冠军',
+  6: '亚军',
+  7: '季军',
+  8: '金奖',
+  9: '银奖',
+  10: '铜奖',
+  11: '第一名',
+  12: '第二名',
+  13: '第三名',
+  14: '第四名',
+  15: '第五名',
+  16: '第六名',
+  17: '其他'
+};
+
+const typeMaps = {
+  1: '学科竞赛',
+  2: '文娱比赛',
+  3: '体育比赛',
+  4: '实践活动',
+  5: '征文比赛',
+  6: '其他'
+}
+
 import { format } from 'date-fns';
 
 onMounted(async () => {
   try {
+    console.log("currentUser:", userStore.currentUser)
     const params = {'SID': userStore.currentUser.sid, 'table': "competition"};
     // 调用 select 接口获取数据
     const response = await select(params);
@@ -204,8 +243,10 @@ onMounted(async () => {
     // 处理接口返回的数据，格式化日期字段为年月日
     const formattedData = response.data.map(item => ({
       ...item,
-      date: format(new Date(item.date), 'yyyy-MM-dd') // 假设 date 是需要格式化的字段
-      // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
+      date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
+      rank: rankMaps[item.my_rank],
+      level: levelMaps[item.level],
+      type: typeMaps[item.type],
     }));
 
     // 更新 ContTableData
@@ -216,6 +257,17 @@ onMounted(async () => {
   }
 });
 
+const deleteRow = async (index) => {
+  try {
+    const item = ContTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "competition"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    ContTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
 
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
@@ -231,14 +283,23 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+    const params = {'SID': userStore.currentUser.sid, 'table': "competition"};
+    const response2 = await select(params);
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
+      rank: rankMaps[item.my_rank],
+      level: levelMaps[item.level],
+      type: typeMaps[item.type],
+      // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
+    }));
+
+    // 更新 ContTableData
+    ContTableData.value = formattedData;
   } catch (error) {
     console.error('提交失败!', error);
   }
 }
-
-const deleteRow = (index: number) => {
-  ContTableData.value.splice(index, 1);
-};
 
 // const addRow = () => {
 //   ContTableData.value.push({ ...form });

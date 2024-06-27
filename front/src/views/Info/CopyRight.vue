@@ -116,23 +116,24 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
-import { submitCopyright } from '../../api/api.js';
+import {deleteByPID, select, submitCopyright} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import { onMounted } from 'vue';
 
 const userStore = UserStore()
 
 // 默认显示
 const SoftwareCopyrightData = ref([
-  {
-    title: '智能管理系统',
-    author_level: '一作',
-    team: '张三, 李四, 王五',
-    application_status: '申请中',
-    date: '2024-05-04',
-    link_name: '智能管理系统申请通知书',
-    link: 'https://example.com/software1',
-    remarks: '无'
-  },
+  // {
+  //   title: '智能管理系统',
+  //   author_level: '一作',
+  //   team: '张三, 李四, 王五',
+  //   application_status: '申请中',
+  //   date: '2024-05-04',
+  //   link_name: '智能管理系统申请通知书',
+  //   link: 'https://example.com/software1',
+  //   remarks: '无'
+  // },
   // 更多数据...
 ]);
 
@@ -160,6 +161,62 @@ const form = reactive({
   title: ""
 });
 
+const statusMaps = {
+  1: "申请中",
+  2: "收到证书"
+};
+
+const levelMaps = {
+  1: "通讯",
+  2: "一作",
+  3: "通讯+一作",
+  4: "通讯+共同一作",
+  5: "共同一作",
+  6: "二作",
+  7: "其他"
+};
+
+
+
+import { format } from 'date-fns';
+
+onMounted(async () => {
+  try {
+    console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
+      application_status: statusMaps[item.application_status],
+      author_level: levelMaps[item.author_level],
+      // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
+    }));
+
+    // 更新 ContTableData
+    SoftwareCopyrightData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
+const deleteRow = async (index) => {
+  try {
+    const item = SoftwareCopyrightData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "copyright"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    SoftwareCopyrightData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
@@ -174,6 +231,18 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+    const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
+    const response2 = await select(params);
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
+      application_status: statusMaps[item.application_status],
+      author_level: levelMaps[item.author_level],
+    }));
+
+    // 更新 ContTableData
+    SoftwareCopyrightData.value = formattedData;
+
   } catch (error) {
     console.error('提交失败!', error);
   }

@@ -184,31 +184,33 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
-import { submitExchange } from '../../api/api.js';
+import {deleteByPID, select, submitExchange} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import {format} from "date-fns";
+import { onMounted } from 'vue';
 
 const userStore = UserStore()
 // 默认显示
 const OverseasExchangeData = ref([
-  {
-    title: '交换项目',
-    type: '交换项目',
-    funding_source: '校内资助',
-    country: '美国',
-    city: '纽约',
-    institution: '纽约大学',
-    duration: '长期（180天以上）',
-    date_start: '2023-01-01',
-    date_end: '2023-12-31',
-    current_status: '已返校',
-    flag1: '是',
-    flag2: '是',
-    flag3: '是',
-    flag4: '是',
-    link_name: '交换项目证明',
-    link: 'https://example.com/exchange1',
-    remarks: '无'
-  },
+  // {
+  //   title: '交换项目',
+  //   type: '交换项目',
+  //   funding_source: '校内资助',
+  //   country: '美国',
+  //   city: '纽约',
+  //   institution: '纽约大学',
+  //   duration: '长期（180天以上）',
+  //   date_start: '2023-01-01',
+  //   date_end: '2023-12-31',
+  //   current_status: '已返校',
+  //   flag1: '是',
+  //   flag2: '是',
+  //   flag3: '是',
+  //   flag4: '是',
+  //   link_name: '交换项目证明',
+  //   link: 'https://example.com/exchange1',
+  //   remarks: '无'
+  // },
   // 更多数据...
 ]);
 
@@ -217,6 +219,34 @@ const OverseasExchangeData = ref([
 // };
 
 const dialogFormVisible = ref(false);
+
+const typeMap = {
+  1: '交换项目',
+  2: '学术会议',
+  3: '短期学术交流',
+  4: '短期课程',
+  5: '汉语教师志愿者',
+  6: '实习',
+  7: '竞赛',
+  8: '其他'
+};
+
+const judgeMap = {
+  1: '是',
+  2: '否'
+};
+
+const durationMap = {
+  1: '长期（180天以上）',
+  2: '短期（180天以下）'
+};
+
+const statusMap = {
+  1: '已返校',
+  2: '在外',
+  3: '即将赴外'
+};
+
 
 const form = reactive({
   city: "",
@@ -243,6 +273,52 @@ const form = reactive({
   type: ""
 });
 
+
+
+
+onMounted(async () => {
+  try {
+    console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "exchange"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      duration: durationMap[item.duration],
+      flag1: judgeMap[item.flag1],
+      flag2: judgeMap[item.flag2],
+      flag3: judgeMap[item.flag3],
+      flag4: judgeMap[item.flag4],
+      current_status: statusMap[item.current_status]
+    }));
+
+    // 更新 ContTableData
+    OverseasExchangeData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
+const deleteRow = async (index) => {
+  try {
+    const item = OverseasExchangeData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "exchange"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    OverseasExchangeData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
@@ -257,6 +333,25 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+    const params = {'SID': userStore.currentUser.sid, 'table': "exchange"};
+    const response2 = await select(params);
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      duration: durationMap[item.duration],
+      flag1: judgeMap[item.flag1],
+      flag2: judgeMap[item.flag2],
+      flag3: judgeMap[item.flag3],
+      flag4: judgeMap[item.flag4],
+      current_status: statusMap[item.current_status]
+    }));
+
+    // 更新 ContTableData
+    OverseasExchangeData.value = formattedData;
   } catch (error) {
     console.error('提交失败!', error);
   }

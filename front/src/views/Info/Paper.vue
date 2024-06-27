@@ -27,21 +27,21 @@
         </template>
       </el-table-column>
       <el-table-column prop="corresponding_author" label="通讯作者"/>
-      <el-table-column prop="issn_cn" label="ISSN/CN"/>
+      <el-table-column prop="issn_CN" label="ISSN/CN"/>
       <el-table-column prop="factor" label="影响因子"/>
       <el-table-column prop="published_status" label="发表状态"/>
       <el-table-column prop="submission_date" label="投稿日期" sortable/>
       <el-table-column prop="received_date" label="接收日期" sortable/>
       <el-table-column prop="publication_date" label="发表日期" sortable/>
-      <el-table-column prop="range" label="卷/期/页码范围">
+      <el-table-column prop="my_range" label="卷/期/页码范围">
         <template #default="scope">
-          <span>{{ scope.row.range }}</span>
+          <span>{{ scope.row.my_range }}</span>
           <br />
         </template>
       </el-table-column>
-      <el-table-column prop="DOI_PMID" label="DOI/PMID"/>
-      <el-table-column prop="CCF" label="CCF推荐情况"/>
-      <el-table-column prop="partition" label="中科院分区"/>
+      <el-table-column prop="doi_PMID" label="DOI/PMID"/>
+      <el-table-column prop="ccf" label="CCF推荐情况"/>
+      <el-table-column prop="my_partition" label="中科院分区"/>
       <el-table-column prop="inclusion" label="期刊收录情况"/>
       <el-table-column prop="publisher" label="出版单位"/>
       <el-table-column prop="language" label="论文语言"/>
@@ -117,7 +117,7 @@
       </el-form-item>
 
       <el-form-item label="ISSN/CN">
-        <el-input v-model="form.issn_cn" autocomplete="off" style="width: 100%" placeholder="请输入ISSN或CN号"/>
+        <el-input v-model="form.issn_CN" autocomplete="off" style="width: 100%" placeholder="请输入ISSN或CN号"/>
       </el-form-item>
 
       <el-form-item label="影响因子">
@@ -160,16 +160,16 @@
       </el-form-item>
 
       <el-form-item label="卷/期/页码范围">
-        <el-input v-model="form.range" autocomplete="off" style="width: 100%" placeholder="请输入卷/期/页码范围"/>
+        <el-input v-model="form.my_range" autocomplete="off" style="width: 100%" placeholder="请输入卷/期/页码范围"/>
         <span style="font-size: 12px;">如未正式发表请留空</span>
       </el-form-item>
 
       <el-form-item label="DOI/PMID">
-        <el-input v-model="form.DOI_PMID" autocomplete="off" style="width: 100%" placeholder="请输入DOI或PMID"/>
+        <el-input v-model="form.doi_PMID" autocomplete="off" style="width: 100%" placeholder="请输入DOI或PMID"/>
       </el-form-item>
 
       <el-form-item label="CCF推荐情况">
-        <el-select v-model="form.CCF" placeholder="请选择CCF推荐情况" style="width: 100%">
+        <el-select v-model="form.ccf" placeholder="请选择CCF推荐情况" style="width: 100%">
           <el-option label="CCF-A" :value="1"></el-option>
           <el-option label="CCF-B" :value="2"></el-option>
           <el-option label="CCF-C" :value="3"></el-option>
@@ -178,7 +178,7 @@
       </el-form-item>
 
       <el-form-item label="中科院分区">
-        <el-select v-model="form.partition" placeholder="请选择中科院分区" style="width: 100%">
+        <el-select v-model="form.my_partition" placeholder="请选择中科院分区" style="width: 100%">
           <el-option label="一区" :value="1"></el-option>
           <el-option label="二区" :value="2"></el-option>
           <el-option label="三区" :value="3"></el-option>
@@ -259,45 +259,106 @@
 <script lang="ts" setup>
 import {reactive, ref} from "vue";
 import { Delete } from "@element-plus/icons-vue";
-import { submitPaper } from '../../api/api.js';
+import {deleteByPID, select, submitPaper} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import {format} from "date-fns";
+import { onMounted } from 'vue';
 
 // 默认显示
 const PaperTableData = ref([
   // 示例数据
-  {
-    title: '示例论文标题',
-    type: '期刊论文',
-    publish: '示例期刊',
-    author_level: '通讯',
-    authors: '小红、小明',
-    corresponding_author: '小红',
-    issn_cn: '1234-5678',
-    factor: 3.5,
-    published_status: '正式发表',
-    submission_date: '2022-01-01',
-    received_date: '2022-02-01',
-    publication_date: '2022-03-01',
-    range: '10(1):1-10',
-    DOI_PMID: '10.1234/example.doi',
-    CCF: 'CCF-A',
-    partition: '一区',
-    inclusion: 'SCI',
-    publisher: '示例出版社',
-    language: '中文',
-    award_flag: '是',
-    collaborative_one: '非国际合作',
-    collaborative_two: '校内合作',
-    link_name: '证明材料文件名',
-    link: 'https://example.com',
-    remarks: '无'
-  }
+  // {
+  //   title: '示例论文标题',
+  //   type: '期刊论文',
+  //   publish: '示例期刊',
+  //   author_level: '通讯',
+  //   authors: '小红、小明',
+  //   corresponding_author: '小红',
+  //   issn_cn: '1234-5678',
+  //   factor: 3.5,
+  //   published_status: '正式发表',
+  //   submission_date: '2022-01-01',
+  //   received_date: '2022-02-01',
+  //   publication_date: '2022-03-01',
+  //   range: '10(1):1-10',
+  //   DOI_PMID: '10.1234/example.doi',
+  //   CCF: 'CCF-A',
+  //   partition: '一区',
+  //   inclusion: 'SCI',
+  //   publisher: '示例出版社',
+  //   language: '中文',
+  //   award_flag: '是',
+  //   collaborative_one: '非国际合作',
+  //   collaborative_two: '校内合作',
+  //   link_name: '证明材料文件名',
+  //   link: 'https://example.com',
+  //   remarks: '无'
+  // }
   // 更多数据...
 ]);
 
-const deleteRow = (index: number) => {
-  PaperTableData.value.splice(index, 1);
+const typeMap = {
+  1: '会议论文',
+  2: '期刊论文'
 };
+
+const statusMap = {
+  1: '已投稿',
+  2: '已接收',
+  3: '正式发表'
+};
+
+const authorLevelMap = {
+  1: '通讯',
+  2: '一作',
+  3: '通讯+一作',
+  4: '通讯+共同一作',
+  5: '共同一作',
+  6: '二作',
+  7: '其他'
+};
+
+const CCFMap = {
+  1: 'CCF-A',
+  2: 'CCF-B',
+  3: 'CCF-C',
+  4: '其他'
+};
+
+const partitionMap = {
+  1: '一区',
+  2: '二区',
+  3: '三区',
+  4: '不适用'
+};
+
+const inclusionMap = {
+  1: 'CSSCI',
+  2: 'CSCD',
+  3: 'SCI',
+  4: 'SSCI',
+  5: 'EI',
+  6: 'A&HCI',
+  7: '其他'
+};
+
+const collaborativeOneMap = {
+  1: '国外合作',
+  2: '港澳台合作',
+  3: '非国际合作'
+};
+
+const collaborativeTwoMap = {
+  1: '校内合作',
+  2: '院内合作',
+  3: '否'
+};
+
+const awardFlagMap = {
+  1: '是',
+  2: '否'
+};
+
 
 const dialogFormVisible = ref(false);
 
@@ -352,6 +413,54 @@ const form = reactive({
 
 const userStore = UserStore()
 
+onMounted(async () => {
+  try {
+    // console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "paper"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      publication_date: item.publication_date ? format(new Date(item.publication_date), 'yyyy-MM-dd') : null,
+      received_date: item.received_date ? format(new Date(item.received_date), 'yyyy-MM-dd') : null,
+      submission_date: item.submission_date ? format(new Date(item.submission_date), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      published_status: statusMap[item.published_status],
+      author_level: authorLevelMap[item.author_level],
+      ccf: CCFMap[item.ccf],
+      my_partition: partitionMap[item.my_partition],
+      inclusion: inclusionMap[item.inclusion],
+      collaborative_one: collaborativeOneMap[item.collaborative_one],
+      collaborative_two: collaborativeTwoMap[item.collaborative_two],
+      award_flag: awardFlagMap[item.award_flag],
+    }));
+
+    // 更新 ContTableData
+    PaperTableData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
+const deleteRow = async (index) => {
+  try {
+    const item = PaperTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "paper"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    PaperTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
@@ -366,6 +475,33 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+    const params = {'SID': userStore.currentUser.sid, 'table': "paper"};
+    // 调用 select 接口获取数据
+    const response2 = await select(params);
+    console.log('Select 接口调用成功!', response2);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      publication_date: item.publication_date ? format(new Date(item.publication_date), 'yyyy-MM-dd') : null,
+      received_date: item.received_date ? format(new Date(item.received_date), 'yyyy-MM-dd') : null,
+      submission_date: item.submission_date ? format(new Date(item.submission_date), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      published_status: statusMap[item.published_status],
+      author_level: authorLevelMap[item.author_level],
+      ccf: CCFMap[item.ccf],
+      my_partition: partitionMap[item.my_partition],
+      inclusion: inclusionMap[item.inclusion],
+      collaborative_one: collaborativeOneMap[item.collaborative_one],
+      collaborative_two: collaborativeTwoMap[item.collaborative_two],
+      award_flag: awardFlagMap[item.award_flag],
+    }));
+
+    // 更新 ContTableData
+    PaperTableData.value = formattedData;
   } catch (error) {
     console.error('提交失败!', error);
   }

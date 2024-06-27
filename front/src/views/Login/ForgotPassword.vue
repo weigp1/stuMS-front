@@ -1,9 +1,6 @@
 <template>
   <meta charset="utf-8"/>
   <div class="centered">
-    <el-button class="back" @click="router.push('/login');">
-      返回登录
-    </el-button>
     <div>
       <el-card class="card">
         <el-input v-model="input_account" class="account" placeholder="请输入您的账号"/>
@@ -20,6 +17,11 @@
         <el-button class="reset" @click="ResetPassword">
           重置密码
         </el-button>
+
+        <el-button class="back" @click="router.push('/login');">
+          返回登录
+        </el-button>
+
       </el-card>
     </div>
   </div>
@@ -103,28 +105,21 @@ async function ResetPassword() {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url("../../assets/background.jpg");
+  background-image: url("../../assets/login.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-}
-
-.back {
-  position: absolute;
-  top: 2vh;
-  left: 2vh;
-  font-size: 2vh;
-  color: rgba(35, 101, 255, 0.6);
 }
 
 .card {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  width: 50vh;
-  padding: 2vh;
-  opacity: 1;
-  color: aliceblue;
-  border-radius: 2vh;
+  background: rgba(255, 255, 255, 0.8);
+  height: 45vh;
+  width: 45vh;
+  padding: 5vh;
+  border-radius: 10px;
 }
 
 .account, .email, .new-password {
@@ -133,7 +128,7 @@ async function ResetPassword() {
   width: 35vh;
   height: 5vh;
   opacity: 1;
-  margin-bottom: 2vh;
+  margin-bottom: 3vh;
   font-size: 2vh;
 }
 
@@ -141,7 +136,7 @@ async function ResetPassword() {
   display: flex;
   position: relative;
   width: 35vh;
-  margin-bottom: 2vh;
+  margin-bottom: 3vh;
 }
 
 .verification-code {
@@ -156,7 +151,7 @@ async function ResetPassword() {
   top: 0;
   height: 5vh;
   border-radius: 0 1vh 1vh 0;
-  background-color: rgba(12, 64, 196, 0.58);
+  background-color: rgb(102, 132, 213);
   font-size: 2vh;
   color: aliceblue;
 }
@@ -167,11 +162,23 @@ async function ResetPassword() {
   width: 35vh;
   height: 5.2vh;
   border-radius: 1vh;
-  margin-bottom: 4vh;
+  margin-bottom: 1vh;
   opacity: 1;
   border: none;
-  background-color: rgba(12, 64, 196, 0.58);
+  background-color: rgba(12, 64, 196, 0.6);
   font-size: 2.5vh;
   color: aliceblue;
 }
+
+.back {
+  top: 1vh;
+  left: 22vh;
+  opacity: 1;
+  border: none;
+  font-weight: bold;
+  font-size: 2vh;
+  color: #007bff;
+  background-color: transparent;
+}
+
 </style>

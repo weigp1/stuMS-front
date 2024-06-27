@@ -10,6 +10,7 @@ export const UserStore = defineStore('user', {
     async login(sid) {
       const resp = await getUser(sid)
       this.loggedIn = true; // 将用户登录状态设为true
+      this.userInfo = resp.data; // 存储用户信息
       this.userInfo = resp.data // 存储用户信息
     },
     logout() {

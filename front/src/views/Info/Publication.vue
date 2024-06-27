@@ -17,7 +17,7 @@
       <el-table-column prop="publisher" label="出版单位"/>
       <el-table-column prop="type" label="著作类别"/>
       <el-table-column prop="date" label="出版时间" sortable/>
-      <el-table-column prop="ISBN" label="ISBN"/>
+      <el-table-column prop="isbn" label="ISBN"/>
       <el-table-column prop="link_name" label="证明材料文件名"/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
@@ -95,7 +95,7 @@
       </el-form-item>
 
       <el-form-item label="ISBN">
-        <el-input v-model="form.ISBN" autocomplete="off" style="width: 100%" placeholder="请输入ISBN"/>
+        <el-input v-model="form.isbn" autocomplete="off" style="width: 100%" placeholder="请输入ISBN"/>
       </el-form-item>
 
       <el-form-item label="证明材料文件名">
@@ -129,26 +129,48 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
-import { submitPublication } from '../../api/api.js';
+import {deleteByPID, select, submitPublication} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import {format} from "date-fns";
+import { onMounted } from 'vue';
 
 const userStore = UserStore()
 
+const typeMap = {
+  1: "研究型著作",
+  2: "教材",
+  3: "译著",
+  4: "编著",
+  5: "其他"
+};
+
+const author_levelMap = {
+  1: "通讯",
+  2: "一作",
+  3: "通讯+一作",
+  4: "通讯+共同一作",
+  5: "共同一作",
+  6: "二作",
+  7: "其他"
+};
+
+
+
 // 默认显示
 const BookPublicationData = ref([
-  {
-    title: '现代管理学',
-    author_level: '一作',
-    team: '张三, 李四, 王五',
-    publisher: '北京大学出版社',
-    type: '研究型著作',
-    date: '2023-06-15',
-    ISBN: '978-7-12345-678-9',
-    link_name: '现代管理学出版证明',
-    link: 'https://example.com/book1',
-    remarks: '无'
-  },
-  // 更多数据...
+  // {
+  //   title: '现代管理学',
+  //   author_level: '一作',
+  //   team: '张三, 李四, 王五',
+  //   publisher: '北京大学出版社',
+  //   type: '研究型著作',
+  //   date: '2023-06-15',
+  //   ISBN: '978-7-12345-678-9',
+  //   link_name: '现代管理学出版证明',
+  //   link: 'https://example.com/book1',
+  //   remarks: '无'
+  // },
+  // // 更多数据...
 ]);
 
 // const deleteRow = (index: number) => {
@@ -177,12 +199,49 @@ const form = reactive({
   type: ""
 });
 
+onMounted(async () => {
+  try {
+    // console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "publication"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      author_level: author_levelMap[item.author_level]
+    }));
+
+    // 更新 ContTableData
+    BookPublicationData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
+const deleteRow = async (index) => {
+  try {
+    const item = BookPublicationData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "publication"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    BookPublicationData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
   form.status_two = "-1";
   // console.log(form);
-
 
   // 提交表单数据
   try {
@@ -191,6 +250,24 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+
+    const params = {'SID': userStore.currentUser.sid, 'table': "publication"};
+    // 调用 select 接口获取数据
+    const response2 = await select(params);
+    console.log('Select 接口调用成功!', response2);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      author_level: author_levelMap[item.author_level]
+    }));
+
+    // 更新 ContTableData
+    BookPublicationData.value = formattedData;
   } catch (error) {
     console.error('提交失败!', error);
   }

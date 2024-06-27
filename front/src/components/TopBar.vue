@@ -1,4 +1,11 @@
 <template>
+
+  <el-image
+      src="/src/assets/topBar.png"
+      style="position: fixed; top: 0; left: 0; width: 100%; height: 20%; z-index: 998;"
+      alt="Top Bar"
+  />
+
   <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false">
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
