@@ -128,7 +128,8 @@ async function ResetPassword() {
   width: 35vh;
   height: 5vh;
   opacity: 1;
-  margin-bottom: 3vh;
+  margin-top: 2vh;
+  margin-bottom: 2vh;
   font-size: 2vh;
 }
 
@@ -151,7 +152,7 @@ async function ResetPassword() {
   top: 0;
   height: 5vh;
   border-radius: 0 1vh 1vh 0;
-  background-color: rgb(102, 132, 213);
+  background-color: rgb(0, 122, 253);
   font-size: 2vh;
   color: aliceblue;
 }
@@ -165,19 +166,19 @@ async function ResetPassword() {
   margin-bottom: 1vh;
   opacity: 1;
   border: none;
-  background-color: rgba(12, 64, 196, 0.6);
+  background-color: rgb(0, 122, 253);
   font-size: 2.5vh;
   color: aliceblue;
 }
 
 .back {
-  top: 1vh;
+  top: 0.2vh;
   left: 22vh;
   opacity: 1;
   border: none;
   font-weight: bold;
   font-size: 2vh;
-  color: #007bff;
+  color: #007afd;
   background-color: transparent;
 }
 
