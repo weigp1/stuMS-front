@@ -5,7 +5,7 @@ import axios from 'axios';  // 导入axios库
 // 定义函数来向服务器请求预签名 URL
 async function PutPresignedURL(bucketName, objectName) {
   try {
-    const response = await axios.get('http://localhost:3000/PutObjectPresignedURL', {
+    const response = await axios.get('http://43.136.61.147:3000/PutObjectPresignedURL', {
       params: {
         bucketName,
         objectName,
