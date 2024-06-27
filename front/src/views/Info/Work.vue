@@ -85,7 +85,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
-import {select, submitSocialWork} from '../../api/api.js';
+import {deleteByPID, select, submitSocialWork} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import {format} from "date-fns";
 import { onMounted } from 'vue';
@@ -94,14 +94,14 @@ const userStore = UserStore()
 
 const WorkTableData = ref([
   // Sample data, replace with your actual data
-  {
-    title: '社会工作名称示例',
-    date_start: '2022-01',
-    date_end: '2022-06',
-    link_name: '证明材料文件名示例',
-    link: 'https://example.com',
-    remarks: '无'
-  }
+  // {
+  //   title: '社会工作名称示例',
+  //   date_start: '2022-01',
+  //   date_end: '2022-06',
+  //   link_name: '证明材料文件名示例',
+  //   link: 'https://example.com',
+  //   remarks: '无'
+  // }
 ]);
 
 const dialogFormVisible = ref(false);
@@ -145,6 +145,18 @@ onMounted(async () => {
     console.error('Select 接口调用失败!', error);
   }
 });
+
+const deleteRow = async (index) => {
+  try {
+    const item = WorkTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "socialwork"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    WorkTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
 
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;

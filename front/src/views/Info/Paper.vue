@@ -259,7 +259,7 @@
 <script lang="ts" setup>
 import {reactive, ref} from "vue";
 import { Delete } from "@element-plus/icons-vue";
-import {select, submitPaper} from '../../api/api.js';
+import {deleteByPID, select, submitPaper} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import {format} from "date-fns";
 import { onMounted } from 'vue';
@@ -360,10 +360,6 @@ const awardFlagMap = {
 };
 
 
-const deleteRow = (index: number) => {
-  PaperTableData.value.splice(index, 1);
-};
-
 const dialogFormVisible = ref(false);
 
 const form = reactive({
@@ -452,6 +448,18 @@ onMounted(async () => {
     console.error('Select 接口调用失败!', error);
   }
 });
+
+const deleteRow = async (index) => {
+  try {
+    const item = PaperTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "paper"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    PaperTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
 
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;

@@ -56,6 +56,16 @@ function select(params)
   });
 }
 
+function deleteByPID(params)
+{
+  return request({
+    url: '/score-service/score/common',
+    method: 'DELETE',
+    mock: false,
+    params: params,
+  });
+}
+
 function submitMorality(params)
 {
   return request({
@@ -312,6 +322,6 @@ function submitCopyright(params)
 /* 分数相关 */
 
 export {
-  login, sendVerificationCode, confirmVerificationCode, getUser, select, submitMorality, submitPaper, submitCompetition,
+  login, sendVerificationCode, confirmVerificationCode, getUser, select, deleteByPID, submitMorality, submitPaper, submitCompetition,
   submitPatent, submitPublication, submitSocialWork, submitVolunteer, submitExchange, submitCopyright
 };

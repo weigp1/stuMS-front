@@ -116,7 +116,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
-import {select, submitVolunteer} from '../../api/api.js';
+import {deleteByPID, select, submitVolunteer} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import {format} from "date-fns";
 import { onMounted } from 'vue';
@@ -201,6 +201,17 @@ onMounted(async () => {
   }
 });
 
+const deleteRow = async (index) => {
+  try {
+    const item = VolTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "volunteer"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    VolTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
 
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;

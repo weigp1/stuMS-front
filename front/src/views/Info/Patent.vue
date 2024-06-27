@@ -184,7 +184,7 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
-import {select, submitPatent} from '../../api/api.js';
+import {deleteByPID, select, submitPatent} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import {format} from "date-fns";
 import { onMounted } from 'vue';
@@ -302,6 +302,18 @@ onMounted(async () => {
     console.error('Select 接口调用失败!', error);
   }
 });
+
+const deleteRow = async (index) => {
+  try {
+    const item = PatentTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "patent"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    PatentTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
 
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;

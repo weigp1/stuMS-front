@@ -147,7 +147,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
-import { select, submitCompetition } from '../../api/api.js';
+import {deleteByPID, select, submitCompetition} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import { onMounted } from 'vue';
 
@@ -257,6 +257,17 @@ onMounted(async () => {
   }
 });
 
+const deleteRow = async (index) => {
+  try {
+    const item = ContTableData.value[index];
+    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "competition"}
+    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    console.log('删除成功!', response);
+    ContTableData.value.splice(index, 1); // 删除成功后更新界面数据
+  } catch (error) {
+    console.error('删除失败!', error);
+  }
+};
 
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
@@ -289,10 +300,6 @@ const submitForm = async (form) => {
     console.error('提交失败!', error);
   }
 }
-
-const deleteRow = (index: number) => {
-  ContTableData.value.splice(index, 1);
-};
 
 // const addRow = () => {
 //   ContTableData.value.push({ ...form });
