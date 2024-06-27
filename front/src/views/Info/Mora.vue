@@ -1,21 +1,21 @@
 <template>
   <el-row>
     <el-table
-        :data="MoraTableData"
-        style="width: 100%; max-width: 68vw; min-width: 68vw;"
-        max-height="55vh"
-        :header-cell-style="{'text-align':'center'}"
-        :cell-style="{'text-align':'center'}"
-        fit
-        stripe
-        highlight-current-row
+      :data="MoraTableData"
+      style="width: 100%; max-width: 68vw; min-width: 68vw;"
+      max-height="55vh"
+      :header-cell-style="{'text-align':'center'}"
+      :cell-style="{'text-align':'center'}"
+      fit
+      stripe
+      highlight-current-row
     >
       <el-table-column fixed type="index" label="序号" width="65px"/>
       <el-table-column prop="title" label="奖项名"/>
       <el-table-column prop="date" label="获奖时间" sortable/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="scope.row.link" target="_blank">下 载 </a>
+          <a :href="scope.row.link" target="_blank">下 载</a>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -27,14 +27,13 @@
           </el-button>
         </template>
       </el-table-column>
-
     </el-table>
 
     <el-button
-        class="mt-4"
-        type="primary"
-        style="position: absolute; width: 10%; height: 8%; right: 10px; bottom: 20px;"
-        @click="dialogFormVisible = true"
+      class="mt-4"
+      type="primary"
+      style="position: absolute; width: 10%; height: 8%; right: 10px; bottom: 20px;"
+      @click="dialogFormVisible = true"
     >
       添 加
     </el-button>
@@ -50,15 +49,15 @@
 
       <el-form-item label="获奖时间">
         <el-date-picker
-            v-model="form.date"
-            type="date"
-            placeholder="请选择"
-            style="width: 100%"
+          v-model="form.date"
+          type="date"
+          placeholder="请选择"
+          style="width: 100%"
         />
       </el-form-item>
 
       <el-form-item label="证明材料">
-        <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请填写证明材料"/>
+        <input type="file" @change="handleFileChange" accept=".pdf" />
       </el-form-item>
 
       <el-form-item label="备注">
@@ -74,7 +73,6 @@
       </div>
     </template>
   </el-dialog>
-
 </template>
 
 <script lang="ts" setup>
@@ -82,6 +80,7 @@ import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
 import {deleteByPID, select, submitMorality} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js'
+import {uploadFile , downloadFile} from '../../api/resource.js';
 import {format} from "date-fns";
 import { onMounted } from 'vue';
 
@@ -108,7 +107,7 @@ const MoraTableData = ref([
 
 
 const dialogFormVisible = ref(false);
-const userStore = UserStore()
+const userStore = UserStore();
 
 const form = reactive({
   title: '',
@@ -117,13 +116,15 @@ const form = reactive({
   remarks: '',
   comment: '',
   idx: '',
-  link_name: '', // 这个字段感觉可以删
+  link_name: '',
   pid: '',
   score: '',
   sid: '',
   status_one: '',
   status_two: ''
 });
+
+const file = ref<File | null>(null);
 
 onMounted(async () => {
   try {
@@ -162,20 +163,16 @@ const deleteRow = async (index) => {
 };
 
 const submitForm = async (form) => {
-  // console.log(userStore.currentUser);
   form.sid = userStore.currentUser.sid;
-  // form.comment = "xxx";
-  // form.link_name = "xxx";
-  // form.score = "0";
   form.status_one = 0;
   form.status_two = -1;
-  // form.idx = "1";
-  // 提交表单数据
   try {
-    // 调用 submitMorality 函数提交表单数据
     const response = await submitMorality(form);
-    console.log('提交成功!', response);
-    // 处理成功后的逻辑，比如关闭弹窗等
+    // 调用文件上传函数
+    if (file.value) {
+      await uploadFile('credential', form.link, file.value);
+      console.log('提交成功!', response);
+    }
     dialogFormVisible.value = false;
 
     const params = {'SID': userStore.currentUser.sid, 'table': "morality"};
@@ -199,6 +196,15 @@ const submitForm = async (form) => {
   }
 }
 
+const handleFileChange = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    const currentTime = new Date().toISOString().replace(/[:.]/g, '-'); // 获取当前时间并格式化
+    form.link_name = selectedFile.name;
+    form.link = `${userStore.currentUser.sid}-${selectedFile.name}-${currentTime}`;
+    file.value = selectedFile;
+  }
+}
 </script>
 
 <style scoped>

@@ -14,7 +14,6 @@ function login(params)
   });
 }
 
-// (params: { 'Email': input_email.value}
 function sendVerificationCode(params)
 {
   return request({
@@ -30,6 +29,16 @@ function confirmVerificationCode(params)
   return request({
     url: '/auth-service/mail/valid',
     method: 'GET',
+    mock: false,
+    params: params,
+  });
+}
+
+function resetPassword(params)
+{
+  return request({
+    url: '/auth-service/auth/password',
+    method: 'PUT',
     mock: false,
     params: params,
   });
@@ -322,6 +331,6 @@ function submitCopyright(params)
 /* 分数相关 */
 
 export {
-  login, sendVerificationCode, confirmVerificationCode, getUser, select, deleteByPID, submitMorality, submitPaper, submitCompetition,
+  login, sendVerificationCode, confirmVerificationCode, resetPassword, getUser, select, deleteByPID, submitMorality, submitPaper, submitCompetition,
   submitPatent, submitPublication, submitSocialWork, submitVolunteer, submitExchange, submitCopyright
 };
