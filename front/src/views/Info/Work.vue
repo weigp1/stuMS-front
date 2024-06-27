@@ -85,8 +85,10 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
-import { submitSocialWork } from '../../api/api.js';
+import {select, submitSocialWork} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import {format} from "date-fns";
+import { onMounted } from 'vue';
 
 const userStore = UserStore()
 
@@ -120,6 +122,30 @@ const form = reactive({
   title: ""
 });
 
+onMounted(async () => {
+  try {
+    // console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "socialwork"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+    }));
+
+    // 更新 ContTableData
+    WorkTableData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
@@ -134,6 +160,23 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+
+    const params = {'SID': userStore.currentUser.sid, 'table': "socialwork"};
+    // 调用 select 接口获取数据
+    const response2 = await select(params);
+    console.log('Select 接口调用成功!', response2);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+    }));
+
+    // 更新 ContTableData
+    WorkTableData.value = formattedData;
+
   } catch (error) {
     console.error('提交失败!', error);
   }

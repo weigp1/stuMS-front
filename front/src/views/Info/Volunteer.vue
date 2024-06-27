@@ -116,27 +116,47 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
-import { submitVolunteer } from '../../api/api.js';
+import {select, submitVolunteer} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import {format} from "date-fns";
+import { onMounted } from 'vue';
 
 const userStore = UserStore()
 
 const VolTableData = ref([
   // Sample data, replace with your actual data
-  {
-    title: '志愿活动名称示例',
-    organization: '组织团体示例',
-    type: '其他',
-    date_start: '2022-01-01',
-    date_end: '2022-01-07',
-    duration: '20.5',
-    link_name: '证明材料文件名示例',
-    link: 'https://example.com',
-    remarks: '无'
-  }
+  // {
+  //   title: '志愿活动名称示例',
+  //   organization: '组织团体示例',
+  //   type: '其他',
+  //   date_start: '2022-01-01',
+  //   date_end: '2022-01-07',
+  //   duration: '20.5',
+  //   link_name: '证明材料文件名示例',
+  //   link: 'https://example.com',
+  //   remarks: '无'
+  // }
 ]);
 
 const dialogFormVisible = ref(false);
+
+const typeMap = {
+  1: '助学支教',
+  2: '文化文艺服务',
+  3: '科学普及',
+  4: '理论政策宣讲',
+  5: '敬老服务',
+  6: '助残服务',
+  7: '文明交通',
+  8: '卫生环保',
+  9: '扶贫帮困',
+  10: '体育活动',
+  11: '迎新活动',
+  12: '三下乡',
+  13: '会务工作',
+  14: '医疗服务',
+  15: '其他'
+};
 
 const form = reactive({
   comment: "",
@@ -156,6 +176,32 @@ const form = reactive({
   type: ""
 });
 
+onMounted(async () => {
+  try {
+    // console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "volunteer"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+    }));
+
+    // 更新 ContTableData
+    VolTableData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
@@ -170,6 +216,24 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+
+    const params = {'SID': userStore.currentUser.sid, 'table': "volunteer"};
+    // 调用 select 接口获取数据
+    const response2 = await select(params);
+    console.log('Select 接口调用成功!', response2);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+    }));
+
+    // 更新 ContTableData
+    VolTableData.value = formattedData;
+
   } catch (error) {
     console.error('提交失败!', error);
   }

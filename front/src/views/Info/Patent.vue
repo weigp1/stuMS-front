@@ -152,6 +152,7 @@
         <el-input v-model="form.transferred_income" autocomplete="off" style="width: 100%" placeholder="请输入转让收入"/>
       </el-form-item>
 
+
       <el-form-item label="证明材料文件名">
         <el-input v-model="form.link_name" autocomplete="off" style="width: 100%" placeholder="请输入证明材料文件名"/>
       </el-form-item>
@@ -183,34 +184,65 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
-import { submitPatent } from '../../api/api.js';
+import {select, submitPatent} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import {format} from "date-fns";
+import { onMounted } from 'vue';
 
 const userStore = UserStore()
 
 const dialogFormVisible = ref(false);
 // 默认显示
 const PatentTableData = ref([
-  {
-    title: '智能家居控制系统',
-    type: '发明专利',
-    application_num: 'CN123456789A',
-    certificate_num: 'CN123456789B',
-    team: '张三, 李四, 王五',
-    acceptance: '是',
-    acceptance_date: '2023-01-15',
-    my_release: '是',
-    release_date: '2023-06-20',
-    empower: '是',
-    empower_date: '2023-12-25',
-    transferred: '否',
-    transferred_date: '',
-    transferred_income: '',
-    link_name: '智能家居控制系统专利证书',
-    link: 'https://example.com/patent1',
-    remarks: '暂无'
-  },
+  // {
+  //   title: '智能家居控制系统',
+  //   type: '发明专利',
+  //   application_num: 'CN123456789A',
+  //   certificate_num: 'CN123456789B',
+  //   team: '张三, 李四, 王五',
+  //   acceptance: '是',
+  //   acceptance_date: '2023-01-15',
+  //   my_release: '是',
+  //   release_date: '2023-06-20',
+  //   empower: '是',
+  //   empower_date: '2023-12-25',
+  //   transferred: '否',
+  //   transferred_date: '',
+  //   transferred_income: '',
+  //   link_name: '智能家居控制系统专利证书',
+  //   link: 'https://example.com/patent1',
+  //   remarks: '暂无'
+  // },
 ]);
+
+const typeMap = {
+  1: '发明专利',
+  2: '实用新型',
+  3: '外观设计',
+  4: 'PCT国际申请',
+  5: '其他'
+};
+
+const acceptanceMap = {
+  1: '是',
+  2: '否'
+};
+
+const my_releaseMap = {
+  1: '是',
+  2: '否'
+};
+
+const empowerMap = {
+  1: '是',
+  2: '否'
+};
+
+const transferredMap = {
+  1: '是',
+  2: '否'
+};
+
 
 const form = reactive({
   acceptance: "",
@@ -238,6 +270,39 @@ const form = reactive({
   type: ""
 });
 
+onMounted(async () => {
+  try {
+    // console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "patent"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      acceptance_date: item.acceptance_date ? format(new Date(item.acceptance_date), 'yyyy-MM-dd') : null,
+      empower_date: item.empower_date ? format(new Date(item.empower_date), 'yyyy-MM-dd') : null,
+      release_date: item.release_date ? format(new Date(item.release_date), 'yyyy-MM-dd') : null,
+      transferred_date: item.transferred_date ? format(new Date(item.transferred_date), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      acceptance: acceptanceMap[item.acceptance],
+      my_release: my_releaseMap[item.my_release],
+      empower: empowerMap[item.empower],
+      transferred: transferredMap[item.transferred]
+    }));
+
+    // 更新 ContTableData
+    PatentTableData.value = formattedData;
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
+});
+
 const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
@@ -252,6 +317,31 @@ const submitForm = async (form) => {
     console.log('提交成功!', response);
     // 处理成功后的逻辑，比如关闭弹窗等
     dialogFormVisible.value = false;
+
+    const params = {'SID': userStore.currentUser.sid, 'table': "patent"};
+    // 调用 select 接口获取数据
+    const response2 = await select(params);
+    console.log('Select 接口调用成功!', response2);
+
+    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+    const formattedData = response2.data.map(item => ({
+      ...item,
+      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      acceptance_date: item.acceptance_date ? format(new Date(item.acceptance_date), 'yyyy-MM-dd') : null,
+      empower_date: item.empower_date ? format(new Date(item.empower_date), 'yyyy-MM-dd') : null,
+      release_date: item.release_date ? format(new Date(item.release_date), 'yyyy-MM-dd') : null,
+      transferred_date: item.transferred_date ? format(new Date(item.transferred_date), 'yyyy-MM-dd') : null,
+      type: typeMap[item.type],
+      acceptance: acceptanceMap[item.acceptance],
+      my_release: my_releaseMap[item.my_release],
+      empower: empowerMap[item.empower],
+      transferred: transferredMap[item.transferred]
+    }));
+
+    // 更新 ContTableData
+    PatentTableData.value = formattedData;
   } catch (error) {
     console.error('提交失败!', error);
   }
