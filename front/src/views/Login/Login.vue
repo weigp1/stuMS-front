@@ -124,18 +124,19 @@ onMounted(() => {
 
 .login-box {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: rgba(255, 255, 255, 0.8);
   height: 45vh;
-  width: 25vw;
-  padding: 5px;
+  width: 45vh;
+  padding: 5vh;
   border-radius: 10px;
 }
 
 .login-box h1 {
   text-align: center;
-  width: 15vw;
+  width: 30vh;
   top: 15vh;
   color: black;
 }
@@ -148,7 +149,7 @@ onMounted(() => {
   color: white;
   border: none;
   height: 6vh;
-  width: 15vw;
+  width: 30vh;
   margin-top: 50vh;
   font-size: 16px;
   cursor: pointer;
