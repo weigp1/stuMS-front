@@ -34,18 +34,19 @@ const dialogContent = ref('');
 const fetchData = () => {
   // 创建10条示例数据
   rawData.value = [
-    { id: 1, class: '政治思想道德类', date: '2023-01-01', name: '奖项1', remarks: '备注1', status: 0, category: 'personal' },
-    { id: 2, class: '政治思想道德类', date: '2023-02-01', name: '奖项2', remarks: '备注2', status: 1, category: 'personal' },
+    { id: 1, class: '政治思想道德类', date: '2023-01-25', name: '全国三好学生', remarks: '', status: 0, category: 'personal' },
+    { id: 2, class: '政治思想道德类', date: '2023-02-11', name: '全国优秀共青团员', remarks: '材料真实，批准通过', status: 1, category: 'personal' },
     { id: 3, class: '社会工作类', date: '2023-03-01', name: '奖项3', remarks: '备注3', status: 0, category: 'personal' },
     { id: 4, class: '学习、竞赛及科研成果类', date: '2023-04-01', name: '奖项4', remarks: '备注4', status: 1, category: 'overall' },
-    { id: 5, class: '政治思想道德类', date: '2023-05-01', name: '奖项5', remarks: '备注555', status: 1, category: 'personal' },
+    { id: 5, class: '政治思想道德类', date: '2023-05-22', name: '校青马班结课', remarks: '材料真实，批准通过', status: 1, category: 'personal' },
     { id: 6, class: '文体实践类', date: '2023-06-01', name: '奖项6', remarks: '备注6', status: 2, category: 'overall' },
     { id: 7, class: '社会工作类', date: '2023-07-01', name: '奖项7', remarks: '备注7', status: 2, category: 'personal' },
     { id: 8, class: '学习、竞赛及科研成果类', date: '2023-08-01', name: '奖项8', remarks: '备注8', status: 2, category: 'overall' },
-    { id: 9, class: '政治思想道德类', date: '2023-09-01', name: '奖项9', remarks: '备注99999', status: 2, category: 'personal' },
+    { id: 9, class: '政治思想道德类', date: '2023-09-27', name: '院优秀团支书', remarks: '材料有误，请重新提交', status: 2, category: 'personal' },
     { id: 10, class: '文体实践类', date: '2023-10-01', name: '奖项10', remarks: '备注10', status: 0, category: 'overall' },
-    { id: 11, class: '政治思想道德类', date: '2023-11-01', name: '奖项11', remarks: '备注1111', status: 0, category: 'overall' },
-    { id: 12, class: '政治思想道德类', date: '2024-11-01', name: '奖项12', remarks: '备注123331', status: 0, category: 'personal' }
+    { id: 11, class: '政治思想道德类', date: '2023-11-15', name: '校优秀共产党院', remarks: '', status: 0, category: 'overall' },
+    { id: 12, class: '政治思想道德类', date: '2024-11-09', name: '校三好学生', remarks: '', status: 0, category: 'personal' },
+    { id: 13, class: '政治思想道德类', date: '2024-12-02', name: '校优秀毕业生', remarks: '材料真实，批准通过', status: 1, category: 'personal' }
   ];
 };
 
@@ -136,10 +137,10 @@ onMounted(() => {
               <img :src="getStatusIcon(item.status)" alt="status icon"/>
             </div>
             <div class="card-text">
-              <p>类别: {{ item.class }}</p>
-              <p>日期: {{ item.date }}</p>
-              <p>奖项: {{ item.name }}</p>
-              <p :style="getStatusStyle(item.status)">状态: {{ getStatusText(item.status) }}</p>
+              <p class="info-line"><span class="label">类别:&nbsp</span> <span>{{ item.class }}</span></p>
+              <p class="info-line"><span class="label">日期:&nbsp</span> <span>{{ item.date }}</span></p>
+              <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.name }}</span></p>
+              <p class="info-line"><span class="label">状态:&nbsp</span> <span :style="getStatusStyle(item.status)">{{ getStatusText(item.status) }}</span></p>
             </div>
           </div>
         </el-card>
@@ -205,6 +206,11 @@ onMounted(() => {
   padding: 1rem;
 }
 
+.card-text .info-line .label {
+  font-weight: bold;
+  white-space: nowrap; /* Ensure label stays on one line */
+}
+
 .status-icon {
   flex: 1;
   display: flex;
@@ -223,10 +229,22 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .card p {
   margin: 0.5rem 0;
+}
+
+.card-text .info-line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+}
+
+.card-text .info-line span:first-child {
+  font-weight: bold;
 }
 
 .dialog-content {
