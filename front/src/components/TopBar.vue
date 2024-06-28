@@ -21,7 +21,7 @@
       <template v-if="item.mainMenu === 'hasSub'">
         <el-sub-menu :index="item.index" class="menu">
           <template #title>
-            <span class="menu-title">{{ item.label }}</span>
+            <span class="menu">{{ item.label }}</span>
           </template>
           <template v-for="subItem in menuItems">
             <el-menu-item :index="item.index + '?category=' + subItem.index"
@@ -84,7 +84,7 @@ const handleLogoutClick = () => {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .topBar {
   position: fixed;
   top: 2.5%;
@@ -99,43 +99,30 @@ const handleLogoutClick = () => {
 .menu {
   font-size: 18px;
   font-weight: bold;
-  border: 0;
-  color: #ffffff;
-}
-
-.menu-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ffffff; /* 白色字体 */
+  color: #ffffff !important; /* 白色字体 */
 }
 
 .submenu-item {
   font-size: 16px;
   font-weight: bold;
-  color: #000000; /* 黑色字体 */
-  text-align: center; /* 水平居中 */
-  min-width: 135px !important;
-}
-
-.el-sub-menu .el-sub-menu__title {
-  display: flex;
-  justify-content: center; /* 水平居中 */
+  text-align: center !important;
+  max-width: 135px !important;
+  width: 100%; /* 确保文本居中 */
 }
 
 .el-menu--horizontal.el-menu {
   border-bottom: 0;
 }
 
-.el-menu--collapse .el-menu .el-submenu, .el-menu--popup{
-  min-width: 135px !important;
+.el-menu--collapse .el-menu, .el-menu--popup {
+  min-width: 135px;
 }
-
 
 .user {
   z-index: 999;
   display: flex;
   font-size: 18px;
-  align-items: center; /* 垂直居中 */
+  align-items: center;
   justify-content: center;
 }
 
