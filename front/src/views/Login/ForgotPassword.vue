@@ -1,6 +1,9 @@
 <template>
   <meta charset="utf-8"/>
   <div class="centered">
+
+    <img src="../../assets/login-logo.png" alt="SYSU Logo" class="sysu-logo">
+
     <div>
       <el-card class="card">
         <el-input v-model="input_account" class="account" placeholder="请输入您的账号"/>
@@ -24,6 +27,11 @@
 
       </el-card>
     </div>
+
+    <div class="footer-text">
+      用户单位：中山大学软件工程学院
+    </div>
+
   </div>
 </template>
 
@@ -110,6 +118,13 @@ async function ResetPassword() {
   background-size: cover;
 }
 
+.sysu-logo {
+  position: absolute;
+  top: 3vh;
+  left: 10vh;
+  width: 65vh; /* 调整图片大小和位置 */
+}
+
 .card {
   display: flex;
   flex-direction: column;
@@ -180,6 +195,15 @@ async function ResetPassword() {
   font-size: 2vh;
   color: #007afd;
   background-color: transparent;
+}
+
+.footer-text {
+  position: absolute;
+  bottom: 2vh; /* 调整文字位置 */
+  text-align: center;
+  width: 100%;
+  font-size: 12px;
+  color: #ffffff; /* 白色字体 */
 }
 
 </style>
