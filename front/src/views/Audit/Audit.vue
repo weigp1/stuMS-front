@@ -46,7 +46,8 @@ const fetchData = () => {
     { id: 10, class: '文体实践类', date: '2023-10-01', name: '奖项10', remarks: '备注10', status: 0, category: 'overall' },
     { id: 11, class: '政治思想道德类', date: '2023-11-15', name: '校优秀共产党院', remarks: '', status: 0, category: 'overall' },
     { id: 12, class: '政治思想道德类', date: '2024-11-09', name: '校三好学生', remarks: '', status: 0, category: 'personal' },
-    { id: 13, class: '政治思想道德类', date: '2024-12-02', name: '校优秀毕业生', remarks: '材料真实，批准通过', status: 1, category: 'personal' }
+    { id: 13, class: '政治思想道德类', date: '2024-12-02', name: '校优秀毕业生', remarks: '材料真实，批准通过', status: 1, category: 'personal' },
+    { id: 14, class: '政治思想道德类', date: '2024-12-03', name: '校优秀毕业论文', remarks: '材料真实，批准通过', status: 1, category: 'personal' }
   ];
 };
 
@@ -158,7 +159,9 @@ onMounted(() => {
 
 <style scoped>
 .box {
-  min-height: 100vh;
+  top: 0;
+  min-height: 130vh;
+  width: 100%;
   background-image: url("../../assets/background.jpg");
   background-size: cover;
   background-attachment: fixed;
