@@ -202,6 +202,11 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.card:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
 .card-content {
   display: flex;
   justify-content: space-between;
@@ -211,7 +216,7 @@ onMounted(() => {
 
 .card-text .info-line .label {
   font-weight: bold;
-  white-space: nowrap; /* Ensure label stays on one line */
+  white-space: nowrap;
 }
 
 .status-icon {
@@ -236,7 +241,7 @@ onMounted(() => {
 }
 
 .card p {
-  margin: 0.5rem 0;
+  margin: 0.3rem 0;
 }
 
 .card-text .info-line {

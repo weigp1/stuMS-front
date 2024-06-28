@@ -9,7 +9,7 @@
   <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false">
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
-    <el-menu-item style="position: absolute; left: -8%; height: 100%;" index="0">
+    <el-menu-item style="position: absolute; left: 2vh; height: 100%;" index="0">
       <el-image style="width: 100%; height: 100%;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
@@ -30,17 +30,16 @@
             </el-menu-item>
           </template>
         </el-sub-menu>
-
       </template>
     </template>
 
     <el-menu-item style="position: absolute; right: 2%; height: 100%; border-radius: 10px;" index="0">
       <el-row>
-        <el-col :span="8">
-          <el-image style="width: 90%; height: auto; top: -10%;" src="/src/assets/avatar.png"/>
+        <el-col :span="6">
+          <el-image style="width: 70%; height: auto; top: -12%;" src="/src/assets/avatar.png"/>
         </el-col>
-        <el-col :span="8">
-          <div class="user" @click.stop="handleUserClick">用户</div>
+        <el-col :span="10">
+          <div class="user" @click.stop="handleUserClick">{{ userName }}</div>
         </el-col>
         <el-col :span="8">
           <div class="logout" @click.stop="handleLogoutClick">退出</div>
@@ -53,7 +52,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute, useRouter} from 'vue-router'
+import { useRoute, useRouter} from 'vue-router';
+import { UserStore } from "../stores/user.js";
+
 // 导入菜单选项配置文件
 import config from '../config/config.json';
 import Cookies from 'js-cookie'
@@ -62,6 +63,7 @@ import { AuthStore } from '../stores/auth'
 const router = useRouter()
 const route = useRoute()
 const authStore = AuthStore()
+const userStore = UserStore()
 
 interface MenuItem {
   index: string;
@@ -82,6 +84,8 @@ const handleLogoutClick = () => {
   // 跳转到登录页面
   authStore.logout()
 }
+
+const userName = (userStore.currentUser?.name || '用户') + "，您好!"
 </script>
 
 <style lang="scss">
