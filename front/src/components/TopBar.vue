@@ -9,7 +9,7 @@
   <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false">
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
-    <el-menu-item style="position: absolute; left: 2%; height: 100%;" index="0">
+    <el-menu-item style="position: absolute; left: -8%; height: 100%;" index="0">
       <el-image style="width: 100%; height: 100%;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
