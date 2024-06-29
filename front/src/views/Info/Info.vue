@@ -377,6 +377,7 @@ const genderMap = {
 
 const userStore = UserStore();
 
+
 const rules = reactive<FormRules<RuleForm>>({
   SID: [
     { required: true, message: '请输入你的学号', trigger: 'blur' },
