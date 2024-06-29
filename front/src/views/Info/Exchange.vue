@@ -28,7 +28,7 @@
       <el-table-column prop="link_name" label="证明材料文件名"/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="scope.row.link" target="_blank">下 载 </a>
+          <a :href="getFileUrl(scope.row.link)" target="_blank">下 载</a>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -152,12 +152,8 @@
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item label="证明材料文件名">
-        <el-input v-model="form.link_name" autocomplete="off" style="width: 100%" placeholder="请输入证明材料文件名"/>
-      </el-form-item>
-
       <el-form-item label="证明材料">
-        <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请输入证明材料的链接"/>
+        <input type="file" @change="handleFileChange" accept=".pdf" />
       </el-form-item>
 
       <el-form-item label="备注">
@@ -186,8 +182,10 @@ import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
 import {deleteByPID, select, submitExchange} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
-import {format} from "date-fns";
+import { uploadFile, fileUrl } from '../../api/resource.js';
+import { format } from "date-fns";
 import { onMounted } from 'vue';
+import { ElMessage } from "element-plus";
 
 const userStore = UserStore()
 // 默认显示
@@ -214,9 +212,6 @@ const OverseasExchangeData = ref([
   // 更多数据...
 ]);
 
-// const deleteRow = (index: number) => {
-//   OverseasExchangeData.value.splice(index, 1);
-// };
 
 const dialogFormVisible = ref(false);
 
@@ -273,8 +268,7 @@ const form = reactive({
   type: ""
 });
 
-
-
+const file = ref<File | null>(null);
 
 onMounted(async () => {
   try {
@@ -328,35 +322,61 @@ const submitForm = async (form) => {
 
   // 提交表单数据
   try {
+    if (file.value) {
+        const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
+        form.link_name = file.value.name;
+        form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
+    }
     // 调用 submitPaper 函数提交表单数据
     const response = await submitExchange(form);
-    console.log('提交成功!', response);
-    // 处理成功后的逻辑，比如关闭弹窗等
-    dialogFormVisible.value = false;
-    const params = {'SID': userStore.currentUser.sid, 'table': "exchange"};
-    const response2 = await select(params);
-    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-    const formattedData = response2.data.map(item => ({
-      ...item,
-      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
-      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
-      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
-      type: typeMap[item.type],
-      duration: durationMap[item.duration],
-      flag1: judgeMap[item.flag1],
-      flag2: judgeMap[item.flag2],
-      flag3: judgeMap[item.flag3],
-      flag4: judgeMap[item.flag4],
-      current_status: statusMap[item.current_status]
-    }));
+    console.log('提交表单为：',form);
+    if (response.data === 1) {
+      ElMessage.success('提交成功!');
+      // 处理成功后的逻辑，比如关闭弹窗等
+      dialogFormVisible.value = false;
+      const params = {'SID': userStore.currentUser.sid, 'table': "exchange"};
+      const response2 = await select(params);
+      // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+      const formattedData = response2.data.map(item => ({
+        ...item,
+        date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+        date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+        date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+        type: typeMap[item.type],
+        duration: durationMap[item.duration],
+        flag1: judgeMap[item.flag1],
+        flag2: judgeMap[item.flag2],
+        flag3: judgeMap[item.flag3],
+        flag4: judgeMap[item.flag4],
+        current_status: statusMap[item.current_status]
+      }));
 
-    // 更新 ContTableData
-    OverseasExchangeData.value = formattedData;
+      // 更新 ContTableData
+      OverseasExchangeData.value = formattedData;
+      // 上传证明文件
+      if (file.value) {
+        await uploadFile('credential', form.link, file.value);
+        file.value = null; // 上传成功后清除文件
+      }
+    } else {
+      ElMessage.error('提交失败!');
+    }
+    
   } catch (error) {
     console.error('提交失败!', error);
   }
-}
+};
 
+const handleFileChange = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    file.value = selectedFile;
+  }
+};
+
+const getFileUrl = (link) => {
+  return fileUrl('credential', link);
+};
 </script>
 
 <style scoped>

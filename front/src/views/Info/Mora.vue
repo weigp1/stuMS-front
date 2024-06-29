@@ -15,7 +15,7 @@
       <el-table-column prop="date" label="获奖时间" sortable/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="scope.row.link" target="_blank">下 载</a>
+          <a :href="getFileUrl(scope.row.link)" target="_blank">下 载</a>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -69,7 +69,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitForm(form)">提交</el-button>
+        <el-button type="primary" @click="submitForm">提交</el-button>
       </div>
     </template>
   </el-dialog>
@@ -78,33 +78,14 @@
 <script lang="ts" setup>
 import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
-import {deleteByPID, select, submitMorality} from '../../api/api.js';
-import { UserStore } from '../../stores/user.js'
-import {uploadFile , downloadFile} from '../../api/resource.js';
-import {format} from "date-fns";
+import { deleteByPID, select, submitMorality } from '../../api/api.js';
+import { UserStore } from '../../stores/user.js';
+import { uploadFile, fileUrl } from '../../api/resource.js';
+import { format } from "date-fns";
 import { onMounted } from 'vue';
+import { ElMessage } from "element-plus";
 
-const MoraTableData = ref([
-  // {
-  //   title: '全国三好学生',
-  //   date: '2022-08-22',
-  //   link: 'https://123.com',
-  //   remarks: '颁奖日期为08-27'
-  // },
-  // {
-  //   title: '省级三好学生',
-  //   date: '2022-05-22',
-  //   link: 'https://123.com',
-  //   remarks: '颁奖日期为06-01'
-  // },
-  // {
-  //   title: '校级优秀共青团员',
-  //   date: '2024-05-04',
-  //   link: 'https://123.com',
-  //   remarks: '无'
-  // },
-]);
-
+const MoraTableData = ref([]);
 
 const dialogFormVisible = ref(false);
 const userStore = UserStore();
@@ -128,13 +109,8 @@ const file = ref<File | null>(null);
 
 onMounted(async () => {
   try {
-    // console.log("currentUser:", userStore.currentUser)
-    const params = {'SID': userStore.currentUser.sid, 'table': "morality"};
-    // 调用 select 接口获取数据
+    const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
     const response = await select(params);
-    console.log('Select 接口调用成功!', response);
-
-    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
     const formattedData = response.data.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
@@ -142,7 +118,6 @@ onMounted(async () => {
       date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
     }));
 
-    // 更新 ContTableData
     MoraTableData.value = formattedData;
 
   } catch (error) {
@@ -153,58 +128,62 @@ onMounted(async () => {
 const deleteRow = async (index) => {
   try {
     const item = MoraTableData.value[index];
-    const params = {'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "morality"}
-    const response = await deleteByPID(params); // 假设有 deleteSocialWork 方法并传入需要删除的数据的 ID
+    const params = { 'PID': item.pid, 'SID': userStore.currentUser.sid, 'table': "morality" };
+    const response = await deleteByPID(params);
     console.log('删除成功!', response);
-    MoraTableData.value.splice(index, 1); // 删除成功后更新界面数据
+    MoraTableData.value.splice(index, 1);
   } catch (error) {
     console.error('删除失败!', error);
   }
 };
 
-const submitForm = async (form) => {
+const submitForm = async () => {
   form.sid = userStore.currentUser.sid;
   form.status_one = 0;
   form.status_two = -1;
   try {
-    const response = await submitMorality(form);
-    // 调用文件上传函数
     if (file.value) {
-      await uploadFile('credential', form.link, file.value);
-      console.log('提交成功!', response);
+        const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
+        form.link_name = file.value.name;
+        form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
     }
-    dialogFormVisible.value = false;
-
-    const params = {'SID': userStore.currentUser.sid, 'table': "morality"};
-    // 调用 select 接口获取数据
-    const response2 = await select(params);
-    console.log('Select 接口调用成功!', response2);
-
-    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-    const formattedData = response2.data.map(item => ({
-      ...item,
-      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
-      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
-      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
-    }));
-
-    // 更新 ContTableData
-    MoraTableData.value = formattedData;
-
+    const response = await submitMorality(form);
+    console.log('提交表单为：',form);
+    if (response.data === 1) {
+      ElMessage.success('提交成功!');
+      dialogFormVisible.value = false;
+      const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
+      const response2 = await select(params);
+      const formattedData = response2.data.map(item => ({
+        ...item,
+        date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+        date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+        date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+      }));
+      MoraTableData.value = formattedData;
+      // 上传证明文件
+      if (file.value) {
+        await uploadFile('credential', form.link, file.value);
+        file.value = null; // 上传成功后清除文件
+      }
+    } else {
+      ElMessage.error('提交失败!');
+    }
   } catch (error) {
     console.error('提交失败!', error);
   }
-}
+};
 
 const handleFileChange = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile) {
-    const currentTime = new Date().toISOString().replace(/[:.]/g, '-'); // 获取当前时间并格式化
-    form.link_name = selectedFile.name;
-    form.link = `${userStore.currentUser.sid}-${selectedFile.name}-${currentTime}`;
     file.value = selectedFile;
   }
-}
+};
+
+const getFileUrl = (link) => {
+  return fileUrl('credential', link);
+};
 </script>
 
 <style scoped>

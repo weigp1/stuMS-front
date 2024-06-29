@@ -19,7 +19,7 @@
       <el-table-column prop="link_name" label="证明材料文件名"/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="scope.row.link" target="_blank">下 载 </a>
+          <a :href="getFileUrl(scope.row.link)" target="_blank">下 载</a>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -85,12 +85,8 @@
         />
       </el-form-item>
 
-      <el-form-item label="证明材料文件名">
-        <el-input v-model="form.link_name" autocomplete="off" style="width: 100%" placeholder="请输入证明材料文件名"/>
-      </el-form-item>
-
       <el-form-item label="证明材料">
-        <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请输入证明材料的链接"/>
+        <input type="file" @change="handleFileChange" accept=".pdf" />
       </el-form-item>
 
       <el-form-item label="备注">
@@ -118,7 +114,11 @@ import { Delete } from "@element-plus/icons-vue";
 import { reactive, ref } from "vue";
 import {deleteByPID, select, submitCopyright} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import { uploadFile, fileUrl } from '../../api/resource.js';
+import { format } from "date-fns";
 import { onMounted } from 'vue';
+import { ElMessage } from "element-plus";
+
 
 const userStore = UserStore()
 
@@ -177,8 +177,7 @@ const levelMaps = {
 };
 
 
-
-import { format } from 'date-fns';
+const file = ref<File | null>(null);
 
 onMounted(async () => {
   try {
@@ -226,28 +225,53 @@ const submitForm = async (form) => {
 
   // 提交表单数据
   try {
+    if (file.value) {
+        const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
+        form.link_name = file.value.name;
+        form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
+    }
     // 调用 submitPaper 函数提交表单数据
     const response = await submitCopyright(form);
-    console.log('提交成功!', response);
-    // 处理成功后的逻辑，比如关闭弹窗等
-    dialogFormVisible.value = false;
-    const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
-    const response2 = await select(params);
-    const formattedData = response2.data.map(item => ({
-      ...item,
-      date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
-      application_status: statusMaps[item.application_status],
-      author_level: levelMaps[item.author_level],
-    }));
-
-    // 更新 ContTableData
-    SoftwareCopyrightData.value = formattedData;
+    console.log('提交表单为：',form);
+    if (response.data === 1) {
+      ElMessage.success('提交成功!');
+       // 处理成功后的逻辑，比如关闭弹窗等
+      dialogFormVisible.value = false;
+      const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
+      const response2 = await select(params);
+      const formattedData = response2.data.map(item => ({
+        ...item,
+        date: format(new Date(item.date), 'yyyy-MM-dd'),
+        application_status: statusMaps[item.application_status],
+        author_level: levelMaps[item.author_level],
+      }));
+      // 更新 ContTableData
+      SoftwareCopyrightData.value = formattedData;
+      // 上传证明文件
+      if (file.value) {
+        await uploadFile('credential', form.link, file.value);
+        file.value = null; // 上传成功后清除文件
+      }
+    } else {
+      ElMessage.error('提交失败!');
+    }
+   
 
   } catch (error) {
     console.error('提交失败!', error);
   }
-}
+};
 
+const handleFileChange = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    file.value = selectedFile;
+  }
+};
+
+const getFileUrl = (link) => {
+  return fileUrl('credential', link);
+};
 </script>
 
 <style scoped>
