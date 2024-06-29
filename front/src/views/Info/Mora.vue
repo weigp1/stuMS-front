@@ -15,7 +15,7 @@
       <el-table-column prop="date" label="获奖时间" sortable/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="getFileUrl(scope.row.link)" target="_blank">下 载</a>
+          <el-button type="primary" @click="handleDownload(scope.row.link)">查 看</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -111,7 +111,9 @@ onMounted(async () => {
   try {
     const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
     const response = await select(params);
-    const formattedData = response.data.map(item => ({
+
+    const filteredData = response.data.filter(item => item.status_one === 0);
+    const formattedData = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -124,6 +126,7 @@ onMounted(async () => {
     console.error('Select 接口调用失败!', error);
   }
 });
+
 
 const deleteRow = async (index) => {
   try {
@@ -150,7 +153,7 @@ const submitForm = async () => {
     const response = await submitMorality(form);
     console.log('提交表单为：',form);
     if (response.data === 1) {
-      ElMessage.success('提交成功!');
+      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
       dialogFormVisible.value = false;
       const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
       const response2 = await select(params);
@@ -181,8 +184,9 @@ const handleFileChange = (event) => {
   }
 };
 
-const getFileUrl = (link) => {
-  return fileUrl('credential', link);
+const handleDownload = async (link) => {
+  const url = await fileUrl('credential', link);;
+  window.open(url, '_blank');
 };
 </script>
 

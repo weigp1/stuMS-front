@@ -19,7 +19,7 @@
       <el-table-column prop="duration" label="志愿时长" sortable/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="getFileUrl(scope.row.link)" target="_blank">下 载</a>
+          <el-button type="primary" @click="handleDownload(scope.row.link)">查 看</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -184,8 +184,8 @@ onMounted(async () => {
     const response = await select(params);
     console.log('Select 接口调用成功!', response);
 
-    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-    const formattedData = response.data.map(item => ({
+    const filteredData = response.data.filter(item => item.status_one === 0);
+    const formattedData = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -231,7 +231,7 @@ const submitForm = async (form) => {
     const response = await submitVolunteer(form);
     console.log('提交表单为：',form);
     if (response.data === 1) {
-      ElMessage.success('提交成功!');
+      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
       // 处理成功后的逻辑，比如关闭弹窗等
       dialogFormVisible.value = false;
       const params = {'SID': userStore.currentUser.sid, 'table': "volunteer"};
@@ -272,8 +272,9 @@ const handleFileChange = (event) => {
   }
 };
 
-const getFileUrl = (link) => {
-  return fileUrl('credential', link);
+const handleDownload = async (link) => {
+  const url = await fileUrl('credential', link);;
+  window.open(url, '_blank');
 };
 </script>
 

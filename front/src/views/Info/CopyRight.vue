@@ -19,7 +19,7 @@
       <el-table-column prop="link_name" label="证明材料文件名"/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="getFileUrl(scope.row.link)" target="_blank">下 载</a>
+          <el-button type="primary" @click="handleDownload(scope.row.link)">查 看</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -187,8 +187,8 @@ onMounted(async () => {
     const response = await select(params);
     console.log('Select 接口调用成功!', response);
 
-    // 处理接口返回的数据，格式化日期字段为年月日
-    const formattedData = response.data.map(item => ({
+    const filteredData = response.data.filter(item => item.status_one === 0);
+    const formattedData = filteredData.map(item => ({
       ...item,
       date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
       application_status: statusMaps[item.application_status],
@@ -220,9 +220,6 @@ const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
   form.status_two = "-1";
-  // console.log(form);
-
-
   // 提交表单数据
   try {
     if (file.value) {
@@ -234,8 +231,8 @@ const submitForm = async (form) => {
     const response = await submitCopyright(form);
     console.log('提交表单为：',form);
     if (response.data === 1) {
-      ElMessage.success('提交成功!');
-       // 处理成功后的逻辑，比如关闭弹窗等
+      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
+      // 处理成功后的逻辑，比如关闭弹窗等
       dialogFormVisible.value = false;
       const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
       const response2 = await select(params);
@@ -269,8 +266,9 @@ const handleFileChange = (event) => {
   }
 };
 
-const getFileUrl = (link) => {
-  return fileUrl('credential', link);
+const handleDownload = async (link) => {
+  const url = await fileUrl('credential', link);;
+  window.open(url, '_blank');
 };
 </script>
 

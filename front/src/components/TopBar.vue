@@ -1,5 +1,4 @@
 <template>
-
   <el-image
       src="/src/assets/topBar.png"
       style="position: fixed; top: 0; left: 0; width: 100%; height: 15%; z-index: 998;"
@@ -9,19 +8,19 @@
   <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false">
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
-    <el-menu-item style="position: absolute; left: 2vh; height: 100%;" index="0">
+    <el-menu-item style="position: absolute; left: 2vh; height: 100%; pointer-events: none;" index="0">
       <el-image style="width: 100%; height: 100%;" src="/src/assets/sysu.png"/>
     </el-menu-item>
 
     <template v-for="item in menuItems">
       <template v-if="item.mainMenu === 'noSub'">
-        <el-menu-item :index="item.index" class="menu">{{ item.label }}</el-menu-item>
+        <el-menu-item :index="item.index" class="main_menu">{{ item.label }}</el-menu-item>
       </template>
 
       <template v-if="item.mainMenu === 'hasSub'">
         <el-sub-menu :index="item.index" class="menu">
           <template #title>
-            <span class="menu">{{ item.label }}</span>
+            <span class="main_menu">{{ item.label }}</span>
           </template>
           <template v-for="subItem in menuItems">
             <el-menu-item :index="item.index + '?category=' + subItem.index"
@@ -105,6 +104,15 @@ const userName = (userStore.currentUser?.name || '用户') + "，您好!"
   font-weight: bold;
   color: #ffffff !important; /* 白色字体 */
 }
+.main_menu {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff !important; /* 白色字体 */
+}
+
+.main_menu:hover {
+  color: #0066ff !important;
+}
 
 .submenu-item {
   font-size: 16px;
@@ -137,7 +145,7 @@ const userName = (userStore.currentUser?.name || '用户') + "，您好!"
 
 .logout {
   z-index: 999;
-  margin-left: 10px;
+  margin-left: 1.5vw;
   display: flex;
   font-size: 18px;
   align-items: center; /* 垂直居中 */
