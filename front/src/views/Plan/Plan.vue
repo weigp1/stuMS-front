@@ -41,6 +41,7 @@ onMounted(() => {
 .pdfContainer {
   width: 80%; /* 设置宽度为屏幕宽度的80% */
   /* max-width: 800px; 最大宽度为800px */
+  margin-top: 2vh;
   height: 85vh; /* 高度自适应内容 */
   border: 1px solid #4d4b4b; /* 边框样式 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */

@@ -50,7 +50,7 @@
       <el-table-column prop="collaborative_two" label="是否本单位合作"/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="scope.row.link" target="_blank">下 载 </a>
+          <el-button type="primary" @click="handleDownload(scope.row.link)">查 看</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -109,7 +109,7 @@
 
       <el-form-item label="全部作者">
         <el-input v-model="form.authors" autocomplete="off" style="width: 100%" placeholder="请填写全部作者"/>
-        <span style="font-size: 12px;">请按署名顺序完整填写中文名，如小红、小明</span>
+        <span style="font-size: 12px;">请按署名顺序完整填写中文名</span>
       </el-form-item>
 
       <el-form-item label="通讯作者">
@@ -229,12 +229,8 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="证明材料文件名">
-        <el-input v-model="form.link_name" autocomplete="off" style="width: 100%" placeholder="请输入证明材料文件名"/>
-      </el-form-item>
-
       <el-form-item label="证明材料">
-        <el-input v-model="form.link" autocomplete="off" style="width: 100%" placeholder="请输入证明材料的链接"/>
+        <input type="file" @change="handleFileChange" accept=".pdf" />
       </el-form-item>
 
       <el-form-item label="备注">
@@ -261,8 +257,10 @@ import {reactive, ref} from "vue";
 import { Delete } from "@element-plus/icons-vue";
 import {deleteByPID, select, submitPaper} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
-import {format} from "date-fns";
+import { uploadFile, fileUrl } from '../../api/resource.js';
+import { format } from "date-fns";
 import { onMounted } from 'vue';
+import { ElMessage } from "element-plus";
 
 // 默认显示
 const PaperTableData = ref([
@@ -413,6 +411,8 @@ const form = reactive({
 
 const userStore = UserStore()
 
+const file = ref<File | null>(null);
+
 onMounted(async () => {
   try {
     // console.log("currentUser:", userStore.currentUser)
@@ -421,8 +421,8 @@ onMounted(async () => {
     const response = await select(params);
     console.log('Select 接口调用成功!', response);
 
-    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-    const formattedData = response.data.map(item => ({
+    const filteredData = response.data.filter(item => item.status_one === 0);
+    const formattedData = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -465,48 +465,71 @@ const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
   form.status_two = "-1";
-  console.log(form);
-
 
   // 提交表单数据
   try {
+    if (file.value) {
+        const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
+        form.link_name = file.value.name;
+        form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
+    }
     // 调用 submitPaper 函数提交表单数据
     const response = await submitPaper(form);
-    console.log('提交成功!', response);
-    // 处理成功后的逻辑，比如关闭弹窗等
-    dialogFormVisible.value = false;
-    const params = {'SID': userStore.currentUser.sid, 'table': "paper"};
-    // 调用 select 接口获取数据
-    const response2 = await select(params);
-    console.log('Select 接口调用成功!', response2);
+    console.log('提交表单为：',form);
+     if (response.data === 1) {
+      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
+      // 处理成功后的逻辑，比如关闭弹窗等
+      dialogFormVisible.value = false;
+      const params = {'SID': userStore.currentUser.sid, 'table': "paper"};
+      // 调用 select 接口获取数据
+      const response2 = await select(params);
+      console.log('Select 接口调用成功!', response2);
 
-    // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-    const formattedData = response2.data.map(item => ({
-      ...item,
-      date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
-      date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
-      date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
-      publication_date: item.publication_date ? format(new Date(item.publication_date), 'yyyy-MM-dd') : null,
-      received_date: item.received_date ? format(new Date(item.received_date), 'yyyy-MM-dd') : null,
-      submission_date: item.submission_date ? format(new Date(item.submission_date), 'yyyy-MM-dd') : null,
-      type: typeMap[item.type],
-      published_status: statusMap[item.published_status],
-      author_level: authorLevelMap[item.author_level],
-      ccf: CCFMap[item.ccf],
-      my_partition: partitionMap[item.my_partition],
-      inclusion: inclusionMap[item.inclusion],
-      collaborative_one: collaborativeOneMap[item.collaborative_one],
-      collaborative_two: collaborativeTwoMap[item.collaborative_two],
-      award_flag: awardFlagMap[item.award_flag],
-    }));
-
-    // 更新 ContTableData
-    PaperTableData.value = formattedData;
+      // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
+      const formattedData = response2.data.map(item => ({
+        ...item,
+        date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+        date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+        date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+        publication_date: item.publication_date ? format(new Date(item.publication_date), 'yyyy-MM-dd') : null,
+        received_date: item.received_date ? format(new Date(item.received_date), 'yyyy-MM-dd') : null,
+        submission_date: item.submission_date ? format(new Date(item.submission_date), 'yyyy-MM-dd') : null,
+        type: typeMap[item.type],
+        published_status: statusMap[item.published_status],
+        author_level: authorLevelMap[item.author_level],
+        ccf: CCFMap[item.ccf],
+        my_partition: partitionMap[item.my_partition],
+        inclusion: inclusionMap[item.inclusion],
+        collaborative_one: collaborativeOneMap[item.collaborative_one],
+        collaborative_two: collaborativeTwoMap[item.collaborative_two],
+        award_flag: awardFlagMap[item.award_flag],
+      }));
+      // 更新 ContTableData
+      PaperTableData.value = formattedData;
+      // 上传证明文件
+      if (file.value) {
+        await uploadFile('credential', form.link, file.value);
+        file.value = null; // 上传成功后清除文件
+      }
+    } else {
+      ElMessage.error('提交失败!');
+    }
   } catch (error) {
     console.error('提交失败!', error);
   }
-}
+};
 
+const handleFileChange = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    file.value = selectedFile;
+  }
+};
+
+const handleDownload = async (link) => {
+  const url = await fileUrl('credential', link);;
+  window.open(url, '_blank');
+};
 
 </script>
 

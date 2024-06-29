@@ -20,7 +20,7 @@
       <el-table-column prop="team" label="其他参与人员"/>
       <el-table-column prop="link" label="证明材料">
         <template #default="scope">
-          <a :href="scope.row.link" target="_blank">查看</a>
+          <el-button type="primary" @click="handleDownload(scope.row.link)">查 看</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="remarks" label="备注"/>
@@ -121,12 +121,8 @@
         <span style="font-size: 12px;">姓名+学院，如小红+21310000、小明+21310001，没有就填“无”</span>
       </el-form-item>
 
-      <el-form-item label="证明材料文件名">
-        <el-input v-model="form.link_name" placeholder="请填写证明材料文件名"/>
-      </el-form-item>
-
-      <el-form-item label="证明材料（链接形式）">
-        <el-input v-model="form.link" placeholder="请填写证明材料的链接"/>
+      <el-form-item label="证明材料">
+        <input type="file" @change="handleFileChange" accept=".pdf" />
       </el-form-item>
 
       <el-form-item label="备注">
@@ -149,7 +145,10 @@ import { reactive, ref } from 'vue';
 import { Delete } from '@element-plus/icons-vue';
 import {deleteByPID, select, submitCompetition} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
+import { uploadFile, fileUrl } from '../../api/resource.js';
+import { format } from "date-fns";
 import { onMounted } from 'vue';
+import { ElMessage } from "element-plus";
 
 
 const userStore = UserStore()
@@ -230,7 +229,7 @@ const typeMaps = {
   6: '其他'
 }
 
-import { format } from 'date-fns';
+const file = ref<File | null>(null);
 
 onMounted(async () => {
   try {
@@ -240,8 +239,8 @@ onMounted(async () => {
     const response = await select(params);
     console.log('Select 接口调用成功!', response);
 
-    // 处理接口返回的数据，格式化日期字段为年月日
-    const formattedData = response.data.map(item => ({
+    const filteredData = response.data.filter(item => item.status_one === 0);
+    const formattedData = filteredData.map(item => ({
       ...item,
       date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
       rank: rankMaps[item.my_rank],
@@ -273,53 +272,58 @@ const submitForm = async (form) => {
   form.sid = userStore.currentUser.sid;
   form.status_one = "0";
   form.status_two = "-1";
-  // console.log(form);
-
-
   // 提交表单数据
   try {
+    if (file.value) {
+        const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
+        form.link_name = file.value.name;
+        form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
+    }
     // 调用 submitPaper 函数提交表单数据
     const response = await submitCompetition(form);
-    console.log('提交成功!', response);
-    // 处理成功后的逻辑，比如关闭弹窗等
-    dialogFormVisible.value = false;
-    const params = {'SID': userStore.currentUser.sid, 'table': "competition"};
-    const response2 = await select(params);
-    const formattedData = response2.data.map(item => ({
-      ...item,
-      date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
-      rank: rankMaps[item.my_rank],
-      level: levelMaps[item.level],
-      type: typeMaps[item.type],
-      // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
-    }));
+    console.log('提交表单为：',form);
+    if (response.data === 1) {
+      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
+      // 处理成功后的逻辑，比如关闭弹窗等
+      dialogFormVisible.value = false;
+      const params = {'SID': userStore.currentUser.sid, 'table': "competition"};
+      const response2 = await select(params);
+      const formattedData = response2.data.map(item => ({
+        ...item,
+        date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
+        rank: rankMaps[item.my_rank],
+        level: levelMaps[item.level],
+        type: typeMaps[item.type],
+        // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
+      }));
 
-    // 更新 ContTableData
-    ContTableData.value = formattedData;
+      // 更新 ContTableData
+      ContTableData.value = formattedData;
+      // 上传证明文件
+      if (file.value) {
+        await uploadFile('credential', form.link, file.value);
+        file.value = null; // 上传成功后清除文件
+      }
+    } else {
+      ElMessage.error('提交失败!');
+    }
+    
   } catch (error) {
     console.error('提交失败!', error);
   }
-}
+};
 
-// const addRow = () => {
-//   ContTableData.value.push({ ...form });
-//   resetForm();
-// };
+const handleFileChange = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    file.value = selectedFile;
+  }
+};
 
-// const resetForm = () => {
-//   form.type = '';
-//   form.name = '';
-//   form.organization = '';
-//   form.date = '';
-//   form.title = '';
-//   form.level = '';
-//   form.rank = '';
-//   form.team = '';
-//   form.link_name = '';
-//   form.link = '';
-//   form.remarks = '';
-// };
-
+const handleDownload = async (link) => {
+  const url = await fileUrl('credential', link);;
+  window.open(url, '_blank');
+};
 </script>
 
 <style scoped>
