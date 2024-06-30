@@ -67,7 +67,6 @@ const switchScene = (scene: number) => {
 .centered {
   display: flex;
   justify-content: center;
-  align-items: center;
   height: 100vh;
   background-image: url("../../assets/background.jpg");
   background-repeat: no-repeat;
