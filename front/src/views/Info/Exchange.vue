@@ -178,14 +178,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Delete } from "@element-plus/icons-vue";
-import { reactive, ref } from "vue";
+import {Delete} from "@element-plus/icons-vue";
+import {onMounted, reactive, ref} from "vue";
 import {deleteByPID, select, submitExchange} from '../../api/api.js';
-import { UserStore } from '../../stores/user.js';
-import { uploadFile, fileUrl } from '../../api/resource.js';
-import { format } from "date-fns";
-import { onMounted } from 'vue';
-import { ElMessage } from "element-plus";
+import {UserStore} from '../../stores/user.js';
+import {fileUrl, uploadFile} from '../../api/resource.js';
+import {format} from "date-fns";
+import {ElMessage} from "element-plus";
 
 const userStore = UserStore()
 // 默认显示
@@ -279,7 +278,8 @@ onMounted(async () => {
     console.log('Select 接口调用成功!', response);
 
     const filteredData = response.data.filter(item => item.status_one === 0);
-    const formattedData = filteredData.map(item => ({
+    // 更新 ContTableData
+    OverseasExchangeData.value = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -292,9 +292,6 @@ onMounted(async () => {
       flag4: judgeMap[item.flag4],
       current_status: statusMap[item.current_status]
     }));
-
-    // 更新 ContTableData
-    OverseasExchangeData.value = formattedData;
 
   } catch (error) {
     console.error('Select 接口调用失败!', error);
@@ -334,7 +331,8 @@ const submitForm = async (form) => {
       const params = {'SID': userStore.currentUser.sid, 'table': "exchange"};
       const response2 = await select(params);
       // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-      const formattedData = response2.data.map(item => ({
+      // 更新 ContTableData
+      OverseasExchangeData.value = response2.data.map(item => ({
         ...item,
         date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
         date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -347,9 +345,6 @@ const submitForm = async (form) => {
         flag4: judgeMap[item.flag4],
         current_status: statusMap[item.current_status]
       }));
-
-      // 更新 ContTableData
-      OverseasExchangeData.value = formattedData;
       // 上传证明文件
       if (file.value) {
         await uploadFile('credential', form.link, file.value);
@@ -372,7 +367,7 @@ const handleFileChange = (event) => {
 };
 
 const handleDownload = async (link) => {
-  const url = await fileUrl('credential', link);;
+  const url = await fileUrl('credential', link);
   window.open(url, '_blank');
 };
 </script>

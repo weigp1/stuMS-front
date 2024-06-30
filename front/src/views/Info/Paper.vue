@@ -527,7 +527,7 @@ const handleFileChange = (event) => {
 };
 
 const handleDownload = async (link) => {
-  const url = await fileUrl('credential', link);;
+  const url = await fileUrl('credential', link);
   window.open(url, '_blank');
 };
 
