@@ -112,7 +112,7 @@ onMounted(async () => {
     const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
     const response = await select(params);
 
-    const filteredData = response.data.filter(item => item.status_one === 0);
+    const filteredData = response.data.filter(item => item.status_one === 1);
     const formattedData = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
