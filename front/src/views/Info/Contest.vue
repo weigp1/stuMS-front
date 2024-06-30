@@ -141,14 +141,13 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
-import { Delete } from '@element-plus/icons-vue';
+import {onMounted, reactive, ref} from 'vue';
+import {Delete} from '@element-plus/icons-vue';
 import {deleteByPID, select, submitCompetition} from '../../api/api.js';
-import { UserStore } from '../../stores/user.js';
-import { uploadFile, fileUrl } from '../../api/resource.js';
-import { format } from "date-fns";
-import { onMounted } from 'vue';
-import { ElMessage } from "element-plus";
+import {UserStore} from '../../stores/user.js';
+import {fileUrl, uploadFile} from '../../api/resource.js';
+import {format} from "date-fns";
+import {ElMessage} from "element-plus";
 
 
 const userStore = UserStore()
@@ -240,16 +239,14 @@ onMounted(async () => {
     console.log('Select 接口调用成功!', response);
 
     const filteredData = response.data.filter(item => item.status_one === 0);
-    const formattedData = filteredData.map(item => ({
+    // 更新 ContTableData
+    ContTableData.value = filteredData.map(item => ({
       ...item,
       date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
       rank: rankMaps[item.my_rank],
       level: levelMaps[item.level],
       type: typeMaps[item.type],
     }));
-
-    // 更新 ContTableData
-    ContTableData.value = formattedData;
 
   } catch (error) {
     console.error('Select 接口调用失败!', error);
@@ -288,7 +285,8 @@ const submitForm = async (form) => {
       dialogFormVisible.value = false;
       const params = {'SID': userStore.currentUser.sid, 'table': "competition"};
       const response2 = await select(params);
-      const formattedData = response2.data.map(item => ({
+      // 更新 ContTableData
+      ContTableData.value = response2.data.map(item => ({
         ...item,
         date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
         rank: rankMaps[item.my_rank],
@@ -296,9 +294,6 @@ const submitForm = async (form) => {
         type: typeMaps[item.type],
         // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
       }));
-
-      // 更新 ContTableData
-      ContTableData.value = formattedData;
       // 上传证明文件
       if (file.value) {
         await uploadFile('credential', form.link, file.value);
@@ -321,7 +316,7 @@ const handleFileChange = (event) => {
 };
 
 const handleDownload = async (link) => {
-  const url = await fileUrl('credential', link);;
+  const url = await fileUrl('credential', link);
   window.open(url, '_blank');
 };
 </script>
