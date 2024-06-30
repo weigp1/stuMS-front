@@ -46,8 +46,8 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="学生类别" prop="category" style="margin: 0 auto; width: 90%;">
-                  <el-select v-model="ruleForm.category" placeholder="">
+                <el-form-item label="学生类别" prop="type" style="margin: 0 auto; width: 90%;">
+                  <el-select v-model="ruleForm.type" placeholder="">
                     <el-option label="境内生" value="1" />
                     <el-option label="港澳台生" value="2" />
                     <el-option label="国际生" value="3" />
@@ -71,15 +71,15 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="身份证号" prop="idCard" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.idCard" />
+                <el-form-item label="身份证号" prop="identity" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.identity" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="出生年月" prop="year" style="margin: 0 auto; width: 90%;">
+                <el-form-item label="出生年月" prop="birthday" style="margin: 0 auto; width: 90%;">
                       <el-date-picker
-                          v-model="ruleForm.year"
+                          v-model="ruleForm.birthday"
                           type="date"
                           label="date"
                           placeholder=""
@@ -111,8 +111,8 @@
 
               <!--    这里需要显示省市信息，需要导包-->
               <el-col :span="8">
-                <el-form-item label="籍贯" prop="place" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.place" />
+                <el-form-item label="籍贯" prop="user_native" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.user_native" />
                 </el-form-item>
               </el-col>
 
@@ -149,8 +149,8 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="联系电话" prop="phone" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.phone" />
+                <el-form-item label="联系电话" prop="tel" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.tel" />
                 </el-form-item>
               </el-col>
 
@@ -161,26 +161,26 @@
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="联系邮箱" prop="mail" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.mail" />
+                <el-form-item label="联系邮箱" prop="email" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.email" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="家庭地址" prop="home" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.home" />
+                <el-form-item label="家庭地址" prop="address" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.address" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="紧急联系人姓名" prop="eName" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.eName" />
+                <el-form-item label="紧急联系人姓名" prop="emergency_name" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.emergency_name" />
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
-                <el-form-item label="紧急联系人电话" prop="ePhone" style="margin: 0 auto; width: 90%;">
-                  <el-input v-model="ruleForm.ePhone" />
+                <el-form-item label="紧急联系人电话" prop="emergency_tel" style="margin: 0 auto; width: 90%;">
+                  <el-input v-model="ruleForm.emergency_tel" />
                 </el-form-item>
               </el-col>
 
@@ -312,20 +312,20 @@ const route = useRoute()
 interface RuleForm {
   SID: string
   name: string
-  category: string
+  type: string
   gender: string
-  year: string
-  idCard: string
+  birthday: string
+  identity: string
   level: string
   outlook: string
   dorm: string
-  phone: string
+  tel: string
   wechat: string
-  mail: string
-  home: string
-  place: string
-  eName: string
-  ePhone: string
+  email: string
+  address: string
+  user_native: string
+  emergency_name: string
+  emergency_tel: string
 }
 
 const formSize = ref<ComponentSize>('large')
@@ -333,23 +333,23 @@ const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<RuleForm>({
   SID: '',
   name: '',
-  category: '',
+  type: '',
   gender: '',
-  year: '',
-  idCard: '',
+  birthday: '',
+  identity: '',
   level: '',
   outlook: '',
   dorm: '',
-  phone: '',
+  tel: '',
   wechat: '',
-  mail: '',
-  home: '',
-  place: '',
-  eName: '',
-  ePhone: '',
+  email: '',
+  address: '',
+  user_native: '',
+  emergency_name: '',
+  emergency_tel: '',
 })
 
-const categoryMap = {
+const typeMap = {
   1: "境内生",
   2: "港澳台生",
   3: "国际生"
@@ -389,7 +389,7 @@ const rules = reactive<FormRules<RuleForm>>({
     { min: 2, max: 10, message: '姓名长度应在2-15之间', trigger: 'blur' },
   ],
 
-  category: [
+  type: [
     {required: true, message: '请选择你的学生类别', trigger: 'blur',},
   ],
 
@@ -397,11 +397,11 @@ const rules = reactive<FormRules<RuleForm>>({
     {required: true, message: '请选择你的性别', trigger: 'blur',},
   ],
 
-  year: [
+  birthday: [
     {type: 'date', required: true, message: '请选择你的出生日期', trigger: 'blur'},
   ],
 
-  idCard: [
+  identity: [
     { required: true, message: '请输入身份证号', trigger: 'blur' },
     { min: 18, max: 18, message: '身份证号应为18位', trigger: 'blur' },
   ],
@@ -418,7 +418,7 @@ const rules = reactive<FormRules<RuleForm>>({
     {required: true, message: '请输入宿舍号', trigger: 'blur'},
   ],
 
-  phone: [
+  tel: [
     { required: true, message: '请输入联系电话', trigger: 'blur' },
     { min: 11, max: 11, message: '请输入11位的电话号码', trigger: 'blur' },
   ],
@@ -427,24 +427,24 @@ const rules = reactive<FormRules<RuleForm>>({
     {required: true, message: '请输入微信账号', trigger: 'blur'},
   ],
 
-  mail: [
+  email: [
     {required: true, message: '请输入邮箱账号', trigger: 'blur'},
     {type: 'email', message: '请输入正确的邮箱', trigger: 'blur'},
   ],
 
-  home: [
+  address: [
     {required: true, message: '请输入家庭详细地址', trigger: 'blur'},
   ],
 
-  place: [
+  user_native: [
     {required: true, message: '请输入籍贯', trigger: 'blur'},
   ],
 
-  eName: [
+  emergency_name: [
     {required: true, message: '请输入紧急联系人姓名', trigger: 'blur'},
   ],
 
-  ePhone: [
+  emergency_tel: [
     { required: true, message: '请输入紧急联系人电话', trigger: 'blur' },
     { min: 11, max: 11, message: '请输入11位的电话号码', trigger: 'blur' },
   ],
@@ -503,7 +503,7 @@ onMounted(async () => {
     // const formattedData = response.data.map(item => ({
     //   ...item,
     //   // date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
-    //   category: categoryMap[item.category],
+    //   type: typeMap[item.type],
     //   level: levelMap[item.level],
     //   outlook: outlookMap[item.outlook],
     //   gender: genderMap[item.gender],
@@ -512,44 +512,50 @@ onMounted(async () => {
     // // 更新 ContTableData
     // ruleForm.SID = formattedData[0].SID;
     // ruleForm.name = formattedData[0].name;
-    // ruleForm.category = formattedData[0].category;
+    // ruleForm.type = formattedData[0].type;
     // ruleForm.gender = formattedData[0].gender;
-    // ruleForm.year = formattedData[0].date;
-    // ruleForm.idCard = formattedData[0].idCard;
+    // ruleForm.birthday = formattedData[0].date;
+    // ruleForm.identity = formattedData[0].identity;
     // ruleForm.level = formattedData[0].level;
     // ruleForm.outlook = formattedData[0].outlook;
     // ruleForm.dorm = formattedData[0].dorm;
     // ruleForm.phone = formattedData[0].phone;
     // ruleForm.wechat = formattedData[0].wechat;
     // ruleForm.mail = formattedData[0].mail;
-    // ruleForm.home = formattedData[0].home;
+    // ruleForm.address = formattedData[0].address;
     // ruleForm.place = formattedData[0].place;
-    // ruleForm.eName = formattedData[0].eName;
-    // ruleForm.ePhone = formattedData[0].ePhone;
+    // ruleForm.emergency_name = formattedData[0].emergency_name;
+    // ruleForm.emergency_tel = formattedData[0].emergency_tel;
     const userInfo = userStore.currentUser;
     console.log("userInfo:", userInfo);
     ruleForm.SID = userInfo.sid;
     ruleForm.name = userInfo.name;
-    ruleForm.category = userInfo.category;
+    ruleForm.type = typeMap[userInfo.type];
     ruleForm.gender = userInfo.gender;
-    ruleForm.year = userInfo.date;
-    ruleForm.idCard = userInfo.idCard;
-    ruleForm.level = userInfo.level;
-    ruleForm.outlook = userInfo.outlook;
+    if (userInfo.gender === 1) {
+      ruleForm.gender = "1";
+    } else if (userInfo.gender === 2) {
+      ruleForm.gender = "2";
+    }
+
+    ruleForm.birthday = userInfo.birthday;
+    ruleForm.identity = userInfo.identity;
+    ruleForm.level = levelMap[userInfo.level];
+    ruleForm.outlook = outlookMap[userInfo.outlook];
     ruleForm.dorm = userInfo.dorm;
-    ruleForm.phone = userInfo.phone;
+    ruleForm.tel = userInfo.tel;
     ruleForm.wechat = userInfo.wechat;
-    ruleForm.mail = userInfo.mail;
-    ruleForm.home = userInfo.home;
-    ruleForm.place = userInfo.place;
-    ruleForm.eName = userInfo.eName;
-    ruleForm.ePhone = userInfo.ePhone;
+    ruleForm.email = userInfo.email;
+    ruleForm.address = userInfo.address;
+    ruleForm.user_native = userInfo.user_native;
+    ruleForm.emergency_name = userInfo.emergency_name;
+    ruleForm.emergency_tel = userInfo.emergency_tel;
   } catch (error) {
     console.error('Select 接口调用失败!', error);
   }
 });
 
-// 计数选项
+// 计数选项s
 // const options = Array.from({ length: 1001 }, (_, idx) => ({
 //   value: `${idx + 2000}`,
 //   label: `${idx + 2000}`,
