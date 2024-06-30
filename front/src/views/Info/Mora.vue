@@ -76,14 +76,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Delete } from "@element-plus/icons-vue";
-import { reactive, ref } from "vue";
-import { deleteByPID, select, submitMorality } from '../../api/api.js';
-import { UserStore } from '../../stores/user.js';
-import { uploadFile, fileUrl } from '../../api/resource.js';
-import { format } from "date-fns";
-import { onMounted } from 'vue';
-import { ElMessage } from "element-plus";
+import {Delete} from "@element-plus/icons-vue";
+import {onMounted, reactive, ref} from "vue";
+import {deleteByPID, select, submitMorality} from '../../api/api.js';
+import {UserStore} from '../../stores/user.js';
+import {fileUrl, uploadFile} from '../../api/resource.js';
+import {format} from "date-fns";
+import {ElMessage} from "element-plus";
 
 const MoraTableData = ref([]);
 
@@ -113,14 +112,12 @@ onMounted(async () => {
     const response = await select(params);
 
     const filteredData = response.data.filter(item => item.status_one === 0);
-    const formattedData = filteredData.map(item => ({
+    MoraTableData.value = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
       date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
     }));
-
-    MoraTableData.value = formattedData;
 
   } catch (error) {
     console.error('Select 接口调用失败!', error);
@@ -157,13 +154,12 @@ const submitForm = async () => {
       dialogFormVisible.value = false;
       const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
       const response2 = await select(params);
-      const formattedData = response2.data.map(item => ({
+      MoraTableData.value = response2.data.map(item => ({
         ...item,
         date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
         date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
         date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
       }));
-      MoraTableData.value = formattedData;
       // 上传证明文件
       if (file.value) {
         await uploadFile('credential', form.link, file.value);
@@ -185,7 +181,7 @@ const handleFileChange = (event) => {
 };
 
 const handleDownload = async (link) => {
-  const url = await fileUrl('credential', link);;
+  const url = await fileUrl('credential', link);
   window.open(url, '_blank');
 };
 </script>

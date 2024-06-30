@@ -110,14 +110,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Delete } from "@element-plus/icons-vue";
-import { reactive, ref } from "vue";
+import {Delete} from "@element-plus/icons-vue";
+import {onMounted, reactive, ref} from "vue";
 import {deleteByPID, select, submitCopyright} from '../../api/api.js';
-import { UserStore } from '../../stores/user.js';
-import { uploadFile, fileUrl } from '../../api/resource.js';
-import { format } from "date-fns";
-import { onMounted } from 'vue';
-import { ElMessage } from "element-plus";
+import {UserStore} from '../../stores/user.js';
+import {fileUrl, uploadFile} from '../../api/resource.js';
+import {format} from "date-fns";
+import {ElMessage} from "element-plus";
 
 
 const userStore = UserStore()
@@ -188,16 +187,14 @@ onMounted(async () => {
     console.log('Select 接口调用成功!', response);
 
     const filteredData = response.data.filter(item => item.status_one === 0);
-    const formattedData = filteredData.map(item => ({
+    // 更新 ContTableData
+    SoftwareCopyrightData.value = filteredData.map(item => ({
       ...item,
       date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
       application_status: statusMaps[item.application_status],
       author_level: levelMaps[item.author_level],
       // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
     }));
-
-    // 更新 ContTableData
-    SoftwareCopyrightData.value = formattedData;
 
   } catch (error) {
     console.error('Select 接口调用失败!', error);
@@ -236,14 +233,13 @@ const submitForm = async (form) => {
       dialogFormVisible.value = false;
       const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
       const response2 = await select(params);
-      const formattedData = response2.data.map(item => ({
+      // 更新 ContTableData
+      SoftwareCopyrightData.value = response2.data.map(item => ({
         ...item,
         date: format(new Date(item.date), 'yyyy-MM-dd'),
         application_status: statusMaps[item.application_status],
         author_level: levelMaps[item.author_level],
       }));
-      // 更新 ContTableData
-      SoftwareCopyrightData.value = formattedData;
       // 上传证明文件
       if (file.value) {
         await uploadFile('credential', form.link, file.value);
@@ -267,7 +263,7 @@ const handleFileChange = (event) => {
 };
 
 const handleDownload = async (link) => {
-  const url = await fileUrl('credential', link);;
+  const url = await fileUrl('credential', link);
   window.open(url, '_blank');
 };
 </script>
