@@ -3,14 +3,17 @@ import {ref, computed, onMounted, watch} from 'vue';
 import TopBar from "../../components/TopBar.vue";
 import { ElCard, ElDialog, ElSelect, ElOption } from 'element-plus';
 import {useRoute} from "vue-router";
+import { select } from '../../api/api.js';
+import {UserStore} from '../../stores/user.js';
 
 // 导入图标
 import YesIcon from '../../assets/status/Yes.png';
 import WaitIcon from '../../assets/status/Wait.png';
 import NoIcon from '../../assets/status/No.png';
+import {format} from "date-fns";
 
-// 模拟从数据库读取的数据
-const rawData = ref([]);
+
+const userStore = UserStore()
 
 // personalVisible=true 表示读取个人信息，即category='personal'
 const personalVisible = ref(false);
@@ -20,53 +23,62 @@ const selectedOption = ref('政治思想道德类');
 
 // 选项数据
 const options = ref([
-  { value: '政治思想道德类', label: '政治思想道德类' },
-  { value: '文体实践类', label: '文体实践类' },
-  { value: '社会工作类', label: '社会工作类' },
-  { value: '学习、竞赛及科研成果类', label: '学习、竞赛及科研成果类' },
+  { value: 'morality', label: '政治思想道德类' },
+  { value: 'volunteer', label: '志愿服务活动类' },
+  { value: 'socialwork', label: '社会工作类' },
+  { value: 'competition', label: '比赛获奖类' },
+  { value: 'paper', label: '论文发表类' },
+  { value: 'patent', label: '专利发明类' },
+  { value: 'copyright', label: '软件著作权类' },
+  { value: 'publication', label: '专著出版类' },
+  { value: 'exchange', label: '赴校外交流类' },
 ]);
+
+// 根据 value 获取 label 的函数
+function getLabelByValue(value) {
+  console.log("value", value)
+  const option = options.value.find(opt => opt.value === value);
+  return option ? option.label : '';
+}
 
 // 弹窗控制和内容
 const dialogVisible = ref(false);
 const dialogContent = ref('');
 
-// 模拟数据加载
-const fetchData = () => {
-  // 创建10条示例数据
-  rawData.value = [
-    { id: 1, class: '政治思想道德类', date: '2023-01-25', name: '全国三好学生', remarks: '', status: 0, category: 'personal' },
-    { id: 2, class: '政治思想道德类', date: '2023-02-11', name: '全国优秀共青团员', remarks: '材料真实，批准通过', status: 1, category: 'personal' },
-    { id: 3, class: '社会工作类', date: '2023-03-01', name: '奖项3', remarks: '备注3', status: 0, category: 'personal' },
-    { id: 4, class: '学习、竞赛及科研成果类', date: '2023-04-01', name: '奖项4', remarks: '备注4', status: 1, category: 'overall' },
-    { id: 5, class: '政治思想道德类', date: '2023-05-22', name: '校青马班结课', remarks: '材料真实，批准通过', status: 1, category: 'personal' },
-    { id: 6, class: '文体实践类', date: '2023-06-01', name: '奖项6', remarks: '备注6', status: 2, category: 'overall' },
-    { id: 7, class: '社会工作类', date: '2023-07-01', name: '奖项7', remarks: '备注7', status: 2, category: 'personal' },
-    { id: 8, class: '学习、竞赛及科研成果类', date: '2023-08-01', name: '奖项8', remarks: '备注8', status: 2, category: 'overall' },
-    { id: 9, class: '政治思想道德类', date: '2023-09-27', name: '院优秀团支书', remarks: '材料有误，请重新提交', status: 2, category: 'personal' },
-    { id: 10, class: '文体实践类', date: '2023-10-01', name: '奖项10', remarks: '备注10', status: 0, category: 'overall' },
-    { id: 11, class: '政治思想道德类', date: '2023-11-15', name: '校优秀共产党院', remarks: '', status: 0, category: 'overall' },
-    { id: 12, class: '政治思想道德类', date: '2024-11-09', name: '校三好学生', remarks: '', status: 0, category: 'personal' },
-    { id: 13, class: '政治思想道德类', date: '2024-12-02', name: '校优秀毕业生', remarks: '材料真实，批准通过', status: 1, category: 'personal' },
-    { id: 14, class: '政治思想道德类', date: '2024-12-03', name: '校优秀毕业论文', remarks: '材料真实，批准通过', status: 1, category: 'personal' }
-  ];
+let rawData = ref([]);
+let response = ref([]);
+
+// 数据加载
+const fetchData = async (response) => {
+
+  if (route.query.category === 'personal') {
+    // 如果 route.query.category 的值为 'personal'，将 response 的每一条数据添加到 rawData 中
+    rawData.value = response.value;
+  } else if (route.query.category === 'overall') {
+    // 如果 route.query.category 的值为 'overall'，筛选满足条件的数据
+    rawData.value = response.value.filter(item => item.status_one === 1 && item.status_two !== -1);
+  }
+
+
+  console.log('Processed rawData:', rawData);
 };
 
 // 根据筛选和排序选项处理数据
-const filteredData = computed(() => {
-
-  let data = rawData.value;
-
-  // 筛选数据
-  if (personalVisible.value) {
-    data = data.filter(item => item.category === 'personal');
-  } else {
-    data = data.filter(item => item.category === 'overall');
-  }
-
-  data = data.filter(item => item.class === selectedOption.value);
-
-  return data;
-});
+// const filteredData = computed(() => {
+//
+//   let data = rawData.value;
+//
+//   // 筛选数据
+//   // if (personalVisible.value) {
+//   //   data = data.filter(item => item.category === 'personal');
+//   // } else {
+//   //   data = data.filter(item => item.category === 'overall');
+//   // }
+//
+//   // data = data.filter(item => item.class === selectedOption.value);
+//
+//   return data;
+// });
 
 // 弹窗显示完整的remarks内容
 const showRemarks = (remarks) => {
@@ -74,22 +86,49 @@ const showRemarks = (remarks) => {
   dialogVisible.value = true;
 };
 
-const getStatusText = (status) => {
+const getStatusText = (status_one, status_two) => {
+  console.log("status_one", status_one)
+  console.log("status_two", status_two)
+  let status = '';
+  if(route.query.category === 'personal'){
+    status = status_one;
+  }
+  else
+    status = status_two;
   if (status === 0) return '待审核';
   if (status === 1) return '已通过';
   if (status === 2) return '已驳回';
+
 };
 
-const getStatusStyle = (status) => {
+const getStatusStyle = (status_one, status_two) => {
+  console.log("status_one", status_one)
+  console.log("status_two", status_two)
+  let status = '';
+  if(route.query.category === 'personal'){
+    status = status_one;
+  }
+  else
+    status = status_two;
   if (status === 0) return {color: 'orange'};
   if (status === 1) return {color: 'green'};
   if (status === 2) return {color: 'red'};
+
 };
 
-const getStatusIcon = (status) => {
+const getStatusIcon = (status_one, status_two) => {
+  console.log("status_one", status_one)
+  console.log("status_two", status_two)
+  let status = '';
+  if(route.query.category === 'personal'){
+    status = status_one;
+  }
+  else
+    status = status_two;
   if (status === 0) return WaitIcon;
   if (status === 1) return YesIcon;
   if (status === 2) return NoIcon;
+
 };
 
 const route = useRoute();
@@ -107,9 +146,92 @@ watch(
     updateVisibility
 );
 
-onMounted(() => {
-  fetchData();
-  updateVisibility();
+
+const tableName = ref('morality');
+
+watch(selectedOption, async (newValue) => {
+  tableName.value = newValue; // 每次选项变化时更新 tableName 的值
+  console.log(tableName.value);
+
+  const params = {'SID': userStore.currentUser.sid, 'table': tableName.value};
+  // 调用 select 接口获取数据
+  const data = await select(params); // 调用 select 函数获取数据
+  console.log("data: ", data);
+
+  if (data !== null) {
+    response.value = data;
+
+    if (route.query.category === 'personal') {
+      rawData.value = response.value;
+    } else if (route.query.category === 'overall') {
+      let filteredData = [];
+      for (let i = 0; i < response.value.length; i++) {
+        const item = response.value[i];
+        if (item.status_one === 1 && item.status_two !== -1) {
+          filteredData.push(item);
+        }
+      }
+      rawData.value = filteredData;
+    }
+    console.log("rawData: ", rawData.value)
+}});
+
+onMounted(async () => {
+  try {
+    const params = {'SID': userStore.currentUser.sid, 'table': tableName.value};
+    // 调用 select 接口获取数据
+    const data = await select(params); // 调用 select 函数获取数据
+    console.log("data: ", data);
+
+    if (data !== null) {
+      response.value = data;
+
+      if (route.query.category === 'personal') {
+        rawData.value = response.value;
+      } else if (route.query.category === 'overall') {
+        let filteredData = [];
+        for (let i = 0; i < response.value.length; i++) {
+          const item = response.value[i];
+          if (item.status_one === 1 && item.status_two !== -1) {
+            filteredData.push(item);
+          }
+        }
+        rawData.value = filteredData;
+      }
+
+      console.log("rawData: ", rawData.value)
+
+    // fetchData(response.data);
+
+    // // 模拟数据加载
+    // fetchData();
+    // // console.log("currentUser:", userStore.currentUser)
+    // const params = {'SID': userStore.currentUser.sid, 'table': "patent"};
+    // // 调用 select 接口获取数据
+    // const response = await select(params);
+    // console.log('Select 接口调用成功!', response);
+    //
+    // const filteredData = response.data.filter(item => item.status_one === 0);
+    // // 更新 ContTableData
+    // PatentTableData.value = filteredData.map(item => ({
+    //   ...item,
+    //   date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+    //   date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+    //   date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+    //   acceptance_date: item.acceptance_date ? format(new Date(item.acceptance_date), 'yyyy-MM-dd') : null,
+    //   empower_date: item.empower_date ? format(new Date(item.empower_date), 'yyyy-MM-dd') : null,
+    //   release_date: item.release_date ? format(new Date(item.release_date), 'yyyy-MM-dd') : null,
+    //   transferred_date: item.transferred_date ? format(new Date(item.transferred_date), 'yyyy-MM-dd') : null,
+    //   type: typeMap[item.type],
+    //   acceptance: acceptanceMap[item.acceptance],
+    //   my_release: my_releaseMap[item.my_release],
+    //   empower: empowerMap[item.empower],
+    //   transferred: transferredMap[item.transferred]
+    // }));
+
+  }} catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
 });
 
 </script>
@@ -131,17 +253,17 @@ onMounted(() => {
       </div>
 
       <div class="card-container">
-        <el-card v-for="item in filteredData" :key="item.id" class="card" shadow="hover"
+        <el-card v-for="item in rawData" :key="item.status_one" class="card" shadow="hover"
                  @click="showRemarks(item.remarks)">
           <div class="card-content">
             <div class="status-icon">
-              <img :src="getStatusIcon(item.status)" alt="status icon"/>
+              <img :src="getStatusIcon(item.status_one, item.status_two)" alt="status icon"/>
             </div>
             <div class="card-text">
-              <p class="info-line"><span class="label">类别:&nbsp</span> <span>{{ item.class }}</span></p>
-              <p class="info-line"><span class="label">日期:&nbsp</span> <span>{{ item.date }}</span></p>
-              <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.name }}</span></p>
-              <p class="info-line"><span class="label">状态:&nbsp</span> <span :style="getStatusStyle(item.status)">{{ getStatusText(item.status) }}</span></p>
+              <p class="info-line"><span class="label">类别:&nbsp</span> <span>{{ getLabelByValue(tableName.value) }}</span></p>
+              <p class="info-line"><span class="label">提交审核日期:&nbsp</span> <span>{{ 20240630 }}</span></p>
+              <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.title }}</span></p>
+              <p class="info-line"><span class="label">状态:&nbsp</span> <span :style="getStatusStyle(item.status_one, item.status_two)">{{ getStatusText(item.status_one, item.status_two) }}</span></p>
             </div>
           </div>
         </el-card>
