@@ -567,7 +567,7 @@ import CopyRight from "./CopyRight.vue";
 import Publication from "./Publication.vue";
 import Exchange from "./Exchange.vue";
 import {select} from '../../api/api.js';
-import {format} from "date-fns/index";
+import {format} from "date-fns";
 import {UserStore} from '../../stores/user.js'
 const tabPosition = ref<TabsInstance['tabPosition']>('left')
 

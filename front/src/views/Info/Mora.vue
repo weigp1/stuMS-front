@@ -111,8 +111,8 @@ onMounted(async () => {
     const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
     const response = await select(params);
 
-    const filteredData = response.data.filter(item => item.status_one === 0);
-    MoraTableData.value = filteredData.map(item => ({
+    const filteredData = response.data.filter(item => item.status_one === 1);
+    const formattedData = filteredData.map(item => ({
       ...item,
       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,

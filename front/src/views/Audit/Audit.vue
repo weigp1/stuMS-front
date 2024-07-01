@@ -1,134 +1,113 @@
 <script setup>
-import {ref, computed, onMounted, watch} from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import TopBar from "../../components/TopBar.vue";
 import { ElCard, ElDialog, ElSelect, ElOption } from 'element-plus';
-import {useRoute} from "vue-router";
+import { useRoute } from "vue-router";
+import { UserStore } from '../../stores/user.js';
 import { select } from '../../api/api.js';
-import {UserStore} from '../../stores/user.js';
-
+import { format } from "date-fns";
+import { fileUrl } from '../../api/resource.js';
 // 导入图标
 import YesIcon from '../../assets/status/Yes.png';
 import WaitIcon from '../../assets/status/Wait.png';
 import NoIcon from '../../assets/status/No.png';
-import {format} from "date-fns";
 
-
-const userStore = UserStore()
+// 模拟从数据库读取的数据
+const rawData = ref([]);
 
 // personalVisible=true 表示读取个人信息，即category='personal'
 const personalVisible = ref(false);
 
 // 筛选和排序选项
-const selectedOption = ref('政治思想道德类');
+const selectedOption = ref('政治思想道德');
 
 // 选项数据
 const options = ref([
-  { value: 'morality', label: '政治思想道德类' },
-  { value: 'volunteer', label: '志愿服务活动类' },
-  { value: 'socialwork', label: '社会工作类' },
-  { value: 'competition', label: '比赛获奖类' },
-  { value: 'paper', label: '论文发表类' },
-  { value: 'patent', label: '专利发明类' },
-  { value: 'copyright', label: '软件著作权类' },
-  { value: 'publication', label: '专著出版类' },
-  { value: 'exchange', label: '赴校外交流类' },
+  { value: '政治思想道德', label: '政治思想道德' },
+  { value: '社会工作', label: '社会工作' },
+  { value: '文体实践', label: '文体实践' },
+  { value: '竞赛成果', label: '竞赛成果' },
+  { value: '论文成果', label: '论文成果' },
+  { value: '专利成果', label: '专利成果' },
+  { value: '软件著作权', label: '软件著作权' },
+  { value: '专著出版', label: '专著出版' },
 ]);
-
-// 根据 value 获取 label 的函数
-function getLabelByValue(value) {
-  console.log("value", value)
-  const option = options.value.find(opt => opt.value === value);
-  return option ? option.label : '';
-}
 
 // 弹窗控制和内容
 const dialogVisible = ref(false);
 const dialogContent = ref('');
+const userStore = UserStore();
 
-let rawData = ref([]);
-let response = ref([]);
+const categories = [
+  { table: "morality", class: "政治思想道德" },
+  { table: "volunteer", class: "政治思想道德" },
+  { table: "socialwork", class: "社会工作" },
+  { table: "competition", class: "竞赛成果" },
+  { table: "paper", class: "论文成果" },
+  { table: "patent", class: "专利成果" },
+  { table: "copyright", class: "软件著作权" },
+  { table: "publication", class: "专著出版" },
+];
 
-// 数据加载
-const fetchData = async (response) => {
-
-  if (route.query.category === 'personal') {
-    // 如果 route.query.category 的值为 'personal'，将 response 的每一条数据添加到 rawData 中
-    rawData.value = response.value;
-  } else if (route.query.category === 'overall') {
-    // 如果 route.query.category 的值为 'overall'，筛选满足条件的数据
-    rawData.value = response.value.filter(item => item.status_one === 1 && item.status_two !== -1);
+// 根据所选类别获取数据
+const fetchData = async (categoryClass) => {
+  try {
+    rawData.value = [];
+    const selectedCategories = categories.filter(category => category.class === categoryClass);
+    console.log(selectedCategories);
+    for (const category of selectedCategories) {
+      const params = { 'SID': userStore.currentUser.sid, 'table': category.table };
+      const response = await select(params);
+      const formattedData = response.data.map(item => ({
+        ...item,
+        date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+        link: item.link,
+        link_name: item.link_name,
+        score: item.score,
+        status: item.status_one === 1 ? item.status_two : item.status_one,
+        name: item.title,
+        category: item.status_one === 1 ? 'overall' : 'personal',
+        remarks: item.remarks,
+        class: category.class
+      }));
+      rawData.value.push(...formattedData);
+    }
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
   }
-
-
-  console.log('Processed rawData:', rawData);
 };
 
 // 根据筛选和排序选项处理数据
-// const filteredData = computed(() => {
-//
-//   let data = rawData.value;
-//
-//   // 筛选数据
-//   // if (personalVisible.value) {
-//   //   data = data.filter(item => item.category === 'personal');
-//   // } else {
-//   //   data = data.filter(item => item.category === 'overall');
-//   // }
-//
-//   // data = data.filter(item => item.class === selectedOption.value);
-//
-//   return data;
-// });
+const filteredData = computed(() => {
+  let data = rawData.value;
 
-// 弹窗显示完整的remarks内容
-const showRemarks = (remarks) => {
-  dialogContent.value = remarks;
-  dialogVisible.value = true;
-};
-
-const getStatusText = (status_one, status_two) => {
-  console.log("status_one", status_one)
-  console.log("status_two", status_two)
-  let status = '';
-  if(route.query.category === 'personal'){
-    status = status_one;
+  // 筛选数据
+  if (personalVisible.value) {
+    data = data.filter(item => item.category === 'personal');
+  } else {
+    data = data.filter(item => item.category === 'overall');
   }
-  else
-    status = status_two;
+
+  return data;
+});
+
+
+const getStatusText = (status) => {
   if (status === 0) return '待审核';
   if (status === 1) return '已通过';
   if (status === 2) return '已驳回';
-
 };
 
-const getStatusStyle = (status_one, status_two) => {
-  console.log("status_one", status_one)
-  console.log("status_two", status_two)
-  let status = '';
-  if(route.query.category === 'personal'){
-    status = status_one;
-  }
-  else
-    status = status_two;
-  if (status === 0) return {color: 'orange'};
-  if (status === 1) return {color: 'green'};
-  if (status === 2) return {color: 'red'};
-
+const getStatusStyle = (status) => {
+  if (status === 0) return { color: 'orange' };
+  if (status === 1) return { color: 'green' };
+  if (status === 2) return { color: 'red' };
 };
 
-const getStatusIcon = (status_one, status_two) => {
-  console.log("status_one", status_one)
-  console.log("status_two", status_two)
-  let status = '';
-  if(route.query.category === 'personal'){
-    status = status_one;
-  }
-  else
-    status = status_two;
+const getStatusIcon = (status) => {
   if (status === 0) return WaitIcon;
   if (status === 1) return YesIcon;
   if (status === 2) return NoIcon;
-
 };
 
 const route = useRoute();
@@ -141,129 +120,54 @@ const updateVisibility = () => {
   }
 };
 
-watch(
-    () => route.query.category,
-    updateVisibility
-);
-
-
-const tableName = ref('morality');
-
-watch(selectedOption, async (newValue) => {
-  tableName.value = newValue; // 每次选项变化时更新 tableName 的值
-  console.log(tableName.value);
-
-  const params = {'SID': userStore.currentUser.sid, 'table': tableName.value};
-  // 调用 select 接口获取数据
-  const data = await select(params); // 调用 select 函数获取数据
-  console.log("data: ", data);
-
-  if (data !== null) {
-    response.value = data;
-
-    if (route.query.category === 'personal') {
-      rawData.value = response.value;
-    } else if (route.query.category === 'overall') {
-      let filteredData = [];
-      for (let i = 0; i < response.value.length; i++) {
-        const item = response.value[i];
-        if (item.status_one === 1 && item.status_two !== -1) {
-          filteredData.push(item);
-        }
-      }
-      rawData.value = filteredData;
-    }
-    console.log("rawData: ", rawData.value)
-}});
-
-onMounted(async () => {
-  try {
-    const params = {'SID': userStore.currentUser.sid, 'table': tableName.value};
-    // 调用 select 接口获取数据
-    const data = await select(params); // 调用 select 函数获取数据
-    console.log("data: ", data);
-
-    if (data !== null) {
-      response.value = data;
-
-      if (route.query.category === 'personal') {
-        rawData.value = response.value;
-      } else if (route.query.category === 'overall') {
-        let filteredData = [];
-        for (let i = 0; i < response.value.length; i++) {
-          const item = response.value[i];
-          if (item.status_one === 1 && item.status_two !== -1) {
-            filteredData.push(item);
-          }
-        }
-        rawData.value = filteredData;
-      }
-
-      console.log("rawData: ", rawData.value)
-
-    // fetchData(response.data);
-
-    // // 模拟数据加载
-    // fetchData();
-    // // console.log("currentUser:", userStore.currentUser)
-    // const params = {'SID': userStore.currentUser.sid, 'table': "patent"};
-    // // 调用 select 接口获取数据
-    // const response = await select(params);
-    // console.log('Select 接口调用成功!', response);
-    //
-    // const filteredData = response.data.filter(item => item.status_one === 0);
-    // // 更新 ContTableData
-    // PatentTableData.value = filteredData.map(item => ({
-    //   ...item,
-    //   date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
-    //   date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
-    //   date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
-    //   acceptance_date: item.acceptance_date ? format(new Date(item.acceptance_date), 'yyyy-MM-dd') : null,
-    //   empower_date: item.empower_date ? format(new Date(item.empower_date), 'yyyy-MM-dd') : null,
-    //   release_date: item.release_date ? format(new Date(item.release_date), 'yyyy-MM-dd') : null,
-    //   transferred_date: item.transferred_date ? format(new Date(item.transferred_date), 'yyyy-MM-dd') : null,
-    //   type: typeMap[item.type],
-    //   acceptance: acceptanceMap[item.acceptance],
-    //   my_release: my_releaseMap[item.my_release],
-    //   empower: empowerMap[item.empower],
-    //   transferred: transferredMap[item.transferred]
-    // }));
-
-  }} catch (error) {
-    console.error('Select 接口调用失败!', error);
-  }
+onMounted(() => {
+  fetchData(selectedOption.value);
+  updateVisibility();
 });
+
+// 弹窗显示完整的remarks内容
+const showRemarks = (remarks) => {
+  console.log('ok')
+  dialogContent.value = remarks;
+  dialogVisible.value = true;
+};
+
+
+const handleDownload = async (link) => {
+  const url = await fileUrl('credential', link);
+  window.open(url, '_blank');
+};
 
 </script>
 
 <template>
   <div class="box">
-    <TopBar/>
+    <TopBar />
     <div class="content">
       <div class="filter-bar">
-        <el-select v-model="selectedOption" filterable placeholder="请选择">
+        <el-select v-model="selectedOption" filterable placeholder="请选择" @change="fetchData(selectedOption)">
           <el-option
-              class="select_item"
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+            class="select_item"
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </div>
 
       <div class="card-container">
-        <el-card v-for="item in rawData" :key="item.status_one" class="card" shadow="hover"
-                 @click="showRemarks(item.remarks)">
+        <el-card v-for="item in filteredData" :key="item.date" class="card" shadow="hover">
           <div class="card-content">
             <div class="status-icon">
-              <img :src="getStatusIcon(item.status_one, item.status_two)" alt="status icon"/>
+              <img :src="getStatusIcon(item.status)" alt="status icon" />
             </div>
             <div class="card-text">
-              <p class="info-line"><span class="label">类别:&nbsp</span> <span>{{ getLabelByValue(tableName.value) }}</span></p>
-              <p class="info-line"><span class="label">提交审核日期:&nbsp</span> <span>{{ 20240630 }}</span></p>
-              <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.title }}</span></p>
-              <p class="info-line"><span class="label">状态:&nbsp</span> <span :style="getStatusStyle(item.status_one, item.status_two)">{{ getStatusText(item.status_one, item.status_two) }}</span></p>
+              <p class="info-line"><span class="label">类别:&nbsp</span> <span>{{ item.class }}</span></p>
+              <p class="info-line"><span class="label">日期:&nbsp</span> <span>{{ item.date }}</span></p>
+              <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.name }}</span></p>
+              <p class="info-line"><span class="label">详细信息:&nbsp</span> <span><el-button type="primary" @click="showRemarks(item.remarks)">详 情</el-button></span></p>
+              <p class="info-line"><span class="label">证明材料:&nbsp</span> <span><el-button type="primary" @click="handleDownload(item.link)">查 看</el-button></span></p>
             </div>
           </div>
         </el-card>
@@ -274,7 +178,6 @@ onMounted(async () => {
           <p>{{ dialogContent }}</p>
         </div>
       </el-dialog>
-
     </div>
   </div>
 </template>
@@ -344,6 +247,7 @@ onMounted(async () => {
 .status-icon {
   flex: 1;
   display: flex;
+  margin-left: -3vh;
 }
 
 .status-icon img {
@@ -363,10 +267,12 @@ onMounted(async () => {
 }
 
 .card p {
-  margin: 0.3rem 0;
+  justify-content: center;
+  
 }
 
 .card-text .info-line {
+  width: 25vh;
   display: flex;
   justify-content: space-between;
   margin-top: 1vh;
