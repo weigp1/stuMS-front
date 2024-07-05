@@ -154,7 +154,7 @@ defineProps<{
   align-items: center;
   background: rgba(255, 255, 255, 0.8);
   width: 65vh;
-  height: 26vh;
+  height: 30vh;
   border-radius: 10px;
 }
 
@@ -164,7 +164,7 @@ defineProps<{
   justify-content: center;
   align-items: center;
   width: 65vh;
-  height: 26vh;
+  height: 30vh;
   border-radius: 10px;
   background-color: rgba(240, 240, 240, 0.9);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

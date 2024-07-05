@@ -23,6 +23,7 @@
       </el-col>
 
       <el-col span="22">
+
 <!--        基本信息-->
         <div class="right" v-if="showFirst">
           <el-form
@@ -302,7 +303,7 @@ import Paper from "./Paper.vue";
 import TopBar from "../../components/TopBar.vue";
 
 import axios from "axios";
-import { reactive, ref, onMounted } from 'vue'
+import {reactive, ref, onMounted, computed} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 
@@ -372,8 +373,6 @@ const genderMap = {
   1: "男",
   2: "女"
 };
-
-
 
 const userStore = UserStore();
 
