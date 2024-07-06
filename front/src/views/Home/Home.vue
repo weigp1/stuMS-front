@@ -1,6 +1,6 @@
 <template>
   <Chart></Chart>
-
+  <TopBar></TopBar>
   <!-- 底部图案 -->
   <div class="bottom-bar">
     <img src="/src/assets/bottomBar.png" alt="Bottom Bar">
@@ -17,6 +17,7 @@
 
 import Chart from "./Chart.vue";
 import { useRoute, useRouter } from 'vue-router'
+import TopBar from "../../components/TopBar.vue";
 const router = useRouter()
 const route = useRoute()
 

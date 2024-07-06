@@ -10,6 +10,7 @@ import { fileUrl } from '../../api/resource.js';
 import YesIcon from '../../assets/status/Yes.png';
 import WaitIcon from '../../assets/status/Wait.png';
 import NoIcon from '../../assets/status/No.png';
+import TopBar from "../../components/TopBar.vue";
 
 // 模拟从数据库读取的数据
 const rawData = ref([]);
@@ -134,6 +135,7 @@ const handleDownload = async (link) => {
 
 <template>
   <div class="box">
+    <TopBar></TopBar>
     <div class="content">
       <div class="filter-bar">
         <el-select v-model="selectedOption" filterable placeholder="请选择" @change="fetchData(selectedOption)">

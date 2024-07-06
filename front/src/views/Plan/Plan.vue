@@ -1,4 +1,5 @@
 <template>
+  <TopBar></TopBar>
   <div class="container">
     <div class="pdfContainer">
       <embed :src="file_url" type="application/pdf" width="100%" height="100%" />
@@ -8,7 +9,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fileUrl } from '../../api/resource.js'// 根据实际路径调整
+import { fileUrl } from '../../api/resource.js'
+import TopBar from "../../components/TopBar.vue";
+// 根据实际路径调整
 
 let file_url = ref('')
 

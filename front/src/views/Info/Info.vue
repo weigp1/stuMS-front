@@ -1,5 +1,6 @@
 <template>
   <el-row>
+    <TopBar></TopBar>
     <div class="centered">
 
       <el-col span="2">
@@ -566,6 +567,7 @@ import Exchange from "./Exchange.vue";
 import {select} from '../../api/api.js';
 import {format} from "date-fns";
 import {UserStore} from '../../stores/user.js'
+import TopBar from "../../components/TopBar.vue";
 const tabPosition = ref<TabsInstance['tabPosition']>('left')
 
 const activeName = ref('first')

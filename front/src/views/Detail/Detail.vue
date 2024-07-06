@@ -1,4 +1,5 @@
 <template>
+  <TopBar></TopBar>
   <div class="centered">
     <div v-if="currentScene === 1">
       <div class="button-container">
@@ -53,6 +54,7 @@ import Politics from "./Politics.vue";
 import Sports from "./Sports.vue";
 import Social from "./Social.vue";
 import Study from "./Study.vue";
+import TopBar from "../../components/TopBar.vue";
 
 const currentScene = ref(1);
 
