@@ -48,6 +48,9 @@
 
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
   </el-menu>
+
+  <!-- 占位元素，确保页面内容不会被固定定位的菜单栏遮挡 -->
+  <div style="height: 15%;"></div>
 </template>
 
 <script lang="ts" setup>
@@ -90,10 +93,10 @@ const userName = (userStore.currentUser?.name || '用户') + "，您好!"
 <style lang="scss">
 .topBar {
   position: fixed;
-  top: 2.5%;
-  height: 10%;
-  left: 10%;
-  right: 10%;
+  top: 2.5vh;
+  height: 10vh;
+  left: 10vw;
+  right: 10vw;
   z-index: 999;
   border: none;
   background: rgba(0, 0, 0, 0.0);
@@ -104,6 +107,7 @@ const userName = (userStore.currentUser?.name || '用户') + "，您好!"
   font-weight: bold;
   color: #ffffff !important; /* 白色字体 */
 }
+
 .main_menu {
   font-size: 18px;
   font-weight: bold;

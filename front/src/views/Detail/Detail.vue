@@ -1,5 +1,4 @@
 <template>
-  <TopBar></TopBar>
   <div class="centered">
     <div v-if="currentScene === 1">
       <div class="button-container">
@@ -50,7 +49,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import TopBar from "../../components/TopBar.vue";
 import Politics from "./Politics.vue";
 import Sports from "./Sports.vue";
 import Social from "./Social.vue";
@@ -67,10 +65,11 @@ const switchScene = (scene: number) => {
 .centered {
   display: flex;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   background-image: url("../../assets/background.jpg");
   background-repeat: no-repeat;
-  background-size: cover;
+  background-attachment: fixed;
+  background-size: 100% 100%;
   padding: 5vh;
   box-sizing: border-box;
 }

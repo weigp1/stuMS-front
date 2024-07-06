@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
-import { select } from '../../api/api.js';
+import {select, submit_idx_score, submit_status2} from '../../api/api.js';
 import { UserStore } from '../../stores/user.js';
 import { ElMessage } from "element-plus";
 
@@ -71,10 +71,10 @@ const selectedCardMeta = ref({ pid: null, table: '' });
 const fetchData = async () => {
   try {
     const params = { 'SID': userStore.currentUser.sid };
-    const socialworkResponse = await select({ ...params, table: 'socialwork' });
+    const socialWorkResponse = await select({ ...params, table: 'socialwork' });
 
-    // 过滤并提取 socialwork 表的所需字段
-    const filteredSocialworkData = socialworkResponse.data
+    // 过滤并提取 SocialWork 表的所需字段
+    const filteredSocialWorkData = socialWorkResponse.data
         .filter(item => item.status_one === 1)
         .map(item => ({
           title: item.title,
@@ -83,9 +83,9 @@ const fetchData = async () => {
         }));
 
     // 赋值给 cardsData
-    cardsData.value = filteredSocialworkData;
+    cardsData.value = filteredSocialWorkData;
 
-    console.log('Socialwork Data:', filteredSocialworkData);
+    console.log('SocialWork Data:', filteredSocialWorkData);
 
   } catch (error) {
     console.error('获取数据失败:', error);
@@ -101,31 +101,48 @@ const selectCard = (item) => {
 };
 
 const submitForm = async () => {
-  // if (!selectedCardMeta.value.pid || !form.selection || !form.score) {
-  //   console.error('表单数据不完整');
-  //   return;
-  // }
-  //
-  // try {
-  //   const updateParams = {
-  //     PID: selectedCardMeta.value.pid,
-  //     idx: form.selection,
-  //     score: form.score
-  //   };
-  //
-  //   const response = await update({ ...updateParams, table: selectedCardMeta.value.table });
-  //
-  //   if (response === 1){
-  //     ElMessage.success('提交成功, 如需修改请联系管理员');
-  //     console.log('表单提交成功', form);
-  //     alert('提交成功');
-  //   } else {
-  //     ElMessage.error('提交失败，请重新尝试！');
-  //   }
-  // } catch (error) {
-  //   console.error('表单提交失败', error);
-  //   alert('提交失败');
-  // }
+  if (!selectedCardMeta.value.pid || !form.selection || !form.score) {
+    console.error('表单数据不完整');
+    return;
+  }
+
+  try {
+    const updateParams = {
+      PID: selectedCardMeta.value.pid,
+      SID: userStore.currentUser.sid,
+      idx: form.selection,
+      score: form.score,
+      table: selectedCardMeta.value.table
+    };
+
+    const updateStatus = {
+      PID: selectedCardMeta.value.pid,
+      SID: userStore.currentUser.sid,
+      status_two: 0,
+      table: selectedCardMeta.value.table
+    };
+
+    // const response1 = await submit_idx_score({ ...updateParams, table: selectedCardMeta.value.table });
+    // const response2 = await submit_status2({ ...updateStatus, table: selectedCardMeta.value.table });
+
+    // 使用Promise.all来同时提交两个请求
+    const [response1, response2] = await Promise.all([
+      submit_idx_score(updateParams),
+      submit_status2(updateStatus)
+    ]);
+
+    if (response1 === 1 && response2 === 1){
+      ElMessage.success('提交成功, 如需修改请联系管理员');
+      console.log('表单提交成功', form);
+      alert('提交成功');
+    } else {
+      ElMessage.error('提交失败，请重新尝试！');
+    }
+
+  } catch (error) {
+    console.error('表单提交失败', error);
+    alert('提交失败');
+  }
 };
 
 onMounted(fetchData);

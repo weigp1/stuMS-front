@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import TopBar from "../../components/TopBar.vue";
 import { ElCard, ElDialog, ElSelect, ElOption } from 'element-plus';
 import { useRoute } from "vue-router";
 import { UserStore } from '../../stores/user.js';
@@ -135,7 +134,6 @@ const handleDownload = async (link) => {
 
 <template>
   <div class="box">
-    <TopBar />
     <div class="content">
       <div class="filter-bar">
         <el-select v-model="selectedOption" filterable placeholder="请选择" @change="fetchData(selectedOption)">
@@ -184,7 +182,7 @@ const handleDownload = async (link) => {
 <style scoped>
 .box {
   width: 100%;
-  min-height: 150vh; /* 确保背景图至少覆盖整个视口高度 */
+  min-height: 100vh; /* 确保背景图至少覆盖整个视口高度 */
   background-image: url("../../assets/background.jpg");
   background-size: cover;
   background-attachment: fixed;

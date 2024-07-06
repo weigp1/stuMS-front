@@ -1,5 +1,4 @@
 <template>
-  <TopBar></TopBar>
   <el-row>
     <div class="centered">
 
@@ -300,7 +299,6 @@ import Work from "./Work.vue";
 import Contest from "./Contest.vue";
 import Paper from "./Paper.vue";
 // import Patent from "./Patent.vue"
-import TopBar from "../../components/TopBar.vue";
 
 import axios from "axios";
 import {reactive, ref, onMounted, computed} from 'vue'
