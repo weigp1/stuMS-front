@@ -25,7 +25,6 @@ const selectedOption = ref('政治思想道德');
 const options = ref([
   { value: '政治思想道德', label: '政治思想道德' },
   { value: '社会工作', label: '社会工作' },
-  { value: '文体实践', label: '文体实践' },
   { value: '竞赛成果', label: '竞赛成果' },
   { value: '论文成果', label: '论文成果' },
   { value: '专利成果', label: '专利成果' },
