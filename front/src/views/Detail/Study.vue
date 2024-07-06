@@ -73,42 +73,61 @@ const fetchData = async () => {
   try {
     const params = { 'SID': userStore.currentUser.sid };
 
+    const competitionResponse = await select({ ...params, table: 'competition' });
     const paperResponse = await select({ ...params, table: 'paper' });
     const patentResponse = await select({ ...params, table: 'patent' });
     const copyrightResponse = await select({ ...params, table: 'copyright' });
     const publicationResponse = await select({ ...params, table: 'publication' });
 
+    const filteredCompetitionData = competitionResponse.data
+        .filter(item => item.status_one === 1 && item.type === 1)
+        .map(item => ({
+          pid: item.pid,
+          title: item.name,
+          date: item.date ? new Date(item.date).toLocaleDateString() : null,
+          table: 'competition'
+        }));
+
     const filteredPaperData = paperResponse.data
         .filter(item => item.status_one === 1)
         .map(item => ({
+          pid: item.pid,
           title: item.title,
-          date: item.publication_date ? new Date(item.publication_date).toLocaleDateString() : null
+          date: item.publication_date ? new Date(item.publication_date).toLocaleDateString() : null,
+          table: 'paper'
         }));
 
     const filteredPatentData = patentResponse.data
         .filter(item => item.status_one === 1)
         .map(item => ({
+          pid: item.pid,
           title: item.title,
-          date: item.acceptance_date ? new Date(item.acceptance_date).toLocaleDateString() : null
+          date: item.acceptance_date ? new Date(item.acceptance_date).toLocaleDateString() : null,
+          table: 'patent'
         }));
 
     const filteredCopyrightData = copyrightResponse.data
         .filter(item => item.status_one === 1)
         .map(item => ({
+          pid: item.pid,
           title: item.title,
-          date: item.date ? new Date(item.date).toLocaleDateString() : null
+          date: item.date ? new Date(item.date).toLocaleDateString() : null,
+          table: 'copyright'
         }));
 
     const filteredPublicationData = publicationResponse.data
         .filter(item => item.status_one === 1)
         .map(item => ({
+          pid: item.pid,
           title: item.title,
-          date: item.date ? new Date(item.date).toLocaleDateString() : null
+          date: item.date ? new Date(item.date).toLocaleDateString() : null,
+          table: 'publication'
         }));
 
     // 合并数据
-    cardsData.value = [...filteredPaperData, ...filteredPatentData, ...filteredCopyrightData, ...filteredPublicationData];
+    cardsData.value = [...filteredCompetitionData, ...filteredPaperData, ...filteredPatentData, ...filteredCopyrightData, ...filteredPublicationData];
 
+    console.log('Competition Data:', filteredCompetitionData);
     console.log('Paper Data:', filteredPaperData);
     console.log('Patent Data:', filteredPatentData);
     console.log('Copyright Data:', filteredCopyrightData);
@@ -129,46 +148,46 @@ const selectCard = (item) => {
 
 const submitForm = async () => {
   if (!selectedCardMeta.value.pid || !form.selection || !form.score) {
+    console.log("pid: ", selectedCardMeta.value.pid)
+    console.log("idx: ", form.selection)
+    console.log("score: ", form.score)
     console.error('表单数据不完整');
     return;
   }
 
-  try {
-    const updateParams = {
-      PID: selectedCardMeta.value.pid,
-      SID: userStore.currentUser.sid,
-      idx: form.selection,
-      score: form.score,
-      table: selectedCardMeta.value.table
-    };
+  const updateParams = {
+    PID: selectedCardMeta.value.pid,
+    SID: userStore.currentUser.sid,
+    idx: parseInt(form.selection, 10),
+    score: parseFloat(form.score),
+    table: selectedCardMeta.value.table
+  };
 
-    const updateStatus = {
-      PID: selectedCardMeta.value.pid,
-      SID: userStore.currentUser.sid,
-      status_two: 0,
-      table: selectedCardMeta.value.table
-    };
+  const updateStatus = {
+    PID: selectedCardMeta.value.pid,
+    SID: userStore.currentUser.sid,
+    status_two: 0,
+    table: selectedCardMeta.value.table
+  };
 
-    // const response1 = await submit_idx_score({ ...updateParams, table: selectedCardMeta.value.table });
-    // const response2 = await submit_status2({ ...updateStatus, table: selectedCardMeta.value.table });
+  let response1 = await submit_idx_score({ ...updateParams });
+  let response2 = await submit_status2({ ...updateStatus });
 
-    // 使用Promise.all来同时提交两个请求
-    const [response1, response2] = await Promise.all([
-      submit_idx_score(updateParams),
-      submit_status2(updateStatus)
-    ]);
+  const code1 = response1.code;
+  const code2 = response2.code;
 
-    if (response1 === 1 && response2 === 1){
-      ElMessage.success('提交成功, 如需修改请联系管理员');
-      console.log('表单提交成功', form);
-      alert('提交成功');
-    } else {
-      ElMessage.error('提交失败，请重新尝试！');
-    }
+  if (code1 === 200 && code2 === 200){
+    ElMessage.success('提交成功, 如需修改请联系管理员');
+    console.log('表单提交成功', form);
 
-  } catch (error) {
-    console.error('表单提交失败', error);
-    alert('提交失败');
+    // 清除输入框的值
+    form.selection = '';
+    form.score = '';
+    selectedCard.value = null;
+    selectedCardMeta.value = { pid: null, table: '' };
+
+  } else {
+    ElMessage.error('提交失败，请重新尝试！');
   }
 };
 
