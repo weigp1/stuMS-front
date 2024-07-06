@@ -54,11 +54,9 @@ const fetchData = async (categoryClass) => {
   try {
     rawData.value = [];
     const selectedCategories = categories.filter(category => category.class === categoryClass);
-    console.log(selectedCategories);
     for (const category of selectedCategories) {
       const params = { 'SID': userStore.currentUser.sid, 'table': category.table };
       const response = await select(params);
-      console.log(response.data);
       const formattedData = response.data.map(item => ({
         ...item,
         date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -68,7 +66,7 @@ const fetchData = async (categoryClass) => {
         status: item.status_two === 0 ? item.status_two : item.status_one,
         name: item.title,
         category: item.status_two === 0 ? 'overall' : 'personal',
-        remarks: item.remarks,
+        comment: item.comment,
         class: category.class
       }));
       rawData.value.push(...formattedData);
@@ -120,9 +118,8 @@ onMounted(() => {
 });
 
 // 弹窗显示完整的remarks内容
-const showRemarks = (remarks) => {
-  console.log('ok')
-  dialogContent.value = remarks;
+const showRemarks = (comment) => {
+  dialogContent.value = comment;
   dialogVisible.value = true;
 };
 
@@ -161,7 +158,7 @@ const handleDownload = async (link) => {
               <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.name }}</span></p>
               <p class="info-line">
                 <span class="label">
-                  <el-button type="primary" @click="showRemarks(item.remarks)" style="font-size: 1.9vh;margin-top: 0.5vh;">审核意见</el-button>
+                  <el-button type="primary" @click="showRemarks(item.comment)" style="font-size: 1.9vh;margin-top: 0.5vh;">审核意见</el-button>
                 </span> 
                 <span>
                 <el-button type="primary" @click="handleDownload(item.link)" style="font-size: 1.9vh;margin-top: 0.5vh;">证明材料</el-button>

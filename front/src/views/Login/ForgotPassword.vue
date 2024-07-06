@@ -21,7 +21,7 @@
           重置密码
         </el-button>
 
-        <el-button class="back" @click="router.push('/login');">
+        <el-button class="back" @click="router.push('/');">
           返回登录
         </el-button>
 
