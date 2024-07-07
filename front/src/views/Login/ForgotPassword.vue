@@ -78,15 +78,15 @@ async function ResetPassword() {
   }
   try {
     let confirminfo = { 
-      'SID': input_account.value,
-      'password': input_new_password.value
+      'toEmail': input_email.value, 
+      'userCode': input_verification_code.value 
     }
     let response = await confirmVerificationCode(confirminfo)
     const { code,data } = response
     if (code === 200) {
       let resetinfo = { 
-        'toEmail': input_email.value, 
-        'userCode': input_verification_code.value 
+        'SID': input_account.value,
+         'password': input_new_password.value
       }
       let response = await resetPassword(resetinfo)
       const { code,data } = response
