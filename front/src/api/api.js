@@ -165,20 +165,40 @@ function submitCopyright(params)
   });
 }
 
-function submit_idx_score(params)
-{
+// function submit_idx_score(params)
+// {
+//   return request({
+//     url: '/score/common/idx_score',
+//     method: 'PUT',
+//     mock: false,
+//     data: params,
+//   });
+// }
+
+function submit_idx_score(params) {
+  const queryString = Object.keys(params).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
   return request({
-    url: '/score/common/idx_score',
+    url: `/score-service/score/common/idx_score?${queryString}`,
     method: 'PUT',
     mock: false,
     data: params,
   });
 }
 
-function submit_status2(params)
-{
+// function submit_status2(params)
+// {
+//   return request({
+//     url: '/score/common/status_two',
+//     method: 'PUT',
+//     mock: false,
+//     data: params,
+//   });
+// }
+
+function submit_status2(params) {
+  const queryString = Object.keys(params).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
   return request({
-    url: '/score/common/status_two',
+    url: `/score-service/score/common/status_two?${queryString}`,
     method: 'PUT',
     mock: false,
     data: params,
