@@ -104,9 +104,7 @@ function hideContactInfo() {
 onMounted(async () => {
   const token = Cookies.get('authToken');
   const sid = Cookies.get('SID');
-  console.log('token:', token);
   if (token) {
-    console.log('token:', token);
     try {
       authStore.setToken(token);
       await userStore.login({ 'SID': sid })
