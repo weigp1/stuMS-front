@@ -23,34 +23,46 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from "vue";
+import {reactive, ref} from "vue";
+  import { select } from '../../api/api.js';
+  import {UserStore} from '../../stores/user.js';
+  const userStore = UserStore()
+
   // 默认显示
   const ScoreTableData = ref([
-    {
-      date: '2021',
-      gpa: 4.07,
-      gpa_rank: 12,
-      cep: 3.52,
-      ce: 4.422,
-      ce_rank: 2,
-    },
-    {
-      date: '2022',
-      gpa: 4.23,
-      gpa_rank: 2,
-      cep: 2.02,
-      ce: 4.432,
-      ce_rank: 1,
-    },
-    {
-      date: '2023',
-      gpa: 4.57,
-      gpa_rank: 1,
-      cep: 7.93,
-      ce: 5.363,
-      ce_rank: 1,
-    },
+    // {
+    //   date: '2021',
+    //   gpa: 4.07,
+    //   gpa_rank: 12,
+    //   cep: 3.52,
+    //   ce: 4.422,
+    //   ce_rank: 2,
+    // },
+    // {
+    //   date: '2022',
+    //   gpa: 4.23,
+    //   gpa_rank: 2,
+    //   cep: 2.02,
+    //   ce: 4.432,
+    //   ce_rank: 1,
+    // },
+    // {
+    //   date: '2023',
+    //   gpa: 4.57,
+    //   gpa_rank: 1,
+    //   cep: 7.93,
+    //   ce: 5.363,
+    //   ce_rank: 1,
+    // },
   ]);
+
+const form = reactive({
+  pid: "",
+
+
+});
+
+
 </script>
 
 <style scoped>

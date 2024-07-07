@@ -241,30 +241,30 @@ const transferredMap = {
 
 
 const form = reactive({
-  acceptance: "",
-  acceptance_date: "",
-  application_num: "",
-  certificate_num: "",
-  comment: "",
-  empower: "",
-  empower_date: "",
-  idx: "",
-  link: "",
-  link_name: "",
-  my_release: "",
-  pid: "",
-  release_date: "",
-  remarks: "",
-  score: "",
-  sid: "",
-  status_one: 0,
-  status_two: -1,
-  team: "",
-  title: "",
-  transferred: "",
-  transferred_date: "",
-  type: ""
-});
+    acceptance: "",
+    acceptance_date: "",
+    application_num: "",
+    certificate_num: "",
+    comment: "",
+    empower: "",
+    empower_date: "",
+    idx: "",
+    link: "",
+    link_name: "",
+    my_release: "",
+    pid: "",
+    release_date: "",
+    remarks: "",
+    score: "",
+    sid: "",
+    status_one: 0,
+    status_two: -1,
+    team: "",
+    title: "",
+    transferred: "",
+    transferred_date: "",
+    type: ""
+  });
 
 const file = ref<File | null>(null);
 
@@ -363,7 +363,7 @@ const submitForm = async (form) => {
     } else {
       ElMessage.error('提交失败!');
     }
-    
+
   } catch (error) {
     console.error('提交失败!', error);
   }

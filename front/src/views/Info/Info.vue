@@ -326,6 +326,8 @@ interface RuleForm {
   user_native: string
   emergency_name: string
   emergency_tel: string
+  personal: number
+  overall: number
 }
 
 const formSize = ref<ComponentSize>('large')
@@ -347,6 +349,8 @@ const ruleForm = reactive<RuleForm>({
   user_native: '',
   emergency_name: '',
   emergency_tel: '',
+  personal: 0,
+  overall: 0,
 })
 
 const typeMap = {
@@ -548,6 +552,8 @@ onMounted(async () => {
     ruleForm.user_native = userInfo.user_native;
     ruleForm.emergency_name = userInfo.emergency_name;
     ruleForm.emergency_tel = userInfo.emergency_tel;
+    ruleForm.overall = userInfo.overall;
+    ruleForm.personal = userInfo.personal;
   } catch (error) {
     console.error('Select 接口调用失败!', error);
   }
