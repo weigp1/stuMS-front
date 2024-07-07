@@ -101,19 +101,21 @@ function hideContactInfo() {
   showContact.value = false;
 }
 
-onMounted(() => {
+onMounted(async () => {
   const token = Cookies.get('authToken');
   const sid = Cookies.get('SID');
+  console.log('token:', token);
   if (token) {
-    authStore.setToken(token);
-    userStore.login({ 'SID': sid })
-        .then(() => {
-          router.push('/home');
-        })
-        .catch(error => {
-          console.error('Error:', error.message);
-          userStore.logout();
-        });
+    console.log('token:', token);
+    try {
+      authStore.setToken(token);
+      await userStore.login({ 'SID': sid })
+      router.push('/home');
+    } catch (error)
+    {
+      console.error('Error:', error.message);
+      userStore.logout();
+    };
   }
 });
 </script>

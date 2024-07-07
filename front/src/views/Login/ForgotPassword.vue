@@ -21,7 +21,7 @@
           重置密码
         </el-button>
 
-        <el-button class="back" @click="router.push('/');">
+        <el-button class="back" @click="router.push('/login');">
           返回登录
         </el-button>
 
@@ -86,7 +86,7 @@ async function ResetPassword() {
     if (code === 200) {
       let resetinfo = { 
         'SID': input_account.value,
-         'password': input_new_password.value
+        'password': input_new_password.value
       }
       let response = await resetPassword(resetinfo)
       const { code,data } = response
