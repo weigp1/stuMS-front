@@ -1,11 +1,20 @@
 <template>
-  <router-view />
-
+  <div id="app">
+    <router-view />
+  </div>
 </template>
 
 <script setup>
 </script>
 
-<style scoped>
+<style>
+::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 </style>
 

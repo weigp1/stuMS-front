@@ -177,13 +177,12 @@ const file = ref<File | null>(null);
 
 onMounted(async () => {
   try {
-    // console.log("currentUser:", userStore.currentUser)
     const params = {'SID': userStore.currentUser.sid, 'table': "volunteer"};
     // 调用 select 接口获取数据
     const response = await select(params);
     console.log('Select 接口调用成功!', response);
 
-    const filteredData = response.data.filter(item => item.status_one === 0);
+    const filteredData = response.data.filter(item => item.status_one === 1);
     // 更新 ContTableData
     VolTableData.value = filteredData.map(item => ({
       ...item,

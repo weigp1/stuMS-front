@@ -1,6 +1,6 @@
 <template>
-  <TopBar></TopBar>
   <el-row>
+    <TopBar></TopBar>
     <div class="centered">
 
       <el-col span="2">
@@ -23,6 +23,7 @@
       </el-col>
 
       <el-col span="22">
+
 <!--        基本信息-->
         <div class="right" v-if="showFirst">
           <el-form
@@ -299,10 +300,9 @@ import Work from "./Work.vue";
 import Contest from "./Contest.vue";
 import Paper from "./Paper.vue";
 // import Patent from "./Patent.vue"
-import TopBar from "../../components/TopBar.vue";
 
 import axios from "axios";
-import { reactive, ref, onMounted } from 'vue'
+import {reactive, ref, onMounted, computed} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
 
@@ -372,8 +372,6 @@ const genderMap = {
   1: "男",
   2: "女"
 };
-
-
 
 const userStore = UserStore();
 
@@ -569,6 +567,7 @@ import Exchange from "./Exchange.vue";
 import {select} from '../../api/api.js';
 import {format} from "date-fns";
 import {UserStore} from '../../stores/user.js'
+import TopBar from "../../components/TopBar.vue";
 const tabPosition = ref<TabsInstance['tabPosition']>('left')
 
 const activeName = ref('first')

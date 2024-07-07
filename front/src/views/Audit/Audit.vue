@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import TopBar from "../../components/TopBar.vue";
+import { ref, computed, onMounted, watch } from 'vue';
 import { ElCard, ElDialog, ElSelect, ElOption } from 'element-plus';
 import { useRoute } from "vue-router";
 import { UserStore } from '../../stores/user.js';
@@ -11,6 +10,7 @@ import { fileUrl } from '../../api/resource.js';
 import YesIcon from '../../assets/status/Yes.png';
 import WaitIcon from '../../assets/status/Wait.png';
 import NoIcon from '../../assets/status/No.png';
+import TopBar from "../../components/TopBar.vue";
 
 // 模拟从数据库读取的数据
 const rawData = ref([]);
@@ -25,7 +25,6 @@ const selectedOption = ref('政治思想道德');
 const options = ref([
   { value: '政治思想道德', label: '政治思想道德' },
   { value: '社会工作', label: '社会工作' },
-  { value: '文体实践', label: '文体实践' },
   { value: '竞赛成果', label: '竞赛成果' },
   { value: '论文成果', label: '论文成果' },
   { value: '专利成果', label: '专利成果' },
@@ -54,7 +53,6 @@ const fetchData = async (categoryClass) => {
   try {
     rawData.value = [];
     const selectedCategories = categories.filter(category => category.class === categoryClass);
-    console.log(selectedCategories);
     for (const category of selectedCategories) {
       const params = { 'SID': userStore.currentUser.sid, 'table': category.table };
       const response = await select(params);
@@ -64,16 +62,16 @@ const fetchData = async (categoryClass) => {
         link: item.link,
         link_name: item.link_name,
         score: item.score,
-        status: item.status_one === 1 ? item.status_two : item.status_one,
+        status: item.status_two === 0 ? item.status_two : item.status_one,
         name: item.title,
-        category: item.status_one === 1 ? 'overall' : 'personal',
-        remarks: item.remarks,
+        category: item.status_two === 0 ? 'overall' : 'personal',
+        comment: item.comment,
         class: category.class
       }));
       rawData.value.push(...formattedData);
     }
   } catch (error) {
-    console.error('Select 接口调用失败!', error);
+    console.error(error);
   }
 };
 
@@ -91,19 +89,6 @@ const filteredData = computed(() => {
   return data;
 });
 
-
-const getStatusText = (status) => {
-  if (status === 0) return '待审核';
-  if (status === 1) return '已通过';
-  if (status === 2) return '已驳回';
-};
-
-const getStatusStyle = (status) => {
-  if (status === 0) return { color: 'orange' };
-  if (status === 1) return { color: 'green' };
-  if (status === 2) return { color: 'red' };
-};
-
 const getStatusIcon = (status) => {
   if (status === 0) return WaitIcon;
   if (status === 1) return YesIcon;
@@ -120,18 +105,22 @@ const updateVisibility = () => {
   }
 };
 
-onMounted(() => {
-  fetchData(selectedOption.value);
+// 监听 route.query.category 的变化
+watch(() => route.query.category, (newCategory) => {
   updateVisibility();
+  fetchData(selectedOption.value);
+});
+
+onMounted(() => {
+  updateVisibility();
+  fetchData(selectedOption.value);
 });
 
 // 弹窗显示完整的remarks内容
-const showRemarks = (remarks) => {
-  console.log('ok')
-  dialogContent.value = remarks;
+const showRemarks = (comment) => {
+  dialogContent.value = comment;
   dialogVisible.value = true;
 };
-
 
 const handleDownload = async (link) => {
   const url = await fileUrl('credential', link);
@@ -142,7 +131,7 @@ const handleDownload = async (link) => {
 
 <template>
   <div class="box">
-    <TopBar />
+    <TopBar></TopBar>
     <div class="content">
       <div class="filter-bar">
         <el-select v-model="selectedOption" filterable placeholder="请选择" @change="fetchData(selectedOption)">
@@ -166,8 +155,14 @@ const handleDownload = async (link) => {
               <p class="info-line"><span class="label">类别:&nbsp</span> <span>{{ item.class }}</span></p>
               <p class="info-line"><span class="label">日期:&nbsp</span> <span>{{ item.date }}</span></p>
               <p class="info-line"><span class="label">奖项:&nbsp</span> <span>{{ item.name }}</span></p>
-              <p class="info-line"><span class="label">详细信息:&nbsp</span> <span><el-button type="primary" @click="showRemarks(item.remarks)">详 情</el-button></span></p>
-              <p class="info-line"><span class="label">证明材料:&nbsp</span> <span><el-button type="primary" @click="handleDownload(item.link)">查 看</el-button></span></p>
+              <p class="info-line">
+                <span class="label">
+                  <el-button type="primary" @click="showRemarks(item.comment)" style="font-size: 1.9vh;margin-top: 0.5vh;">审核意见</el-button>
+                </span> 
+                <span>
+                <el-button type="primary" @click="handleDownload(item.link)" style="font-size: 1.9vh;margin-top: 0.5vh;">证明材料</el-button>
+                </span>
+              </p>
             </div>
           </div>
         </el-card>
@@ -184,9 +179,8 @@ const handleDownload = async (link) => {
 
 <style scoped>
 .box {
-  top: 0;
-  min-height: 130vh;
   width: 100%;
+  min-height: 100vh; /* 确保背景图至少覆盖整个视口高度 */
   background-image: url("../../assets/background.jpg");
   background-size: cover;
   background-attachment: fixed;

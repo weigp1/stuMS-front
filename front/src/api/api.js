@@ -165,6 +165,45 @@ function submitCopyright(params)
   });
 }
 
+// function submit_idx_score(params)
+// {
+//   return request({
+//     url: '/score/common/idx_score',
+//     method: 'PUT',
+//     mock: false,
+//     data: params,
+//   });
+// }
+
+function submit_idx_score(params) {
+  const queryString = Object.keys(params).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
+  return request({
+    url: `/score-service/score/common/idx_score?${queryString}`,
+    method: 'PUT',
+    mock: false,
+    data: params,
+  });
+}
+
+// function submit_status2(params)
+// {
+//   return request({
+//     url: '/score/common/status_two',
+//     method: 'PUT',
+//     mock: false,
+//     data: params,
+//   });
+// }
+
+function submit_status2(params) {
+  const queryString = Object.keys(params).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
+  return request({
+    url: `/score-service/score/common/status_two?${queryString}`,
+    method: 'PUT',
+    mock: false,
+    data: params,
+  });
+}
 
 // /* 综测相关 */
 //
@@ -332,5 +371,5 @@ function submitCopyright(params)
 
 export {
   login, sendVerificationCode, confirmVerificationCode, resetPassword, getUser, select, deleteByPID, submitMorality, submitPaper, submitCompetition,
-  submitPatent, submitPublication, submitSocialWork, submitVolunteer, submitExchange, submitCopyright
+  submitPatent, submitPublication, submitSocialWork, submitVolunteer, submitExchange, submitCopyright, submit_idx_score, submit_status2
 };
