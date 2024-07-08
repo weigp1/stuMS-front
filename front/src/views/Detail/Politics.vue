@@ -80,7 +80,7 @@ const fetchData = async () => {
 
     // 过滤并提取 morality 表的所需字段
     const filteredMoralityData = moralityResponse.data
-        .filter(item => item.status_one === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2))
         .map(item => ({
           title: item.title,
           pid: item.pid,
@@ -90,7 +90,7 @@ const fetchData = async () => {
 
     // 过滤并提取 volunteer 表的所需字段
     const filteredVolunteerData = volunteerResponse.data
-        .filter(item => item.status_one === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2))
         .map(item => ({
           title: item.title,
           pid: item.pid,
@@ -157,6 +157,9 @@ const submitForm = async () => {
     form.score = '';
     selectedCard.value = null;
     selectedCardMeta.value = { pid: null, table: '' };
+
+    // 重新加载数据
+    await fetchData()
 
   } else {
     ElMessage.error('提交失败，请重新尝试！');

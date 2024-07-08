@@ -80,7 +80,7 @@ const fetchData = async () => {
     const publicationResponse = await select({ ...params, table: 'publication' });
 
     const filteredCompetitionData = competitionResponse.data
-        .filter(item => item.status_one === 1 && item.type === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2) && item.type === 1)
         .map(item => ({
           pid: item.pid,
           title: item.name,
@@ -89,7 +89,7 @@ const fetchData = async () => {
         }));
 
     const filteredPaperData = paperResponse.data
-        .filter(item => item.status_one === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2))
         .map(item => ({
           pid: item.pid,
           title: item.title,
@@ -98,7 +98,7 @@ const fetchData = async () => {
         }));
 
     const filteredPatentData = patentResponse.data
-        .filter(item => item.status_one === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2))
         .map(item => ({
           pid: item.pid,
           title: item.title,
@@ -107,7 +107,7 @@ const fetchData = async () => {
         }));
 
     const filteredCopyrightData = copyrightResponse.data
-        .filter(item => item.status_one === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2))
         .map(item => ({
           pid: item.pid,
           title: item.title,
@@ -116,7 +116,7 @@ const fetchData = async () => {
         }));
 
     const filteredPublicationData = publicationResponse.data
-        .filter(item => item.status_one === 1)
+        .filter(item => item.status_one === 1 && (item.status_two === -1 || item.status_two === 2))
         .map(item => ({
           pid: item.pid,
           title: item.title,
@@ -186,6 +186,9 @@ const submitForm = async () => {
     selectedCard.value = null;
     selectedCardMeta.value = { pid: null, table: '' };
 
+    // 重新加载数据
+    await fetchData()
+
   } else {
     ElMessage.error('提交失败，请重新尝试！');
   }
@@ -239,7 +242,7 @@ defineProps<{
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  top: 15vh;
+  top: 10vh;
   width: 80%;
   margin: 0 auto;
 }

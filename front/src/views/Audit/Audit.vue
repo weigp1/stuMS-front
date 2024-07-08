@@ -180,7 +180,7 @@ const handleDownload = async (link) => {
 <style scoped>
 .box {
   width: 100%;
-  min-height: 100vh; /* 确保背景图至少覆盖整个视口高度 */
+  min-height: 150vh; /* 确保背景图至少覆盖整个视口高度 */
   background-image: url("../../assets/background.jpg");
   background-size: cover;
   background-attachment: fixed;
