@@ -11,22 +11,23 @@
         highlight-current-row
     >
       <el-table-column fixed type="index" label="序号" width="65px"/>
-      <el-table-column prop="date" label="学年" sortable/>
+      <el-table-column prop="sch_year" label="学年" sortable/>
       <el-table-column prop="gpa" label="平均学分绩点"/>
-      <el-table-column prop="gpa_rank" label="绩点排名" sortable/>
-      <el-table-column prop="cep" label="综测加分"/>
-      <el-table-column prop="ce" label="综测分数"/>
-      <el-table-column prop="ce_rank" label="综测排名" sortable/>
+      <el-table-column prop="gpa_rk" label="绩点排名" sortable/>
+      <el-table-column prop="com_bonus_total" label="综测加分"/>
+      <el-table-column prop="com_score" label="综测分数"/>
+      <el-table-column prop="com_rk" label="综测排名" sortable/>
     </el-table>
   </el-row>
 
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
   import { select } from '../../api/api.js';
   import {UserStore} from '../../stores/user.js';
   const userStore = UserStore()
+
 
   // 默认显示
   const ScoreTableData = ref([
@@ -56,10 +57,39 @@ import {reactive, ref} from "vue";
     // },
   ]);
 
-const form = reactive({
-  pid: "",
+// const form = reactive({
+//   pid: '',
+//   sid: '',
+//   sch_year: '',
+//   gpa: '',
+//   gpa_rk: '',
+//   com_bonus_vo1: '',
+//   com_bonus1: '',
+//   com_bonus2: '',
+//   com_bonus3: '',
+//   com_bonus4: '',
+//   com_bonus_total: '',
+//   com_score: '',
+//   com_rk: ''
+// });
 
+onMounted(async () => {
+  try {
+    // console.log("currentUser:", userStore.currentUser)
+    const params = {'SID': userStore.currentUser.sid, 'table': "gpa"};
+    // 调用 select 接口获取数据
+    const response = await select(params);
+    console.log('Select 接口调用成功!', response);
 
+    const filteredData = response.data;
+    // 更新 ContTableData
+    ScoreTableData.value = filteredData.map(item => ({
+      ...item,
+    }));
+
+  } catch (error) {
+    console.error('Select 接口调用失败!', error);
+  }
 });
 
 
