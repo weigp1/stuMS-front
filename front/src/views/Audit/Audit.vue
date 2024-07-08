@@ -24,6 +24,7 @@ const selectedOption = ref('政治思想道德');
 // 选项数据
 const options = ref([
   { value: '政治思想道德', label: '政治思想道德' },
+  { value: '志愿工作', label: '志愿工作' },
   { value: '社会工作', label: '社会工作' },
   { value: '竞赛成果', label: '竞赛成果' },
   { value: '论文成果', label: '论文成果' },
@@ -39,7 +40,7 @@ const userStore = UserStore();
 
 const categories = [
   { table: "morality", class: "政治思想道德" },
-  { table: "volunteer", class: "政治思想道德" },
+  { table: "volunteer", class: "志愿工作" },
   { table: "socialwork", class: "社会工作" },
   { table: "competition", class: "竞赛成果" },
   { table: "paper", class: "论文成果" },
@@ -63,12 +64,14 @@ const fetchData = async (categoryClass) => {
         link_name: item.link_name,
         score: item.score,
         status: item.status_two === 0 ? item.status_two : item.status_one,
-        name: item.title,
+        name: item.name ? item.name : item.title,
         category: item.status_two === 0 ? 'overall' : 'personal',
         comment: item.comment,
         class: category.class
       }));
+      console.log(formattedData);
       rawData.value.push(...formattedData);
+      
     }
   } catch (error) {
     console.error(error);
