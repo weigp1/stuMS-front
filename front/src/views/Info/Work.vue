@@ -130,7 +130,7 @@ onMounted(async () => {
     const response = await select(params);
     console.log('Select 接口调用成功!', response);
 
-    const filteredData = response.data.filter(item => item.status_one === 0);
+    const filteredData = response.data.filter(item => item.status_one === 1);
     // 更新 ContTableData
     WorkTableData.value = filteredData.map(item => ({
       ...item,

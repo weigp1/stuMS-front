@@ -123,28 +123,4 @@ const switchScene = (scene: number) => {
   object-fit: cover;
 }
 
-.new-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.back-button {
-  width: 100px;
-  height: 30px;
-  margin: 0 20px;
-  transition: transform 0.3s ease;
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 2px solid #ccc;
-  border-radius: 5px;
-}
-
-.back-button:hover {
-  transform: scale(1.1);
-  background-color: rgba(255, 255, 255, 0.9);
-}
 </style>
