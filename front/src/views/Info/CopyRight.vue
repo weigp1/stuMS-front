@@ -234,11 +234,14 @@ const submitForm = async (form) => {
       const params = {'SID': userStore.currentUser.sid, 'table': "copyright"};
       const response2 = await select(params);
       // 更新 ContTableData
-      SoftwareCopyrightData.value = response2.data.map(item => ({
+      const filteredData = response2.data.filter(item => item.status_one === 1);
+      // 更新 ContTableData
+      SoftwareCopyrightData.value = filteredData.map(item => ({
         ...item,
-        date: format(new Date(item.date), 'yyyy-MM-dd'),
+        date: format(new Date(item.date), 'yyyy-MM-dd'), // 假设 date 是需要格式化的字段
         application_status: statusMaps[item.application_status],
         author_level: levelMaps[item.author_level],
+        // 如果 date 不是日期类型而是字符串，需要先转换为 Date 对象
       }));
       // 上传证明文件
       if (file.value) {

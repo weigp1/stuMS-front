@@ -24,6 +24,7 @@
 
 <script lang="ts" setup>
   import { ref } from "vue";
+  
   // 默认显示
   const ScoreTableData = ref([
     {

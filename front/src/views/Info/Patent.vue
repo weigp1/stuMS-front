@@ -340,7 +340,9 @@ const submitForm = async (form) => {
 
       // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
       // 更新 ContTableData
-      PatentTableData.value = response2.data.map(item => ({
+      const filteredData = response2.data.filter(item => item.status_one === 1);
+      // 更新 ContTableData
+      PatentTableData.value = filteredData.map(item => ({
         ...item,
         date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
         date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,

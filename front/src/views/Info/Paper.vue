@@ -485,8 +485,8 @@ const submitForm = async (form) => {
       const response2 = await select(params);
       console.log('Select 接口调用成功!', response2);
 
-      // 处理接口返回的数据，格式化日期字段为年月日（仅当 date 字段非空时）
-      const formattedData = response2.data.map(item => ({
+      const filteredData = response2.data.filter(item => item.status_one === 1);
+      const formattedData = filteredData.map(item => ({
         ...item,
         date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
         date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
@@ -504,8 +504,10 @@ const submitForm = async (form) => {
         collaborative_two: collaborativeTwoMap[item.collaborative_two],
         award_flag: awardFlagMap[item.award_flag],
       }));
+
       // 更新 ContTableData
       PaperTableData.value = formattedData;
+
       // 上传证明文件
       if (file.value) {
         await uploadFile('credential', form.link, file.value);
