@@ -150,21 +150,24 @@ const submitForm = async () => {
     const response = await submitMorality(form);
     console.log('提交表单为：',form);
     if (response.data === 1) {
-      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
-      dialogFormVisible.value = false;
+      MoraTableData.value = null
       const params = { 'SID': userStore.currentUser.sid, 'table': "morality" };
       const response2 = await select(params);
-      MoraTableData.value = response2.data.map(item => ({
+      const filteredData = response2.data.filter(item => item.status_one === 1);
+      MoraTableData.value = filteredData.map(item => ({
         ...item,
         date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
         date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
         date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
       }));
+
       // 上传证明文件
       if (file.value) {
         await uploadFile('credential', form.link, file.value);
         file.value = null; // 上传成功后清除文件
       }
+      dialogFormVisible.value = false;
+      ElMessage.success('提交成功, 请前往个人信息审核页面查看');
     } else {
       ElMessage.error('提交失败!');
     }
