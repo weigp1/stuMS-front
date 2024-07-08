@@ -63,9 +63,9 @@ const fetchData = async (categoryClass) => {
         link: item.link,
         link_name: item.link_name,
         score: item.score,
-        status: item.status_two === 0 ? item.status_two : item.status_one,
+        status: item.status_two !== -1 ? item.status_two : item.status_one,
         name: item.name ? item.name : item.title,
-        category: item.status_two === 0 ? 'overall' : 'personal',
+        category: item.status_two !== -1 ? 'overall' : 'personal',
         comment: item.comment,
         class: category.class
       }));
