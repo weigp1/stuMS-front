@@ -1,0 +1,35 @@
+卷 Data 的文件夹 PATH 列表
+卷序列号为 CCFB-0051
+D:.
++---node_modules
++---public
+|   \---image
+\---src
+    +---assets
+    |   \---status
+    +---components
+    |   +---common
+    |   +---crud
+    |   \---icon
+    +---composables
+    +---layout
+    |   +---header
+    |   |   \---components
+    |   +---sidebar
+    |   |   \---components
+    |   \---tags
+    +---router
+    +---store
+    |   \---modules
+    +---utils
+    \---views
+        +---audit
+        |   \---list
+        +---error-page
+        +---home
+        +---profile
+        +---student
+        |   +---info
+        |   \---list
+        \---user
+            \---list
