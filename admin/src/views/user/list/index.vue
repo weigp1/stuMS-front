@@ -43,6 +43,15 @@ onMounted(() => {
   $table.value?.handleSearch()
 })
 
+const initForm = {
+  SID: '',
+  password: '',
+  name: '',
+  role: whatRole.value,
+  grade: userStore.grade,
+  user_class: userStore.user_class,
+}
+
 const {
   modalVisible,
   modalLoading,
@@ -55,6 +64,7 @@ const {
   modalFormRef,
 } = useCRUD({
   name: '管理员',
+  initForm,
   doCreate: api.saveUser,
   doUpdate: api.UpdateUser,
   doDelete: api.deleteBackendUser,

@@ -11,6 +11,7 @@ const ACTIONS = {
 /**
  * @typedef {object} FormObject
  * @property {string} name - 名称
+ * @property {object} initForm - 初始表单对象
  * @property {Function} doCreate - 执行创建操作的函数
  * @property {Function} doDelete - 执行删除操作的函数
  * @property {Function} doUpdate - 执行更新操作的函数
@@ -21,7 +22,7 @@ const ACTIONS = {
  * 可复用的 CRUD 操作
  * @param {FormObject} options
  */
-export function useCRUD({ name, doCreate, doDelete, doUpdate, refresh }) {
+export function useCRUD({ name, initForm = {}, doCreate, doDelete, doUpdate, refresh }) {
   const modalVisible = ref(false) // 弹框显示
   /** @type {'add' | 'edit' | 'view'} 弹窗操作类型 */
   const modalAction = ref('')
@@ -30,10 +31,13 @@ export function useCRUD({ name, doCreate, doDelete, doUpdate, refresh }) {
   /** 弹窗标题 */
   const modalTitle = computed(() => ACTIONS[modalAction.value] + name) // 弹窗标题
 
+  const { formModel: modalForm, formRef: modalFormRef, validation } = useForm(initForm)
+
   /** 新增 */
   function handleAdd() {
     modalAction.value = 'add'
     modalVisible.value = true
+    modalForm.value = { ...initForm } // 使用初始表单
   }
 
   /** 修改 */
