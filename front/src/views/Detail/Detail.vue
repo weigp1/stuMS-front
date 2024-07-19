@@ -64,6 +64,7 @@ const switchScene = (scene: number) => {
 </script>
 
 <style scoped>
+
 .centered {
   display: flex;
   justify-content: center;
