@@ -192,30 +192,6 @@ defineProps<{
   position: relative;
 }
 
-.cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  top: 10vh;
-  width: 80%;
-  margin: 0 auto;
-}
-
-.card-layout{
-  width: 40vh;
-  min-width: 40vh;
-  border-radius: 20px;
-  height: 100%;
-  margin: 15px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.card-layout:hover {
-  transform: scale(1.05);
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
 .info-placeholder {
   display: flex;
   flex-direction: column;
@@ -247,29 +223,57 @@ defineProps<{
   border-radius: 20px;
 }
 
+.cards-container {
+  display: grid;
+  top: 10vh;
+  grid-template-columns: repeat(auto-fill, minmax(130vh, 1fr)); /* 自动填充卡片，最小宽度 30vh */
+  justify-content: center; /* 中央对齐 */
+  width: 80%;
+  margin: 0 auto;
+}
+
+.card-layout {
+  width: 100%; /* 确保卡片宽度适应网格列宽 */
+  border-radius: 20px;
+  height: auto; /* 高度自适应 */
+  cursor: pointer;
+  margin-top: 3vh;
+  transition: transform 0.3s ease;
+}
+
+.card-layout:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* 保持响应式设计 */
 @media (max-width: 1200px) {
-  .form-container {
-    flex-direction: column;
-    align-items: center;
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(40vh, 1fr)); /* 调整列宽以适应中等屏幕 */
   }
 
-  .form-layout, .info-layout {
-    width: 80%;
-    margin: 10px 0;
+  .card-layout {
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .form-layout, .info-layout {
-    width: 90%;
-    padding: 10%;
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(50vh, 1fr)); /* 调整列宽以适应小屏幕 */
+  }
+
+  .card-layout {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .form-layout, .info-layout {
+  .cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(70vw, 1fr)); /* 视口宽度适应 */
+  }
+
+  .card-layout {
     width: 100%;
-    padding: 15%;
   }
 }
 </style>

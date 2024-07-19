@@ -59,7 +59,9 @@ const fetchData = async (categoryClass) => {
       const response = await select(params);
       const formattedData = response.data.map(item => ({
         ...item,
-        date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+        date: item.date ? format(new Date(item.date), 'yyyy-MM-dd')
+            : (item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd')
+              : (item.acceptance_date ? format(new Date(item.acceptance_date), 'yyyy-MM-dd') : null)),
         link: item.link,
         link_name: item.link_name,
         score: item.score,
@@ -71,7 +73,7 @@ const fetchData = async (categoryClass) => {
       }));
       console.log(formattedData);
       rawData.value.push(...formattedData);
-      
+
     }
   } catch (error) {
     console.error(error);
@@ -161,7 +163,7 @@ const handleDownload = async (link) => {
               <p class="info-line">
                 <span class="label">
                   <el-button type="primary" @click="showRemarks(item.comment)" style="font-size: 1.9vh;margin-top: 0.5vh;">审核意见</el-button>
-                </span> 
+                </span>
                 <span>
                 <el-button type="primary" @click="handleDownload(item.link)" style="font-size: 1.9vh;margin-top: 0.5vh;">证明材料</el-button>
                 </span>
@@ -183,11 +185,15 @@ const handleDownload = async (link) => {
 <style scoped>
 .box {
   width: 100%;
-  min-height: 150vh; /* 确保背景图至少覆盖整个视口高度 */
+  min-height: 100vh; /* 确保背景图至少覆盖整个视口高度 */
   background-image: url("../../assets/background.jpg");
   background-size: cover;
   background-attachment: fixed;
+  background-repeat: no-repeat;
+  position: relative; /* 确保背景图相对于盒子位置 */
+  padding-bottom: 15vh; /* 确保背景图的下方没有空白 */
 }
+
 
 .content {
   top: 15vh;
@@ -265,7 +271,7 @@ const handleDownload = async (link) => {
 
 .card p {
   justify-content: center;
-  
+
 }
 
 .card-text .info-line {
