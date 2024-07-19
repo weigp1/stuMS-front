@@ -6,11 +6,6 @@
             "mainMenu": "noSub"
         },
         {
-            "index": "/info",
-            "label": "信息查询",
-            "mainMenu": "noSub"
-        },
-        {
             "index": "/plan",
             "label": "综测方案",
             "mainMenu": "noSub"
@@ -23,7 +18,17 @@
         {
             "index": "/audit",
             "label": "审核进度",
-            "mainMenu": "noSub"
+            "mainMenu": "hasSub"
+        },
+        {
+            "index": "personal",
+            "label": "个人信息",
+            "mainMenu": "/audit"
+        },
+        {
+            "index": "overall",
+            "label": "综测项目",
+            "mainMenu": "/audit"
         }
     ]
 }

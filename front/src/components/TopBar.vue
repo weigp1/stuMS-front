@@ -1,54 +1,68 @@
 <template>
-  <!-- 顶部导航栏的外层容器 -->
+  <el-image
+      src="/src/assets/topBar.png"
+      style="position: fixed; top: 0; left: 0; width: 100%; height: 15%; z-index: 998;"
+      alt="Top Bar"
+  />
 
-  <!-- 使用Element UI的el-menu组件来创建导航栏 -->
-  <el-menu class="topBar" router :default-active="this.$route.fullPath" mode="horizontal" :ellipsis="false">
-
-    <!-- 左侧的标题图片 -->
-    <el-menu-item style="position: absolute; left: 2%; height: 100%;" index="0">
-      <el-image style="width: 75%; height: auto;" src="/src/assets/sysu.png"/>
-    </el-menu-item>
-
-    <!-- 左右两侧的弹性盒子，用于自动填充剩余空间 -->
+  <el-menu class="topBar" router :default-active="route.fullPath" mode="horizontal" :ellipsis="false">
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
 
-    <!-- 遍历menuItems数组，渲染菜单项 -->
-    <template v-for="item in menuItems">
+    <el-menu-item style="position: absolute; left: 2vh; height: 100%; pointer-events: none;" index="0">
+      <el-image style="width: 100%; height: 100%;" src="/src/assets/sysu.png"/>
+    </el-menu-item>
 
-      <!-- 如果当前菜单项没有子菜单 -->
+    <template v-for="item in menuItems">
       <template v-if="item.mainMenu === 'noSub'">
-        <!-- 渲染一个el-menu-item -->
-        <el-menu-item :index="item.index" class="menu">{{ item.label }}</el-menu-item>
+        <el-menu-item :index="item.index" class="main_menu">{{ item.label }}</el-menu-item>
       </template>
 
-      <!-- 如果当前菜单项有子菜单 -->
       <template v-if="item.mainMenu === 'hasSub'">
-        <!-- 渲染一个el-sub-menu -->
-        <el-sub-menu :index="item.index">
-          <!-- 设置子菜单的标题 -->
-          <template #title>{{ item.label }}</template>
-          <!-- 遍历子菜单项 -->
+        <el-sub-menu :index="item.index" class="menu">
+          <template #title>
+            <span class="main_menu">{{ item.label }}</span>
+          </template>
           <template v-for="subItem in menuItems">
             <el-menu-item :index="item.index + '?category=' + subItem.index"
-                          v-if="subItem.mainMenu == item.index">
+                          v-if="subItem.mainMenu == item.index" class="submenu-item">
               {{ subItem.label }}
             </el-menu-item>
           </template>
         </el-sub-menu>
       </template>
-
     </template>
 
-    <!-- 右侧的弹性盒子，用于自动填充剩余空间 -->
+    <el-menu-item style="position: absolute; right: 2%; height: 100%; border-radius: 10px;" index="0">
+      <el-row>
+        <el-col :span="6">
+          <el-image style="width: 70%; height: auto; top: -12%;" src="/src/assets/avatar.png"/>
+        </el-col>
+        <el-col :span="10">
+          <div class="user" @click.stop="handleUserClick">{{ userName }}</div>
+        </el-col>
+        <el-col :span="8">
+          <div class="logout" @click.stop="handleLogoutClick">退出</div>
+        </el-col>
+      </el-row>
+    </el-menu-item>
+
     <div class="弹性盒子" :style="{ flexGrow: 1 }" />
   </el-menu>
 </template>
 
+<script lang="ts" setup>
+import { useRoute, useRouter} from 'vue-router';
+import { UserStore } from "../stores/user.js";
 
-<script lang="ts">
-import { defineComponent } from 'vue';
 // 导入菜单选项配置文件
 import config from '../config/config.json';
+import Cookies from 'js-cookie'
+import { AuthStore } from '../stores/auth'
+
+const router = useRouter()
+const route = useRoute()
+const authStore = AuthStore()
+const userStore = UserStore()
 
 interface MenuItem {
   index: string;
@@ -56,18 +70,24 @@ interface MenuItem {
   mainMenu: string;
 }
 
-export default defineComponent({
-  name: 'TopBar',
-  data() {
-    return {
-      menuItems: config.menuItems as MenuItem[]
-    }
-  },
-});
+const menuItems = config.menuItems as MenuItem[]
+
+const handleUserClick = () => {
+  router.push({ path: "/info" })
+}
+
+const handleLogoutClick = () => {
+  // 删除cookie
+  Cookies.remove('authToken')
+  Cookies.remove('SID')
+  // 跳转到登录页面
+  authStore.logout()
+}
+
+const userName = (userStore.currentUser?.name || '用户') + "，您好!"
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="scss">
 .topBar {
   position: fixed;
   top: 2.5%;
@@ -82,13 +102,58 @@ export default defineComponent({
 .menu {
   font-size: 18px;
   font-weight: bold;
-  color: #ffffff;
+  color: #ffffff !important; /* 白色字体 */
+}
+.main_menu {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff !important; /* 白色字体 */
 }
 
-//.sub-menu {
-//  font-size: 16px;
-//  font-weight: bold;
-//  color: #078d18;
-//}
+.main_menu:hover {
+  color: #0066ff !important;
+}
 
+.submenu-item {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center !important;
+  max-width: 135px !important;
+  width: 100%; /* 确保文本居中 */
+}
+
+.el-menu--horizontal.el-menu {
+  border-bottom: 0;
+}
+
+.el-menu--collapse .el-menu, .el-menu--popup {
+  min-width: 135px;
+}
+
+.user {
+  z-index: 999;
+  display: flex;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+.user:hover {
+  color: #0066ff; /* 鼠标悬停时的颜色 */
+  cursor: pointer; /* 鼠标悬停时的光标样式 */
+}
+
+.logout {
+  z-index: 999;
+  margin-left: 1.5vw;
+  display: flex;
+  font-size: 18px;
+  align-items: center; /* 垂直居中 */
+  justify-content: center;
+}
+
+.logout:hover {
+  color: #0066ff; /* 鼠标悬停时的颜色 */
+  cursor: pointer; /* 鼠标悬停时的光标样式 */
+}
 </style>

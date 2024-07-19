@@ -1,45 +1,65 @@
 <script setup>
-import AppHeader from './components/header/index.vue'
-import AppMain from './components/AppMain.vue'
-import Sidebar from './components/sidebar/index.vue'
-import AppTags from './components/tags/index.vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { NLayout, NLayoutSider } from 'naive-ui'
 
-import { useThemeStore } from '@/store'
-import { header, tags } from '~/setting'
+import AppHeader from './header/index.vue'
+import Sidebar from './sidebar/index.vue'
+import AppTags from './tags/index.vue'
 
-const { collapsed } = storeToRefs(useThemeStore())
+import { useTagStore, useThemeStore } from '@/store'
+import themes from '@/assets/themes'
+
+const themeStore = useThemeStore()
+const tagStore = useTagStore()
+const router = useRouter()
+
+// 缓存的路由名
+const keepAliveRouteNames = computed(() => {
+  const allRoutes = router.getRoutes()
+  const names = allRoutes.filter(route => route.meta?.keepAlive).map(route => route.name)
+  return names
+})
 </script>
 
 <template>
-  <n-layout has-sider wh-full>
+  <NLayout has-sider class="h-full w-full">
     <!-- 左侧边栏 -->
-    <n-layout-sider
+    <NLayoutSider
       bordered
       collapse-mode="width"
       :collapsed-width="64"
       :width="220"
       :native-scrollbar="false"
-      :collapsed="collapsed"
+      :collapsed="themeStore.collapsed"
     >
       <Sidebar />
-    </n-layout-sider>
+    </NLayoutSider>
     <!-- 右半部分 -->
-    <article flex-1 flex-col overflow-hidden>
+    <article class="flex flex-1 flex-col overflow-hidden">
       <!-- 头部 -->
       <header
-        :style="`height: ${header.height}px`"
-        flex items-center bg-white px-15 border-b bc-eee
+        class="flex items-center border-b-1 border-gray-200 border-b-solid px-4"
+        :style="{ height: `${themes.header.height}px` }"
       >
         <AppHeader />
       </header>
       <!-- 标签栏 -->
-      <section v-if="tags.visible" border-b bc-eee>
-        <AppTags :style="{ height: `${tags.height}px` }" />
+      <section v-if="themes.tags.visible" class="border-b border-gray-200 border-b-solid">
+        <AppTags :style="{ height: `${themes.tags.height}px` }" />
       </section>
       <!-- 主体内容 -->
-      <section flex-1 overflow-hidden>
-        <AppMain />
+      <section class="flex-1 overflow-hidden">
+        <RouterView v-slot="{ Component, route }">
+          <KeepAlive :include="keepAliveRouteNames">
+            <component
+              :is="Component"
+              v-if="tagStore.reloading"
+              :key="tagStore.aliveKeys[route.name] || route.fullPath"
+            />
+          </keepalive>
+        </RouterView>
       </section>
     </article>
-  </n-layout>
+  </NLayout>
 </template>

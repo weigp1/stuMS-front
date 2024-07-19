@@ -1,54 +1,48 @@
 import axios from 'axios';
-import EnvConfig from '../config';
-import { ElMessage } from 'element-plus';
-
+import EnvConfig from '../config/URL';
+import { AuthStore } from '../stores/auth'
+import { ElMessage, vLoading } from 'element-plus';
 
 // 创建axios实例
 const service = axios.create({
   baseURL: EnvConfig.baseApi,
+  timeout: 10000,
+  
 });
 
-// 请求之前
+// 请求之前的拦截器
 service.interceptors.request.use((req) => {
-  // jwt-token认证
-  const jwtToken = localStorage.getItem('jwtToken');
-  if (jwtToken) {
-    req.headers.Authorization = `Bearer ${jwtToken}`;
+  // 获取JWT Token
+  const { token } = AuthStore()
+  if (token) {
+    req.headers.token = token;
   }
   return req;
 });
 
-// 请求之后
-service.interceptors.response.use((res) => {
-  console.log(res.data);
-  const { code, data, msg } = res.data;
-  console.log(code);
-  if (code == 200) {
-    return data;
-  } 
-  else if(code == 101)
-  {
-    ElMessage.error('登录已过期，请重新登录！');
-    return Promise.reject(code);
+
+// 请求之后的拦截器
+service.interceptors.response.use(
+  (res) => {
+    const { code, data } = res.data
+    const authStore = AuthStore()
+    if (code === 4003) {
+      authStore.forceOffline()
+      return ;
+    }
+    return res.data;
+  },
+  (error) => {
+    ElMessage.error('网络请求出错！');
+    return Promise.reject(error);
   }
-  else if (code == 404) {
-    ElMessage.error('网络请求失败！');
-  } 
-  else {
-    ElMessage.error(msg || '网络请求异常！');
-    return Promise.reject(msg || '网络请求异常！');
-  }
-});
+);
 
 // 封装的核心函数
 function request(options) {
-  if (options.method.toLowerCase() == 'post') {
-    options.params = options.data;
-  }
-  //对mock的处理
-  let isMock = options.mock;
-  service.defaults.baseURL = isMock ? EnvConfig.mockApi : EnvConfig.baseApi;
-  return service(options);
+  let isMock = options.mock;  // 是否使用Mock
+  service.defaults.baseURL = isMock ? EnvConfig.mockApi : EnvConfig.baseApi;  // 根据标志设置axios实例的baseURL
+  return service(options);  // 返回axios实例发送请求后的Promise
 }
 
 export default request;
