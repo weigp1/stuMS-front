@@ -190,25 +190,7 @@ const userStore = UserStore()
 const dialogFormVisible = ref(false);
 // 默认显示
 const PatentTableData = ref([
-  // {
-  //   title: '智能家居控制系统',
-  //   type: '发明专利',
-  //   application_num: 'CN123456789A',
-  //   certificate_num: 'CN123456789B',
-  //   team: '张三, 李四, 王五',
-  //   acceptance: '是',
-  //   acceptance_date: '2023-01-15',
-  //   my_release: '是',
-  //   release_date: '2023-06-20',
-  //   empower: '是',
-  //   empower_date: '2023-12-25',
-  //   transferred: '否',
-  //   transferred_date: '',
-  //   transferred_income: '',
-  //   link_name: '智能家居控制系统专利证书',
-  //   link: 'https://example.com/patent1',
-  //   remarks: '暂无'
-  // },
+
 ]);
 
 const typeMap = {
@@ -241,36 +223,65 @@ const transferredMap = {
 
 
 const form = reactive({
-    acceptance: "",
-    acceptance_date: "",
-    application_num: "",
-    certificate_num: "",
-    comment: "",
-    empower: "",
-    empower_date: "",
-    idx: "",
-    link: "",
-    link_name: "",
-    my_release: "",
-    pid: "",
-    release_date: "",
-    remarks: "",
-    score: "",
-    sid: "",
-    status_one: 0,
-    status_two: -1,
-    team: "",
-    title: "",
-    transferred: "",
-    transferred_date: "",
-    type: ""
-  });
+  acceptance: "",
+  acceptance_date: "",
+  application_num: "",
+  certificate_num: "",
+  comment: "",
+  empower: "",
+  empower_date: "",
+  idx: "",
+  link: "",
+  link_name: "",
+  my_release: "",
+  pid: "",
+  release_date: "",
+  remarks: "",
+  score: "",
+  sid: "",
+  status_one: 0,
+  status_two: -1,
+  team: "",
+  title: "",
+  transferred: "",
+  transferred_date: "",
+  type: ""
+});
 
 const file = ref<File | null>(null);
 
+// onMounted(async () => {
+//   try {
+//     const params = {'SID': userStore.currentUser.sid, 'table': "patent"};
+//     // 调用 select 接口获取数据
+//     const response = await select(params);
+//     console.log('Select 接口调用成功!', response);
+//
+//     const filteredData = response.data.filter(item => item.status_one === 1);
+//     // 更新 ContTableData
+//     PatentTableData.value = filteredData.map(item => ({
+//       ...item,
+//       date: item.date ? format(new Date(item.date), 'yyyy-MM-dd') : null,
+//       date_end: item.date_end ? format(new Date(item.date_end), 'yyyy-MM-dd') : null,
+//       date_start: item.date_start ? format(new Date(item.date_start), 'yyyy-MM-dd') : null,
+//       acceptance_date: item.acceptance_date ? format(new Date(item.acceptance_date), 'yyyy-MM-dd') : null,
+//       empower_date: item.empower_date ? format(new Date(item.empower_date), 'yyyy-MM-dd') : null,
+//       release_date: item.release_date ? format(new Date(item.release_date), 'yyyy-MM-dd') : null,
+//       transferred_date: item.transferred_date ? format(new Date(item.transferred_date), 'yyyy-MM-dd') : null,
+//       type: typeMap[item.type],
+//       acceptance: acceptanceMap[item.acceptance],
+//       my_release: my_releaseMap[item.my_release],
+//       empower: empowerMap[item.empower],
+//       transferred: transferredMap[item.transferred]
+//     }));
+//
+//   } catch (error) {
+//     console.error('Select 接口调用失败!', error);
+//   }
+// });
+
 onMounted(async () => {
   try {
-    // console.log("currentUser:", userStore.currentUser)
     const params = {'SID': userStore.currentUser.sid, 'table': "patent"};
     // 调用 select 接口获取数据
     const response = await select(params);
@@ -299,6 +310,7 @@ onMounted(async () => {
   }
 });
 
+
 const deleteRow = async (index) => {
   try {
     const item = PatentTableData.value[index];
@@ -321,9 +333,9 @@ const submitForm = async (form) => {
   // 提交表单数据
   try {
     if (file.value) {
-        const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
-        form.link_name = file.value.name;
-        form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
+      const currentTime = new Date().toISOString().replace(/[:.]/g, '-');
+      form.link_name = file.value.name;
+      form.link = `${userStore.currentUser.sid}-${currentTime}-${file.value.name}`;
     }
     // 调用 submitPaper 函数提交表单数据
     const response = await submitPatent(form);
